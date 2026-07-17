@@ -1,0 +1,47 @@
+# ==========================
+# Data Processing
+# ==========================
+pandas
+numpy
+pyspark
+pyarrow
+
+# ==========================
+# AWS
+# ==========================
+boto3
+
+# ==========================
+# Visualization
+# ==========================
+matplotlib
+seaborn
+plotly
+
+# ==========================
+# Dashboard
+# ==========================
+streamlit
+
+# ==========================
+# Machine Learning
+# ==========================
+scikit-learn
+
+# ==========================
+# NLP / Semantic Search
+# ==========================
+sentence-transformers
+faiss-cpu
+
+# ==========================
+# Jupyter Notebook
+# ==========================
+jupyter
+ipykernel
+
+# ==========================
+# Utilities
+# ==========================
+python-dotenv
+tqdm
