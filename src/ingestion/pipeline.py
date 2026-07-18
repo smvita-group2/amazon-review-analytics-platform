@@ -38,6 +38,7 @@ def main():
         .select(*REVIEWS_COLUMNS)
     )
 
+    #testing
     # print(f"Reviews Rows : {reviews_df.count():,}")
     print("Reviews Dataset Loaded.")
 
@@ -57,6 +58,7 @@ def main():
         )
     )
 
+    #testing
     # print(f"Metadata Rows : {metadata_df.count():,}")
     print("Metadata Dataset Loaded.")
 
