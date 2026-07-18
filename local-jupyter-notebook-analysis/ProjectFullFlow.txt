@@ -1,0 +1,6306 @@
+
+Engineering Guide
+
+Part 1A
+Project Vision
+Repository Structure
+
+↓
+
+Part 1B
+S3
+Local Development
+Team Workflow
+
+↓
+
+Part 2A
+Bronze
+Silver
+Validation
+
+↓
+
+Part 2B
+EDA
+KPI Discovery
+Notebook → Production Mapping
+
+↓
+
+Part 3A
+Gold Visualization
+Gold Semantic
+Embeddings
+
+↓
+
+Part 3B
+EMR
+Glue
+CI/CD
+Deployment
+
+↓
+
+Part 4
+Development Standards
+Testing
+Documentation
+Demo
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 1A
+(Project Vision • System Architecture • Repository Structure)
+Version 4.0 (FINAL)
+===========================================================================================
+
+
+PROJECT OBJECTIVE
+===========================================================================================
+
+Develop a production-ready Product Intelligence Platform capable of processing
+large-scale Amazon Product Review datasets using Apache Spark on AWS while
+providing Business Intelligence and AI-powered Product Search through a
+single unified web application.
+
+The platform should follow modern Data Engineering practices and production
+software engineering standards.
+
+The final platform should support
+
+✓ Distributed Data Processing
+
+✓ Exploratory Data Analysis (EDA)
+
+✓ Business KPI Generation
+
+✓ Interactive Business Dashboards
+
+✓ AI Powered Semantic Product Search
+
+✓ Automated ETL Pipelines
+
+✓ Cloud Deployment
+
+✓ CI/CD
+
+✓ Production Monitoring
+
+The objective is not just to analyze data.
+
+The objective is to build a complete Product Intelligence Platform.
+
+
+
+===========================================================================================
+
+PROJECT PHILOSOPHY
+
+===========================================================================================
+
+The project consists of TWO completely different systems working together.
+
+──────────────────────────────────────────────────────────────────────────────
+
+SYSTEM 1
+
+DATA ENGINEERING PLATFORM
+
+Responsible for
+
+• Data Validation
+
+• Data Cleaning
+
+• Data Transformation
+
+• Data Integration
+
+• Exploratory Data Analysis
+
+• KPI Generation
+
+• Feature Engineering
+
+• Semantic Dataset Preparation
+
+• Embedding Generation
+
+Runs using
+
+Apache Spark
+
+Amazon EMR
+
+AWS Glue
+
+Amazon S3
+
+──────────────────────────────────────────────────────────────────────────────
+
+SYSTEM 2
+
+APPLICATION PLATFORM
+
+Responsible for
+
+Providing ONE interface to the user.
+
+The application contains TWO modules.
+
+Module 1
+
+AI Product Search
+
+(Chatbot)
+
+Module 2
+
+Business Analytics Dashboard
+
+(Tableau Embedded)
+
+Both modules are accessed from ONE Streamlit application.
+
+The user should never interact with two separate applications.
+
+Everything should feel like one unified Product Intelligence Platform.
+
+
+
+===========================================================================================
+
+FINAL SYSTEM ARCHITECTURE
+
+===========================================================================================
+
+
+                        Amazon Product Dataset
+                                  │
+                                  ▼
+
+                           Amazon S3 (Raw)
+
+                                  │
+
+                          Validation Pipeline
+
+                                  │
+
+                                  ▼
+
+                           Bronze Data Layer
+
+                                  │
+
+                                  ▼
+
+                           Silver Data Layer
+
+                     (Product Master Dataset)
+
+                                  │
+
+              ┌───────────────────┴───────────────────┐
+
+              ▼                                       ▼
+
+     Visualization Pipeline                 Semantic Pipeline
+
+              ▼                                       ▼
+
+ Gold Visualization Dataset             Gold Semantic Dataset
+
+              ▼                                       ▼
+
+      Tableau Dashboard                 Embedding Generation
+
+              │                                 │
+
+              ▼                                 ▼
+
+     Dashboard Module                   FAISS Vector Database
+
+              │                                 │
+
+              └─────────────────┬───────────────┘
+
+                                ▼
+
+                     Streamlit Application
+
+              ┌───────────────────────────────────────┐
+
+              │                                       │
+
+              │      AI Product Search                │
+
+              │                                       │
+
+              │      Analytics Dashboard              │
+
+              │                                       │
+
+              └───────────────────────────────────────┘
+
+                                │
+
+                                ▼
+
+                         Docker Container
+
+                                │
+
+                                ▼
+
+                            Amazon ECS
+
+                                │
+
+                                ▼
+
+                              End Users
+
+
+
+===========================================================================================
+
+ENGINEERING PRINCIPLES
+
+===========================================================================================
+
+Rule 1
+
+Silver is the Single Source of Truth.
+
+Nothing should read Bronze once Silver has been created.
+
+All downstream pipelines start from Silver.
+
+──────────────────────────────────────────────
+
+Rule 2
+
+Visualization and Semantic Search are completely independent pipelines.
+
+They only share one dataset.
+
+Silver Product Master.
+
+──────────────────────────────────────────────
+
+Rule 3
+
+Every notebook eventually becomes ONE production script.
+
+Notebook
+
+↓
+
+Validation
+
+↓
+
+Production Script
+
+↓
+
+EMR
+
+↓
+
+Glue
+
+──────────────────────────────────────────────
+
+Rule 4
+
+Business logic should NEVER remain inside notebooks.
+
+Notebook
+
+↓
+
+Prototype
+
+Production Script
+
+↓
+
+Reusable Production Code
+
+──────────────────────────────────────────────
+
+Rule 5
+
+Never engineer features before EDA.
+
+EDA should justify every engineered column.
+
+If a feature cannot be justified,
+
+it should not exist.
+
+──────────────────────────────────────────────
+
+Rule 6
+
+No hardcoded values.
+
+Never hardcode
+
+S3 Paths
+
+Bucket Names
+
+Regions
+
+Model Names
+
+Output Paths
+
+Credentials
+
+Spark Configuration
+
+Everything should come from configuration files.
+
+──────────────────────────────────────────────
+
+Rule 7
+
+Every production script should be
+
+Reusable
+
+Modular
+
+Idempotent
+
+Config Driven
+
+Well Logged
+
+Production Ready
+
+
+
+===========================================================================================
+
+FINAL GITHUB REPOSITORY STRUCTURE
+
+===========================================================================================
+
+product-intelligence-platform/
+
+│
+
+├── .github/
+│
+│   └── workflows/
+│       │
+│       ├── ci.yml
+│       ├── lint.yml
+│       ├── tests.yml
+│       └── deployment.yml
+│
+
+├── config/
+│
+│   ├── aws/
+│   ├── spark/
+│   ├── datasets/
+│   ├── models/
+│   └── logging/
+│
+
+├── data/
+│
+│   ├── sample/
+│   ├── bronze/
+│   ├── silver/
+│   └── gold/
+│
+
+├── notebooks/
+│
+
+├── src/
+│
+│   ├── data_pipeline/
+│   │
+│   │   ├── ingestion/
+│   │   ├── processing/
+│   │   ├── eda/
+│   │   ├── visualization/
+│   │   ├── semantic/
+│   │   └── embeddings/
+│   │
+│   ├── application/
+│   │
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── components/
+│   │   └── streamlit_app.py
+│   │
+│   ├── common/
+│   │
+│   └── utils/
+│
+
+├── scripts/
+│
+│   ├── local/
+│   ├── emr/
+│   └── glue/
+│
+
+├── glue_jobs/
+│
+
+├── dashboards/
+│
+
+├── reports/
+│
+
+├── docs/
+│
+
+├── tests/
+│
+
+├── requirements/
+│
+
+├── Dockerfile
+
+├── docker-compose.yml
+
+├── README.md
+
+├── requirements.txt
+
+└── .gitignore
+
+
+
+===========================================================================================
+
+REPOSITORY DESIGN PHILOSOPHY
+
+===========================================================================================
+
+GitHub stores
+
+Source Code
+
+Configuration
+
+Documentation
+
+Notebooks
+
+Tests
+
+Application Code
+
+Deployment Files
+
+CI/CD Pipelines
+
+
+Amazon S3 stores
+
+Datasets
+
+Reports
+
+Embeddings
+
+Logs
+
+Models
+
+Athena Results
+
+
+GitHub is NEVER used as storage.
+
+Amazon S3 is NEVER used as source code storage.
+
+
+===========================================================================================
+
+END OF PART 1A
+
+===========================================================================================
+
+Next
+
+PART 1B
+
+• Folder Responsibilities
+
+• Final S3 Structure
+
+• Local Development Environment
+
+• Local Development Workflow
+
+• Branch Strategy
+
+• Team Development Workflow
+
+• How Local → GitHub → EMR → Glue → Streamlit Works
+
+===========================================================================================
+===========================================================================================
+PART 1B BEGINS
+
+
+===========================================================================================
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 1B
+(Folder Responsibilities • S3 Architecture • Local Development Workflow)
+Version 4.0 (FINAL)
+===========================================================================================
+
+
+REPOSITORY RESPONSIBILITIES
+===========================================================================================
+
+Every folder inside the repository has ONE responsibility.
+
+A folder should never have multiple unrelated purposes.
+
+This makes the project easier to maintain and easier for new developers
+to understand.
+
+The repository is divided into
+
+Configuration
+
+↓
+
+Development
+
+↓
+
+Production
+
+↓
+
+Deployment
+
+↓
+
+Documentation
+
+
+
+===========================================================================================
+
+CONFIG DIRECTORY
+===========================================================================================
+
+config/
+
+Purpose
+
+Contains every configurable value used across the project.
+
+Nothing should ever be hardcoded inside the codebase.
+
+Contains
+
+AWS Configuration
+
+Spark Configuration
+
+Pipeline Configuration
+
+Dataset Configuration
+
+Model Configuration
+
+Logging Configuration
+
+Examples
+
+Bucket Name
+
+AWS Region
+
+Input Paths
+
+Output Paths
+
+Shuffle Partitions
+
+Executor Memory
+
+Embedding Model
+
+Chunk Size
+
+Temperature
+
+Vector Dimension
+
+Future Requirement
+
+Changing any environment should only require changing configuration,
+not modifying code.
+
+
+
+===========================================================================================
+
+DATA DIRECTORY
+===========================================================================================
+
+data/
+
+Purpose
+
+Only used during LOCAL DEVELOPMENT.
+
+Never store complete production datasets inside GitHub.
+
+Contains
+
+Sample datasets
+
+Temporary outputs
+
+Testing datasets
+
+Small parquet files
+
+Development validation
+
+Production datasets always belong inside Amazon S3.
+
+
+
+===========================================================================================
+
+NOTEBOOKS DIRECTORY
+===========================================================================================
+
+Purpose
+
+Used ONLY for
+
+Exploration
+
+Validation
+
+EDA
+
+Feature Prototyping
+
+Algorithm Experimentation
+
+Every notebook should answer
+
+"What should our production code do?"
+
+After validation
+
+↓
+
+Convert immediately
+
+↓
+
+Production Script
+
+Notebook Naming Convention
+
+01_Data_Validation.ipynb
+
+02_Bronze_to_Silver.ipynb
+
+03_EDA.ipynb
+
+04_Gold_Visualization.ipynb
+
+05_Gold_Semantic.ipynb
+
+06_Embeddings.ipynb
+
+07_Streamlit_Testing.ipynb (Optional)
+
+Temporary notebooks
+
+↓
+
+notebooks/experiments/
+
+Never keep temporary notebooks in the root.
+
+
+
+===========================================================================================
+
+SRC DIRECTORY
+===========================================================================================
+
+Purpose
+
+Contains ALL reusable production code.
+
+Everything inside src should be importable.
+
+Nothing here should depend on notebooks.
+
+Structure
+
+src/
+
+│
+
+├── data_pipeline/
+
+Contains
+
+Validation
+
+Cleaning
+
+Transformation
+
+EDA
+
+Visualization Pipeline
+
+Semantic Pipeline
+
+Embedding Generation
+
+────────────────────────────────────
+
+application/
+
+Contains
+
+Entire Streamlit Application
+
+Home Page
+
+Chatbot
+
+Dashboard
+
+Backend Services
+
+────────────────────────────────────
+
+common/
+
+Contains
+
+Constants
+
+Configuration Readers
+
+Logging
+
+Shared Classes
+
+Custom Exceptions
+
+────────────────────────────────────
+
+utils/
+
+Contains
+
+Reusable helper functions
+
+Spark Utilities
+
+Date Utilities
+
+Formatting
+
+Validation Helpers
+
+File Utilities
+
+Generic helper functions only.
+
+
+
+===========================================================================================
+
+SCRIPTS DIRECTORY
+===========================================================================================
+
+Purpose
+
+Contains executable entry points.
+
+Business logic NEVER lives here.
+
+Business logic always lives inside
+
+src/data_pipeline/
+
+scripts only execute that logic.
+
+Structure
+
+scripts/
+
+│
+
+├── local/
+
+Runs during local development.
+
+Reads local datasets.
+
+Validates notebook logic.
+
+────────────────────────────────────
+
+emr/
+
+Runs on Amazon EMR.
+
+Reads from S3.
+
+Writes to S3.
+
+Distributed Spark execution.
+
+────────────────────────────────────
+
+glue/
+
+Runs as AWS Glue Jobs.
+
+Uses same processing logic.
+
+Only execution environment changes.
+
+Example
+
+scripts/emr/bronze_to_silver.py
+
+↓
+
+imports
+
+↓
+
+src/data_pipeline/processing/bronze_to_silver.py
+
+Exactly the same processing module should also be imported by
+
+scripts/local/
+
+scripts/glue/
+
+This guarantees
+
+✓ Single codebase
+
+✓ No duplicated logic
+
+✓ Easier maintenance
+
+✓ Same output everywhere
+
+
+
+===========================================================================================
+
+APPLICATION DIRECTORY
+===========================================================================================
+
+The application should have ONE entry point.
+
+Users should never directly interact with Tableau or FAISS.
+
+Everything starts from Streamlit.
+
+Application Structure
+
+Home
+
+↓
+
+Choose Module
+
+↓
+
+AI Product Search
+
+OR
+
+Analytics Dashboard
+
+The application should only consume finished Gold datasets.
+
+It should never perform ETL.
+
+
+
+===========================================================================================
+
+FINAL AMAZON S3 STRUCTURE
+===========================================================================================
+
+amazon-product-intelligence/
+
+│
+
+├── raw/
+│
+│   reviews/
+│
+│   metadata/
+│
+
+────────────────────────────────────────────
+
+├── bronze/
+│
+│   validated_reviews/
+│
+│   validated_metadata/
+│
+
+────────────────────────────────────────────
+
+├── silver/
+│
+│   product_master/
+│
+│      product_master.parquet
+│
+
+────────────────────────────────────────────
+
+├── gold/
+│
+│   visualization/
+│
+│      visualization_master.parquet
+│
+│
+│   semantic/
+│
+│      semantic_master.parquet
+│
+
+────────────────────────────────────────────
+
+├── embeddings/
+│
+│   vectors/
+│
+│   faiss/
+│
+│   metadata/
+│
+
+────────────────────────────────────────────
+
+├── reports/
+│
+
+────────────────────────────────────────────
+
+├── logs/
+│
+
+────────────────────────────────────────────
+
+├── athena-results/
+│
+
+────────────────────────────────────────────
+
+└── models/
+    (Future ML models)
+
+
+
+===========================================================================================
+
+WHY BRONZE → SILVER → GOLD?
+===========================================================================================
+
+RAW
+
+Original dataset.
+
+Never modified.
+
+────────────────────────────
+
+BRONZE
+
+Validated copy.
+
+Schema verified.
+
+No business logic.
+
+────────────────────────────
+
+SILVER
+
+Clean
+
+Merged
+
+Standardized
+
+Reusable
+
+Single Source of Truth.
+
+────────────────────────────
+
+GOLD
+
+Business Ready
+
+Purpose Specific
+
+Visualization
+
+Semantic Search
+
+Future ML
+
+Each Gold dataset serves exactly one purpose.
+
+
+
+===========================================================================================
+
+LOCAL DEVELOPMENT WORKFLOW
+===========================================================================================
+
+Developer
+
+↓
+
+Git Pull
+
+↓
+
+Create Virtual Environment
+
+↓
+
+Install Dependencies
+
+↓
+
+Launch Jupyter Notebook
+
+↓
+
+Develop ONE notebook
+
+↓
+
+Validate Results
+
+↓
+
+Convert into Production Script
+
+↓
+
+Run scripts/local/
+
+↓
+
+Compare Outputs
+
+↓
+
+Commit
+
+↓
+
+Push
+
+Never develop multiple notebooks before creating production scripts.
+
+
+
+===========================================================================================
+
+BRANCH STRATEGY
+===========================================================================================
+
+main
+
+↓
+
+Stable Production Branch
+
+────────────────────────────
+
+develop
+
+↓
+
+Integration Branch
+
+────────────────────────────
+
+feature/
+
+Examples
+
+feature/eda
+
+feature/visualization
+
+feature/semantic
+
+feature/streamlit
+
+feature/emr
+
+OR
+
+experiment/
+
+experiment/affaan
+
+experiment/member_name
+
+Every feature should be developed independently.
+
+Merge only after review.
+
+Never push directly to main.
+
+
+
+===========================================================================================
+
+TEAM DEVELOPMENT WORKFLOW
+===========================================================================================
+
+Create Branch
+
+↓
+
+Develop Notebook
+
+↓
+
+Validate
+
+↓
+
+Create Production Script
+
+↓
+
+Run Local Script
+
+↓
+
+Outputs Match
+
+↓
+
+Commit
+
+↓
+
+Push
+
+↓
+
+Pull Request
+
+↓
+
+Review
+
+↓
+
+Merge
+
+↓
+
+Delete Feature Branch
+
+
+
+===========================================================================================
+
+HOW EVERYTHING WORKS TOGETHER
+===========================================================================================
+
+Developer
+
+↓
+
+GitHub Repository
+
+↓
+
+Notebook Development
+
+↓
+
+Validation
+
+↓
+
+Production Script
+
+↓
+
+Git Commit
+
+↓
+
+GitHub Push
+
+↓
+
+Clone on Amazon EMR
+
+↓
+
+Run scripts/emr/
+
+↓
+
+Read Raw Data from Amazon S3
+
+↓
+
+Create Bronze
+
+↓
+
+Create Silver
+
+↓
+
+Perform EDA
+
+↓
+
+Create Gold Visualization
+
+↓
+
+Create Gold Semantic
+
+↓
+
+Generate Embeddings
+
+↓
+
+Store everything back into Amazon S3
+
+↓
+
+AWS Glue automates the same execution
+
+↓
+
+Tableau reads Gold Visualization
+
+↓
+
+FAISS reads Embeddings
+
+↓
+
+Streamlit becomes the single entry point
+
+↓
+
+Users access
+
+• AI Product Search
+
+• Analytics Dashboard
+
+
+
+===========================================================================================
+
+END OF PART 1B
+
+===========================================================================================
+
+Next
+
+PART 2A
+
+• Bronze Layer
+
+• Validation Framework
+
+• Data Quality Standards
+
+• Silver Layer
+
+• Notebook → Production Script Development
+
+===========================================================================================
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PART 2A BEGINS
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 2A
+(Bronze Layer • Silver Layer • Validation Framework)
+Version 2.0
+===========================================================================================
+
+
+PROJECT PRINCIPLE
+===========================================================================================
+
+The objective of Bronze and Silver is NOT to create business KPIs.
+
+Their objective is to create one reliable, reusable and production-ready master dataset
+that every downstream pipeline can trust.
+
+Everything after Silver depends on the quality of Silver.
+
+If Silver is wrong,
+
+EDA is wrong.
+
+Visualization is wrong.
+
+Semantic Search is wrong.
+
+Embeddings are wrong.
+
+Dashboard is wrong.
+
+Everything starts here.
+
+
+===========================================================================================
+
+DATA FLOW
+===========================================================================================
+
+
+                 Raw JSON Files
+                        │
+                        ▼
+                Validation Notebook
+                        │
+                        ▼
+                 validation.py
+                        │
+                        ▼
+                 Bronze Layer
+                        │
+                Data Cleaning
+                Schema Standardization
+                Data Type Conversion
+                Record Validation
+                        │
+                        ▼
+             Bronze → Silver Script
+                        │
+                        ▼
+               Silver Product Master
+                        │
+                        ▼
+              Complete EDA (Part 2B)
+
+
+
+===========================================================================================
+
+BRONZE LAYER
+===========================================================================================
+
+Purpose
+
+Store validated raw data.
+
+Bronze should always resemble the original dataset.
+
+Do NOT
+
+Create KPIs
+
+Engineer Features
+
+Aggregate Products
+
+Create Sentiment
+
+Generate Bands
+
+Anything analytical.
+
+
+===========================================================================================
+
+INPUT DATA
+===========================================================================================
+
+Amazon Reviews Dataset
+
+4 Review Files
+
+Sports
+
+Musical Instruments
+
+Video Games
+
+Appliances
+
++
+
+4 Metadata Files
+
+Sports
+
+Musical Instruments
+
+Video Games
+
+Appliances
+
+
+Total
+
+8 JSONL Files
+
+
+===========================================================================================
+
+NOTEBOOK
+===========================================================================================
+
+01_Data_Validation.ipynb
+
+
+Purpose
+
+Understand the raw dataset.
+
+Nothing else.
+
+
+===========================================================================================
+
+TASKS
+===========================================================================================
+
+Read every Review Dataset.
+
+Read every Metadata Dataset.
+
+For EVERY dataset perform
+
+
+Read
+
+↓
+
+Schema Inspection
+
+↓
+
+Column Inspection
+
+↓
+
+Row Count
+
+↓
+
+Sample Records
+
+↓
+
+Missing Values
+
+↓
+
+Duplicate Records
+
+↓
+
+Null Distribution
+
+↓
+
+Data Types
+
+↓
+
+Nested Columns
+
+↓
+
+Invalid Records
+
+↓
+
+Encoding Issues
+
+↓
+
+Memory Usage
+
+↓
+
+Observations
+
+
+Repeat
+
+For all 8 datasets.
+
+
+===========================================================================================
+
+QUESTIONS TO ANSWER
+===========================================================================================
+
+How many rows?
+
+How many columns?
+
+Schema?
+
+Which columns contain null values?
+
+Which columns contain nested JSON?
+
+Are timestamps valid?
+
+Are prices numeric?
+
+Are ratings within 1-5?
+
+Are categories consistent?
+
+Which columns are required?
+
+Which columns will be useful later?
+
+Which columns can be ignored?
+
+
+Everything should be documented.
+
+Never assume.
+
+Verify.
+
+
+===========================================================================================
+
+OUTPUT OF NOTEBOOK
+===========================================================================================
+
+Validation Report
+
+Dataset Summary
+
+Schema Documentation
+
+Column Dictionary
+
+Missing Value Report
+
+Duplicate Report
+
+Data Quality Report
+
+
+===========================================================================================
+
+PRODUCTION SCRIPT
+===========================================================================================
+
+Notebook
+
+↓
+
+01_Data_Validation.ipynb
+
+↓
+
+Creates
+
+↓
+
+validation.py
+
+
+Purpose
+
+Perform exactly the same validation
+
+without Jupyter Notebook.
+
+
+Output
+
+Validation Logs
+
+Schema Reports
+
+Console Reports
+
+No transformed dataset.
+
+
+===========================================================================================
+
+VALIDATION CHECKLIST
+===========================================================================================
+
+✓ Every JSON file readable
+
+✓ No corrupted JSON
+
+✓ Schema extracted
+
+✓ Expected columns present
+
+✓ Row counts documented
+
+✓ Missing values reported
+
+✓ Duplicate counts reported
+
+✓ Data types validated
+
+✓ Timestamp readable
+
+✓ Encoding issues documented
+
+Only after this
+
+↓
+
+Move to Silver.
+
+
+===========================================================================================
+
+SILVER LAYER
+===========================================================================================
+
+Purpose
+
+Create ONE reusable Product Master Dataset.
+
+Silver is the
+
+Single Source of Truth.
+
+Nothing downstream should read Bronze.
+
+Everything should read Silver.
+
+
+===========================================================================================
+
+NOTEBOOK
+===========================================================================================
+
+02_Bronze_to_Silver.ipynb
+
+
+Purpose
+
+Convert raw Amazon data
+
+↓
+
+Clean Data
+
+↓
+
+Join Metadata
+
+↓
+
+Merge Categories
+
+↓
+
+Create Product Master
+
+
+===========================================================================================
+
+PIPELINE
+===========================================================================================
+
+
+Bronze
+
+↓
+
+Read Reviews
+
+↓
+
+Read Metadata
+
+↓
+
+Clean Reviews
+
+↓
+
+Clean Metadata
+
+↓
+
+Standardize Schema
+
+↓
+
+Convert Data Types
+
+↓
+
+Validate Records
+
+↓
+
+Join Review + Metadata
+
+↓
+
+Repeat for all Categories
+
+↓
+
+Merge Categories
+
+↓
+
+Create Product Master
+
+↓
+
+Save Silver
+
+
+
+===========================================================================================
+
+TRANSFORMATIONS
+===========================================================================================
+
+Review Dataset
+
+Remove invalid rows
+
+Convert timestamps
+
+Remove exact duplicates
+
+Handle missing values
+
+Validate ratings
+
+Validate helpful votes
+
+Validate verified_purchase
+
+
+Metadata Dataset
+
+Handle missing values
+
+Standardize categories
+
+Convert prices
+
+Extract product title
+
+Extract category
+
+Extract description
+
+Extract features
+
+Extract store
+
+
+No feature engineering.
+
+No KPIs.
+
+
+===========================================================================================
+
+JOIN VALIDATION
+===========================================================================================
+
+Join Key
+
+parent_asin
+
+
+After every join
+
+Validate
+
+Rows
+
+Missing Metadata
+
+Duplicate Products
+
+Products without Reviews
+
+Reviews without Metadata
+
+Category Distribution
+
+
+Never continue if joins fail.
+
+
+===========================================================================================
+
+MERGING
+===========================================================================================
+
+After every category
+
+Sports
+
+↓
+
+Silver Sports
+
+Music
+
+↓
+
+Silver Music
+
+Games
+
+↓
+
+Silver Games
+
+Appliances
+
+↓
+
+Silver Appliances
+
+↓
+
+Union
+
+↓
+
+Silver Product Master
+
+
+===========================================================================================
+
+SILVER DATASET OBJECTIVE
+===========================================================================================
+
+The Product Master should contain
+
+ONLY
+
+Clean
+
+Standardized
+
+Reusable
+
+Business-neutral columns.
+
+
+It should NOT contain
+
+Popularity Score
+
+Sentiment Score
+
+Price Bands
+
+Review Bands
+
+Rating Bands
+
+Embedding Text
+
+Chunk Text
+
+Dashboard KPIs
+
+Topic IDs
+
+Anything Gold related.
+
+
+===========================================================================================
+
+OUTPUT
+===========================================================================================
+
+Silver/
+
+product_master.parquet
+
+
+This dataset becomes
+
+The ONLY input
+
+for
+
+EDA
+
+Visualization
+
+Semantic Search
+
+Future ML Models
+
+Everything.
+
+
+===========================================================================================
+
+PRODUCTION SCRIPT
+===========================================================================================
+
+Notebook
+
+↓
+
+02_Bronze_to_Silver.ipynb
+
+↓
+
+Creates
+
+↓
+
+bronze_to_silver.py
+
+
+Responsibilities
+
+Read Bronze
+
+↓
+
+Clean
+
+↓
+
+Validate
+
+↓
+
+Join
+
+↓
+
+Merge
+
+↓
+
+Save Silver
+
+
+Nothing else.
+
+
+===========================================================================================
+
+VALIDATION FRAMEWORK
+===========================================================================================
+
+Every notebook
+
+Every production script
+
+Must pass exactly the same checks.
+
+
+Validation Level 1
+
+Read Success
+
+✓ Files exist
+
+✓ Read completed
+
+✓ Correct schema
+
+
+────────────────────────────────────
+
+Validation Level 2
+
+Quality
+
+✓ Missing values
+
+✓ Duplicates
+
+✓ Invalid Ratings
+
+✓ Invalid Prices
+
+✓ Invalid Categories
+
+
+────────────────────────────────────
+
+Validation Level 3
+
+Transformation
+
+✓ Join Success
+
+✓ Union Success
+
+✓ Category Counts
+
+✓ Product Counts
+
+
+────────────────────────────────────
+
+Validation Level 4
+
+Output
+
+✓ Row Count
+
+✓ Column Count
+
+✓ Schema
+
+✓ Data Types
+
+✓ Save Success
+
+
+===========================================================================================
+
+NOTEBOOK vs PRODUCTION SCRIPT
+===========================================================================================
+
+Notebook
+
+Purpose
+
+Explore
+
+Experiment
+
+Understand
+
+Visualize
+
+Document
+
+
+Production Script
+
+Purpose
+
+Repeatable
+
+Reusable
+
+Automated
+
+Runs on EMR
+
+Runs on Glue
+
+Runs without human intervention
+
+
+Notebook
+
+↓
+
+Discover logic
+
+↓
+
+Validate
+
+↓
+
+Production Script
+
+↓
+
+Automation
+
+
+Never
+
+Copy notebook cells directly into production.
+
+Refactor them.
+
+Make reusable functions.
+
+Remove print statements.
+
+Replace notebook-specific code with logging.
+
+Parameterize paths.
+
+Handle failures gracefully.
+
+
+===========================================================================================
+
+LOCAL VALIDATION
+===========================================================================================
+
+For every notebook
+
+Run notebook
+
+↓
+
+Save Output
+
+↓
+
+Run Production Script
+
+↓
+
+Compare
+
+Rows
+
+Columns
+
+Schema
+
+Data Types
+
+Category Counts
+
+Unique Products
+
+Missing Values
+
+Output Files
+
+
+If
+
+ANY
+
+difference exists
+
+↓
+
+Fix Script
+
+↓
+
+Run Again
+
+↓
+
+Only then
+
+Commit
+
+
+===========================================================================================
+
+END OF PART 2A
+===========================================================================================
+
+Next
+
+PART 2B
+
+• Complete EDA Development
+• KPI Discovery Framework
+• Business Insights
+• Notebook → Production Script Mapping
+• Local Testing Workflow
+• Documentation Standards
+• Development Best Practices
+
+===========================================================================================
+
+
+PART 2B BEGINS
+
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 2B
+(Complete EDA • KPI Discovery • Notebook → Production Mapping)
+Version 2.0
+===========================================================================================
+
+
+EDA PHILOSOPHY
+===========================================================================================
+
+EDA is NOT creating graphs.
+
+EDA is NOT just plotting charts.
+
+EDA is NOT just checking missing values.
+
+EDA means
+
+Understanding the dataset completely.
+
+The objective is to answer
+
+"What does our data tell us?"
+
+Every analysis performed should answer one of these
+
+• What exists?
+• Why does it exist?
+• Is it expected?
+• Is it useful?
+• Can we improve it?
+• Should this become a KPI?
+• Should this become a Gold feature?
+
+
+===========================================================================================
+
+INPUT
+===========================================================================================
+
+Silver Product Master
+
+This is now the ONLY dataset used.
+
+Bronze is never used again.
+
+All downstream development starts from Silver.
+
+
+===========================================================================================
+
+NOTEBOOK
+===========================================================================================
+
+03_EDA.ipynb
+
+
+Purpose
+
+Completely understand the Product Master Dataset before engineering
+any feature.
+
+
+===========================================================================================
+
+EDA DEVELOPMENT WORKFLOW
+===========================================================================================
+
+Silver Product Master
+
+↓
+
+Understand Dataset
+
+↓
+
+Validate Quality
+
+↓
+
+Explore Relationships
+
+↓
+
+Identify Patterns
+
+↓
+
+Generate Insights
+
+↓
+
+Identify Useful KPIs
+
+↓
+
+Justify Feature Engineering
+
+↓
+
+Gold Dataset Design
+
+
+Feature Engineering NEVER comes before EDA.
+
+
+===========================================================================================
+
+SECTION 1
+DATASET UNDERSTANDING
+===========================================================================================
+
+Answer
+
+How big is the dataset?
+
+How many products?
+
+How many categories?
+
+How many stores?
+
+How many sub categories?
+
+How many years?
+
+How many reviews?
+
+Schema
+
+Data Types
+
+Column Meanings
+
+Primary Keys
+
+Relationships
+
+Document everything.
+
+
+===========================================================================================
+
+SECTION 2
+DATA QUALITY
+===========================================================================================
+
+Perform
+
+Missing Value Analysis
+
+Duplicate Analysis
+
+Invalid Prices
+
+Invalid Ratings
+
+Invalid Categories
+
+Invalid Dates
+
+Outlier Detection
+
+Null Heatmaps
+
+Column Completeness
+
+Consistency Checks
+
+Every issue should have
+
+Cause
+
+Impact
+
+Solution
+
+
+===========================================================================================
+
+SECTION 3
+UNIVARIATE ANALYSIS
+===========================================================================================
+
+Analyse every important column individually.
+
+Examples
+
+Category Distribution
+
+Store Distribution
+
+Rating Distribution
+
+Price Distribution
+
+Helpful Votes
+
+Verified Purchases
+
+Review Length
+
+Review Counts
+
+Review Years
+
+Sentiment Distribution
+
+Document
+
+What
+
+Why
+
+Observation
+
+
+===========================================================================================
+
+SECTION 4
+BIVARIATE ANALYSIS
+===========================================================================================
+
+Find relationships.
+
+Examples
+
+Category vs Rating
+
+Category vs Reviews
+
+Category vs Price
+
+Price vs Rating
+
+Price vs Review Count
+
+Helpful Votes vs Rating
+
+Verified Purchase vs Rating
+
+Review Length vs Sentiment
+
+Store vs Average Rating
+
+Store vs Review Count
+
+Document
+
+Correlation
+
+Observation
+
+Business Meaning
+
+
+===========================================================================================
+
+SECTION 5
+MULTIVARIATE ANALYSIS
+===========================================================================================
+
+Examples
+
+Category
+
++
+
+Price
+
++
+
+Ratings
+
++
+
+Review Counts
+
+Store
+
++
+
+Rating
+
++
+
+Helpful Votes
+
+Time
+
++
+
+Category
+
++
+
+Sentiment
+
+Purpose
+
+Discover hidden patterns.
+
+
+===========================================================================================
+
+SECTION 6
+TIME SERIES ANALYSIS
+===========================================================================================
+
+Analyse
+
+Reviews per Year
+
+Product Growth
+
+Category Growth
+
+Store Growth
+
+Latest Review Year
+
+First Review Year
+
+Trend Analysis
+
+Growth Rate
+
+Document
+
+Business trend
+
+Growth
+
+Decline
+
+Seasonality (if applicable)
+
+
+===========================================================================================
+
+SECTION 7
+BUSINESS INSIGHTS
+===========================================================================================
+
+Every graph should produce
+
+One insight.
+
+Example
+
+Sports category receives the largest number of reviews.
+
+Products above $250 generally have fewer reviews.
+
+Stores with higher average ratings receive more verified purchases.
+
+Longer reviews usually receive more helpful votes.
+
+High review count often correlates with higher popularity.
+
+Every insight should be written in business language.
+
+Never
+
+"This graph shows..."
+
+Instead
+
+"The Sports & Outdoors category dominates customer engagement, indicating
+greater customer activity compared to other categories."
+
+
+===========================================================================================
+
+SECTION 8
+KPI DISCOVERY
+===========================================================================================
+
+This is the MOST IMPORTANT section.
+
+Do NOT create KPIs because they sound useful.
+
+Create KPIs because EDA proves they provide value.
+
+Examples
+
+Average Rating
+
+Average Helpful Votes
+
+Average Review Length
+
+Verified Purchase %
+
+Positive Review %
+
+Negative Review %
+
+Popularity Score
+
+Store Performance
+
+Product Performance
+
+Review Growth
+
+Category Share
+
+Product Market Share
+
+Every KPI must answer
+
+Why does this KPI exist?
+
+Who uses it?
+
+How is it calculated?
+
+Where will it be used?
+
+
+===========================================================================================
+
+FEATURE ENGINEERING DECISION
+===========================================================================================
+
+Example
+
+Price
+
+↓
+
+EDA shows
+
+Raw prices difficult to analyse
+
+↓
+
+Decision
+
+Create
+
+Price Band
+
+Reason
+
+Better dashboard visualization
+
+
+Example
+
+Review Counts
+
+↓
+
+Highly skewed
+
+↓
+
+Decision
+
+Review Count Bands
+
+Reason
+
+Improved comparison
+
+
+Example
+
+Popularity
+
+↓
+
+No direct metric
+
+↓
+
+Decision
+
+Popularity Score
+
+Reason
+
+Combine ratings + reviews
+
+
+Every Gold feature must be justified by EDA.
+
+
+===========================================================================================
+
+OUTPUTS OF EDA
+===========================================================================================
+
+EDA should produce
+
+EDA Report
+
+Business Insight Report
+
+KPI Documentation
+
+Feature Engineering Justification
+
+Data Dictionary Updates
+
+Visualization Requirements
+
+Semantic Requirements
+
+
+===========================================================================================
+
+PRODUCTION SCRIPT
+===========================================================================================
+
+Notebook
+
+↓
+
+03_EDA.ipynb
+
+↓
+
+Creates
+
+↓
+
+eda.py
+
+
+Responsibilities
+
+Generate statistics
+
+Generate KPIs
+
+Generate reports
+
+Validate dataset
+
+Export summary tables
+
+No dashboard creation.
+
+No embeddings.
+
+No semantic processing.
+
+
+===========================================================================================
+
+NOTEBOOK → PRODUCTION MAPPING
+===========================================================================================
+
+Notebook
+
+01_Data_Validation.ipynb
+
+↓
+
+validation.py
+
+────────────────────────────────────────
+
+Notebook
+
+02_Bronze_to_Silver.ipynb
+
+↓
+
+bronze_to_silver.py
+
+────────────────────────────────────────
+
+Notebook
+
+03_EDA.ipynb
+
+↓
+
+eda.py
+
+────────────────────────────────────────
+
+Notebook
+
+04_Gold_Visualization.ipynb
+
+↓
+
+silver_to_gold_visualization.py
+
+────────────────────────────────────────
+
+Notebook
+
+05_Gold_Semantic.ipynb
+
+↓
+
+silver_to_gold_semantic.py
+
+────────────────────────────────────────
+
+Notebook
+
+06_Embeddings.ipynb
+
+↓
+
+generate_embeddings.py
+
+
+This mapping should NEVER change.
+
+One notebook
+
+↓
+
+One production script
+
+
+===========================================================================================
+
+LOCAL TESTING STRATEGY
+===========================================================================================
+
+For every phase
+
+Notebook
+
+↓
+
+Validate
+
+↓
+
+Create Production Script
+
+↓
+
+Run Production Script
+
+↓
+
+Compare Outputs
+
+
+Compare
+
+Row Count
+
+Column Count
+
+Schema
+
+Missing Values
+
+Unique Products
+
+Category Counts
+
+Statistics
+
+KPIs
+
+Output Files
+
+If ANY value differs
+
+↓
+
+Fix Script
+
+↓
+
+Run Again
+
+↓
+
+Repeat until identical
+
+
+===========================================================================================
+
+DOCUMENTATION STANDARDS
+===========================================================================================
+
+Every notebook should answer
+
+What was done?
+
+Why was it done?
+
+How was it done?
+
+What was discovered?
+
+What business value was obtained?
+
+Every production script should include
+
+Purpose
+
+Input
+
+Output
+
+Dependencies
+
+Expected Runtime
+
+Validation Steps
+
+Failure Conditions
+
+
+===========================================================================================
+
+DEVELOPMENT BEST PRACTICES
+===========================================================================================
+
+✓ Never hardcode paths.
+
+✓ Read all paths from configuration.
+
+✓ Keep notebooks clean.
+
+✓ Keep production scripts modular.
+
+✓ Every script should be rerunnable.
+
+✓ Every transformation should be logged.
+
+✓ Validate after every major transformation.
+
+✓ Commit only working code.
+
+✓ Keep Silver generic.
+
+✓ Keep Gold purpose-specific.
+
+✓ Every feature should have business justification.
+
+✓ Every KPI should be documented.
+
+✓ Never skip validation because "it worked yesterday."
+
+
+===========================================================================================
+
+FINAL EDA DELIVERABLES
+===========================================================================================
+
+By the end of EDA we should have
+
+✓ Fully validated Silver Product Master
+
+✓ Complete EDA Report
+
+✓ Business Insights Report
+
+✓ Data Dictionary
+
+✓ KPI Documentation
+
+✓ Feature Engineering Decisions
+
+✓ Gold Visualization Requirements
+
+✓ Gold Semantic Requirements
+
+Only after these are complete
+
+↓
+
+Start Gold Layer Development.
+
+
+===========================================================================================
+
+END OF PART 2B
+===========================================================================================
+
+Next
+
+PART 3
+
+• Gold Visualization Pipeline
+• Gold Semantic Pipeline
+• EMR Production Workflow
+• Glue Automation
+• CI/CD Pipeline
+• Deployment Workflow
+• Monitoring
+• Team Git Strategy
+• Final Production Architecture
+
+===========================================================================================
+
+
+PART 3A BEGINS : 
+
+
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 3
+(Gold Layer • EMR Workflow • Glue Automation • CI/CD • Deployment)
+Version 2.0
+===========================================================================================
+
+
+PROJECT PHILOSOPHY
+===========================================================================================
+
+Silver is our Single Source of Truth.
+
+Nothing should ever read Bronze after Silver has been created.
+
+Every downstream pipeline starts from Silver.
+
+                     Silver Product Master
+                             │
+              ┌──────────────┴──────────────┐
+              ▼                             ▼
+      Visualization Pipeline         Semantic Pipeline
+              ▼                             ▼
+   Gold Visualization Dataset      Gold Semantic Dataset
+
+Both pipelines are completely independent.
+
+
+===========================================================================================
+GOLD LAYER
+===========================================================================================
+
+Purpose
+
+Gold datasets are business-ready datasets.
+
+Unlike Silver,
+
+Gold datasets are
+
+Purpose Specific
+
+Meaning
+
+Visualization Gold
+
+Contains ONLY
+
+Columns useful for dashboards.
+
+Semantic Gold
+
+Contains ONLY
+
+Columns useful for semantic retrieval.
+
+Never mix both.
+
+===========================================================================================
+VISUALIZATION PIPELINE
+===========================================================================================
+
+Notebook
+
+04_Gold_Visualization.ipynb
+
+↓
+
+Production Script
+
+silver_to_gold_visualization.py
+
+
+Input
+
+Silver Product Master
+
+
+Responsibilities
+
+Read Silver
+
+↓
+
+Create Business KPIs
+
+↓
+
+Engineer Dashboard Features
+
+↓
+
+Validate
+
+↓
+
+Save Gold Dataset
+
+
+===========================================================================================
+FEATURE ENGINEERING
+===========================================================================================
+
+Only create features justified by EDA.
+
+Examples
+
+Popularity Score
+
+Price Band
+
+Rating Band
+
+Review Count Band
+
+Helpful Vote Band
+
+Review Length Band
+
+Verified Purchase Band
+
+Sentiment Band
+
+Average Review Rating
+
+Review Percentages
+
+Store Performance
+
+Category Performance
+
+Product Performance
+
+Growth Indicators
+
+Market Share
+
+Every engineered column must have
+
+Purpose
+
+Formula
+
+Business Meaning
+
+===========================================================================================
+OUTPUT
+===========================================================================================
+
+gold/
+
+visualization/
+
+visualization_master.parquet
+
+
+This becomes the ONLY dataset used by
+
+Tableau
+
+Power BI
+
+Business Reports
+
+Executive Dashboards
+
+No dashboard should directly read Silver.
+
+===========================================================================================
+SEMANTIC PIPELINE
+===========================================================================================
+
+Notebook
+
+05_Gold_Semantic.ipynb
+
+↓
+
+Production Script
+
+silver_to_gold_semantic.py
+
+
+Responsibilities
+
+Read Silver
+
+↓
+
+Clean Text
+
+↓
+
+Merge Product Metadata
+
+↓
+
+Generate Product Document
+
+↓
+
+Prepare Semantic Dataset
+
+↓
+
+Save Gold
+
+
+===========================================================================================
+SEMANTIC DATASET
+===========================================================================================
+
+Examples
+
+Product Name
+
+Category
+
+Store
+
+Description
+
+Features
+
+Review Summary
+
+Combined Product Document
+
+Review Statistics
+
+Metadata
+
+Anything useful for semantic retrieval.
+
+Do NOT create embeddings here.
+
+This script only prepares data.
+
+===========================================================================================
+OUTPUT
+===========================================================================================
+
+gold/
+
+semantic/
+
+semantic_master.parquet
+
+
+===========================================================================================
+EMBEDDING PIPELINE
+===========================================================================================
+
+Notebook
+
+06_Embeddings.ipynb
+
+↓
+
+Production Script
+
+generate_embeddings.py
+
+
+Responsibilities
+
+Read Gold Semantic
+
+↓
+
+Generate Sentence Transformer Embeddings
+
+↓
+
+Validate Embedding Dimensions
+
+↓
+
+Save Embeddings
+
+↓
+
+Build FAISS Index
+
+
+Output
+
+embeddings/
+
+faiss/
+
+metadata/
+
+===========================================================================================
+LOCAL DEVELOPMENT FLOW
+===========================================================================================
+
+Notebook
+
+↓
+
+Validate
+
+↓
+
+Production Script
+
+↓
+
+Compare Outputs
+
+↓
+
+Commit
+
+↓
+
+Push
+
+Never skip comparison.
+
+===========================================================================================
+EMR DEVELOPMENT WORKFLOW
+===========================================================================================
+
+Step 1
+
+Launch EMR Cluster
+
+↓
+
+Step 2
+
+Clone GitHub Repository
+
+git clone
+
+↓
+
+Step 3
+
+Install Requirements
+
+↓
+
+Step 4
+
+Configure Spark
+
+↓
+
+Step 5
+
+Run Scripts
+
+
+validation.py
+
+↓
+
+bronze_to_silver.py
+
+↓
+
+eda.py
+
+↓
+
+silver_to_gold_visualization.py
+
+↓
+
+silver_to_gold_semantic.py
+
+↓
+
+generate_embeddings.py
+
+
+Every script should read/write directly to S3.
+
+No manual downloads.
+
+===========================================================================================
+EMR VALIDATION
+===========================================================================================
+
+Compare
+
+Notebook Results
+
+vs
+
+EMR Results
+
+Check
+
+Rows
+
+Columns
+
+Schemas
+
+KPIs
+
+Category Counts
+
+Statistics
+
+Output Files
+
+All values should match.
+
+===========================================================================================
+AWS GLUE WORKFLOW
+===========================================================================================
+
+Purpose
+
+Automate the production pipeline.
+
+Glue should execute
+
+The SAME production scripts.
+
+Never create different logic for Glue.
+
+===========================================================================================
+GLUE JOBS
+===========================================================================================
+
+Job 1
+
+Validation
+
+↓
+
+Job 2
+
+Bronze → Silver
+
+↓
+
+Job 3
+
+Silver → Gold Visualization
+
+↓
+
+Job 4
+
+Silver → Gold Semantic
+
+↓
+
+Job 5
+
+Generate Embeddings
+
+Every job should
+
+Read S3
+
+↓
+
+Transform
+
+↓
+
+Write S3
+
+↓
+
+Log Status
+
+===========================================================================================
+S3 FINAL STRUCTURE
+===========================================================================================
+
+amazon-product-intelligence/
+
+│
+
+├── raw/
+│
+│   ├── reviews/
+│   └── metadata/
+│
+├── bronze/
+│
+│   ├── validated_reviews/
+│   └── validated_metadata/
+│
+├── silver/
+│
+│   └── product_master/
+│
+├── gold/
+│
+│   ├── visualization/
+│   │
+│   │   visualization_master.parquet
+│   │
+│   └── semantic/
+│
+│       semantic_master.parquet
+│
+├── embeddings/
+│
+│   ├── vectors/
+│   ├── faiss/
+│   └── metadata/
+│
+├── reports/
+│
+├── logs/
+│
+├── athena-results/
+│
+└── scripts/
+
+===========================================================================================
+CI/CD PIPELINE
+===========================================================================================
+
+Developer
+
+↓
+
+Creates Feature
+
+↓
+
+Notebook Validation
+
+↓
+
+Production Script
+
+↓
+
+Git Commit
+
+↓
+
+Git Push
+
+↓
+
+GitHub Actions
+
+↓
+
+Run Unit Tests
+
+↓
+
+Run Code Quality Checks
+
+↓
+
+Build Docker Image
+
+↓
+
+Push Docker Image
+
+↓
+
+Amazon ECR
+
+↓
+
+Deploy to ECS
+
+↓
+
+Update Streamlit Application
+
+
+Data Processing (EMR/Glue)
+
+and
+
+Application Deployment (CI/CD)
+
+remain independent.
+
+===========================================================================================
+TEAM GIT WORKFLOW
+===========================================================================================
+
+main
+
+↓
+
+Stable Production Code
+
+────────────────────────────────────
+
+develop
+
+↓
+
+Integration Branch
+
+────────────────────────────────────
+
+experiment/affaan
+
+↓
+
+EDA
+
+Visualization
+
+Semantic
+
+Testing
+
+────────────────────────────────────
+
+experiment/shreyash
+
+────────────────────────────────────
+
+experiment/ankit
+
+────────────────────────────────────
+
+Feature Complete
+
+↓
+
+Pull Request
+
+↓
+
+Code Review
+
+↓
+
+Merge to develop
+
+↓
+
+Testing
+
+↓
+
+Merge to main
+
+Never push directly to main.
+
+===========================================================================================
+DEPLOYMENT WORKFLOW
+===========================================================================================
+
+GitHub
+
+↓
+
+GitHub Actions
+
+↓
+
+Docker Build
+
+↓
+
+Amazon ECR
+
+↓
+
+Amazon ECS
+
+↓
+
+Application Running
+
+↓
+
+Users Access Streamlit
+
+The data pipeline and deployment pipeline are independent.
+
+Updating the dashboard dataset does NOT require redeploying the application.
+
+===========================================================================================
+MONITORING
+===========================================================================================
+
+Monitor
+
+Glue Jobs
+
+EMR Execution
+
+Script Failures
+
+Execution Time
+
+Data Quality
+
+Missing Values
+
+Embedding Generation
+
+Application Health
+
+Container Status
+
+API Latency
+
+System Logs
+
+Every production script should generate
+
+Execution Logs
+
+Validation Reports
+
+Error Logs
+
+===========================================================================================
+PRODUCTION CHECKLIST
+===========================================================================================
+
+Before Production
+
+✓ Validation Passed
+
+✓ Silver Created
+
+✓ EDA Completed
+
+✓ KPIs Approved
+
+✓ Visualization Gold Created
+
+✓ Semantic Gold Created
+
+✓ Embeddings Generated
+
+✓ FAISS Built
+
+✓ EMR Output Verified
+
+✓ Glue Jobs Working
+
+✓ Dashboard Connected
+
+✓ Streamlit Tested
+
+✓ GitHub Updated
+
+✓ Documentation Updated
+
+===========================================================================================
+FINAL PRODUCTION FLOW
+===========================================================================================
+
+Developer
+
+↓
+
+Notebook
+
+↓
+
+Validation
+
+↓
+
+Production Script
+
+↓
+
+Git
+
+↓
+
+GitHub
+
+↓
+
+EMR
+
+↓
+
+Bronze
+
+↓
+
+Silver
+
+↓
+
+EDA
+
+↓
+
+Gold Visualization
+
+↓
+
+Gold Semantic
+
+↓
+
+Embeddings
+
+↓
+
+Glue Automation
+
+↓
+
+Tableau
+
+Power BI
+
+FAISS
+
+↓
+
+Streamlit
+
+↓
+
+Docker
+
+↓
+
+ECR
+
+↓
+
+ECS
+
+↓
+
+End Users
+
+===========================================================================================
+
+END OF PART 3
+===========================================================================================
+
+Next
+
+PART 4
+
+• Complete File Mapping (every notebook ↔ every .py ↔ every S3 folder)
+• Coding Standards
+• Logging Standards
+• Error Handling
+• Configuration Management
+• Testing Framework
+• Daily Team Workflow
+• Demo Day Execution Checklist
+• Future Scalability Plan
+
+===========================================================================================
+
+PART 3A BEGINS :
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 3A
+(Gold Layer • Visualization Pipeline • Semantic Pipeline)
+Version 4.0 (FINAL)
+===========================================================================================
+
+
+GOLD LAYER PHILOSOPHY
+===========================================================================================
+
+The Gold Layer contains business-ready datasets.
+
+Unlike Silver,
+
+Gold datasets are designed for specific business use cases.
+
+The Silver Product Master acts as the Single Source of Truth.
+
+Nothing reads Bronze.
+
+Nothing bypasses Silver.
+
+All downstream pipelines begin from the Silver Product Master.
+
+                         Silver Product Master
+                                  │
+               ┌──────────────────┴──────────────────┐
+               ▼                                     ▼
+     Visualization Pipeline                 Semantic Pipeline
+               ▼                                     ▼
+     Gold Visualization                 Gold Semantic
+               ▼                                     ▼
+        Tableau Dashboard          Embedding Generation
+               ▼                                     ▼
+       Streamlit Dashboard              AI Chatbot
+
+
+Each Gold dataset has ONE responsibility.
+
+Never mix visualization features with semantic features.
+
+
+===========================================================================================
+
+VISUALIZATION PIPELINE
+===========================================================================================
+
+Purpose
+
+Prepare a business-ready analytical dataset for
+
+Tableau
+
+Power BI
+
+Business Reports
+
+Executive Dashboards
+
+The Visualization pipeline should contain ONLY business related
+transformations.
+
+It should never contain embedding logic.
+
+
+===========================================================================================
+
+NOTEBOOK
+===========================================================================================
+
+04_Gold_Visualization.ipynb
+
+
+Purpose
+
+Prototype and validate every visualization feature before creating the
+production implementation.
+
+
+===========================================================================================
+
+PRODUCTION MODULE
+===========================================================================================
+
+Business Logic
+
+src/data_pipeline/visualization/
+
+Entry Point
+
+scripts/local/silver_to_gold_visualization.py
+
+scripts/emr/silver_to_gold_visualization.py
+
+scripts/glue/silver_to_gold_visualization.py
+
+
+Every execution environment imports the same reusable processing module.
+
+
+===========================================================================================
+
+INPUT
+===========================================================================================
+
+Silver Product Master
+
+
+===========================================================================================
+
+RESPONSIBILITIES
+===========================================================================================
+
+Read Silver Dataset
+
+↓
+
+Feature Engineering
+
+↓
+
+Business KPI Generation
+
+↓
+
+Validation
+
+↓
+
+Write Gold Visualization Dataset
+
+
+===========================================================================================
+
+FEATURE ENGINEERING
+===========================================================================================
+
+Features are created ONLY after EDA justifies them.
+
+Examples
+
+Popularity Score
+
+Price Band
+
+Rating Band
+
+Review Count Band
+
+Helpful Vote Band
+
+Review Length Band
+
+Verified Purchase Band
+
+Sentiment Band
+
+Store Performance
+
+Category Performance
+
+Product Performance
+
+Review Growth
+
+Review Percentages
+
+Market Share
+
+Every engineered feature must have
+
+Purpose
+
+Formula
+
+Business Justification
+
+Documentation
+
+
+===========================================================================================
+
+OUTPUT
+===========================================================================================
+
+Amazon S3
+
+↓
+
+gold/
+
+↓
+
+visualization/
+
+↓
+
+visualization_master.parquet
+
+
+Only this dataset should be connected to Tableau.
+
+Never connect Tableau directly to
+
+Raw
+
+Bronze
+
+Silver
+
+Semantic
+
+
+===========================================================================================
+
+VISUALIZATION VALIDATION
+===========================================================================================
+
+Validate
+
+✓ Row Count
+
+✓ Column Count
+
+✓ Missing Values
+
+✓ KPIs
+
+✓ Engineered Columns
+
+✓ Category Distribution
+
+✓ Business Metrics
+
+↓
+
+Connect Tableau
+
+↓
+
+Verify
+
+Dimensions
+
+Measures
+
+Filters
+
+Calculated Fields
+
+KPIs
+
+If Tableau works correctly,
+
+Visualization pipeline is considered validated.
+
+
+===========================================================================================
+
+SEMANTIC PIPELINE
+===========================================================================================
+
+Purpose
+
+Prepare a product-level semantic dataset for AI-powered product search.
+
+The objective is
+
+NOT
+
+to generate embeddings.
+
+The objective is
+
+to prepare the data that will later be embedded.
+
+
+===========================================================================================
+
+NOTEBOOK
+===========================================================================================
+
+05_Gold_Semantic.ipynb
+
+
+===========================================================================================
+
+PRODUCTION MODULE
+===========================================================================================
+
+Business Logic
+
+src/data_pipeline/semantic/
+
+Entry Point
+
+scripts/local/silver_to_gold_semantic.py
+
+scripts/emr/silver_to_gold_semantic.py
+
+scripts/glue/silver_to_gold_semantic.py
+
+
+===========================================================================================
+
+INPUT
+===========================================================================================
+
+Silver Product Master
+
+
+===========================================================================================
+
+RESPONSIBILITIES
+===========================================================================================
+
+Read Silver
+
+↓
+
+Clean Text
+
+↓
+
+Combine Metadata
+
+↓
+
+Generate Product Document
+
+↓
+
+Validate
+
+↓
+
+Write Gold Semantic Dataset
+
+
+===========================================================================================
+
+SEMANTIC DATASET
+===========================================================================================
+
+Examples
+
+Product Name
+
+Store
+
+Category
+
+Sub Category
+
+Description
+
+Features
+
+Review Summary
+
+Review Statistics
+
+Combined Product Document
+
+Metadata
+
+Clean Text
+
+Everything useful for semantic retrieval.
+
+Nothing related to dashboards.
+
+
+===========================================================================================
+
+IMPORTANT DESIGN DECISION
+===========================================================================================
+
+Initial prototype
+
+↓
+
+Review-level embeddings
+
+↓
+
+Problem
+
+Duplicate products returned
+
+Multiple reviews of the same product
+
+Poor user experience
+
+↓
+
+Final Design
+
+↓
+
+Product-level representation
+
+↓
+
+One document per product
+
+↓
+
+Higher quality retrieval
+
+↓
+
+Cleaner recommendations
+
+This design should remain unchanged.
+
+
+===========================================================================================
+
+OUTPUT
+===========================================================================================
+
+Amazon S3
+
+↓
+
+gold/
+
+↓
+
+semantic/
+
+↓
+
+semantic_master.parquet
+
+
+===========================================================================================
+
+EMBEDDING PIPELINE
+===========================================================================================
+
+Purpose
+
+Generate embeddings from
+
+Gold Semantic Dataset.
+
+Embeddings should NEVER be generated from Silver.
+
+
+===========================================================================================
+
+NOTEBOOK
+===========================================================================================
+
+06_Embeddings.ipynb
+
+
+===========================================================================================
+
+PRODUCTION MODULE
+===========================================================================================
+
+Business Logic
+
+src/data_pipeline/embeddings/
+
+Entry Point
+
+scripts/local/generate_embeddings.py
+
+scripts/emr/generate_embeddings.py
+
+scripts/glue/generate_embeddings.py
+
+
+===========================================================================================
+
+RESPONSIBILITIES
+===========================================================================================
+
+Read Gold Semantic
+
+↓
+
+Generate Sentence Transformer Embeddings
+
+↓
+
+Validate Dimensions
+
+↓
+
+Create FAISS Index
+
+↓
+
+Store Embeddings
+
+
+===========================================================================================
+
+OUTPUT
+===========================================================================================
+
+Amazon S3
+
+↓
+
+embeddings/
+
+↓
+
+vectors/
+
+↓
+
+faiss/
+
+↓
+
+metadata/
+
+
+===========================================================================================
+
+NOTEBOOK → PRODUCTION MAPPING
+===========================================================================================
+
+Notebook
+
+04_Gold_Visualization.ipynb
+
+↓
+
+Business Logic
+
+src/data_pipeline/visualization/
+
+↓
+
+Entry Points
+
+scripts/local/silver_to_gold_visualization.py
+
+scripts/emr/silver_to_gold_visualization.py
+
+scripts/glue/silver_to_gold_visualization.py
+
+
+──────────────────────────────────────────────────────────────────────
+
+
+Notebook
+
+05_Gold_Semantic.ipynb
+
+↓
+
+Business Logic
+
+src/data_pipeline/semantic/
+
+↓
+
+Entry Points
+
+scripts/local/silver_to_gold_semantic.py
+
+scripts/emr/silver_to_gold_semantic.py
+
+scripts/glue/silver_to_gold_semantic.py
+
+
+──────────────────────────────────────────────────────────────────────
+
+
+Notebook
+
+06_Embeddings.ipynb
+
+↓
+
+Business Logic
+
+src/data_pipeline/embeddings/
+
+↓
+
+Entry Points
+
+scripts/local/generate_embeddings.py
+
+scripts/emr/generate_embeddings.py
+
+scripts/glue/generate_embeddings.py
+
+
+===========================================================================================
+
+LOCAL VALIDATION WORKFLOW
+===========================================================================================
+
+Notebook
+
+↓
+
+Validate Logic
+
+↓
+
+Create Production Module
+
+↓
+
+Create Entry Point
+
+↓
+
+Run scripts/local/
+
+↓
+
+Compare Outputs
+
+Notebook
+
+vs
+
+Production
+
+↓
+
+Commit
+
+↓
+
+Push
+
+Never proceed to EMR until
+
+Notebook
+
+and
+
+Production
+
+produce identical outputs.
+
+
+===========================================================================================
+
+END OF PART 3A
+
+===========================================================================================
+
+Next
+
+PART 3B
+
+• Amazon EMR Workflow
+
+• AWS Glue Automation
+
+• CI/CD Pipeline
+
+• Docker
+
+• Amazon ECR
+
+• Amazon ECS
+
+• Monitoring
+
+• Final Production Execution Flow
+
+===========================================================================================
+
+
+===========================================================================================
+
+
+PART 3B BEGINS :
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 3B
+(EMR • Glue • CI/CD • Deployment • Monitoring)
+Version 4.0 (FINAL)
+===========================================================================================
+
+
+PRODUCTION PHILOSOPHY
+===========================================================================================
+
+Development happens locally.
+
+Validation happens locally.
+
+Production execution happens on AWS.
+
+Automation happens using AWS Glue.
+
+Application deployment happens independently from the data pipeline.
+
+The data pipeline and application pipeline should never depend on each other.
+
+===========================================================================================
+
+AMAZON EMR WORKFLOW
+===========================================================================================
+
+Purpose
+
+Amazon EMR is responsible for executing distributed Spark jobs on the complete
+Amazon Review dataset.
+
+EMR should execute exactly the same production code that was validated locally.
+
+No separate business logic should exist for EMR.
+
+
+===========================================================================================
+
+EMR EXECUTION FLOW
+===========================================================================================
+
+Developer
+
+↓
+
+Git Pull
+
+↓
+
+Clone GitHub Repository
+
+↓
+
+Install Project Dependencies
+
+↓
+
+Load Configuration
+
+↓
+
+Execute scripts/emr/
+
+↓
+
+Read Raw Dataset from Amazon S3
+
+↓
+
+Run Validation Pipeline
+
+↓
+
+Create Bronze Layer
+
+↓
+
+Create Silver Layer
+
+↓
+
+Run Complete EDA
+
+↓
+
+Generate Gold Visualization Dataset
+
+↓
+
+Generate Gold Semantic Dataset
+
+↓
+
+Generate Embeddings
+
+↓
+
+Write Outputs to Amazon S3
+
+↓
+
+Store Logs
+
+↓
+
+Execution Complete
+
+
+===========================================================================================
+
+EMR SCRIPT EXECUTION ORDER
+===========================================================================================
+
+scripts/emr/
+
+↓
+
+validation.py
+
+↓
+
+bronze_to_silver.py
+
+↓
+
+eda.py
+
+↓
+
+silver_to_gold_visualization.py
+
+↓
+
+silver_to_gold_semantic.py
+
+↓
+
+generate_embeddings.py
+
+
+Each script imports reusable modules from
+
+src/data_pipeline/
+
+
+===========================================================================================
+
+EMR RESPONSIBILITIES
+===========================================================================================
+
+Read datasets from S3
+
+Execute distributed PySpark jobs
+
+Store intermediate datasets
+
+Generate reports
+
+Generate Gold datasets
+
+Generate embeddings
+
+Generate logs
+
+Validate outputs
+
+Nothing should be executed manually once the workflow is finalized.
+
+
+===========================================================================================
+
+AWS GLUE WORKFLOW
+===========================================================================================
+
+Purpose
+
+AWS Glue automates the production pipeline.
+
+Glue should execute the same production logic used by Local and EMR.
+
+Only the execution environment changes.
+
+Business logic never changes.
+
+
+===========================================================================================
+
+GLUE EXECUTION ORDER
+===========================================================================================
+
+Glue Job 1
+
+Validation
+
+↓
+
+Glue Job 2
+
+Bronze → Silver
+
+↓
+
+Glue Job 3
+
+EDA Report Generation
+
+↓
+
+Glue Job 4
+
+Silver → Gold Visualization
+
+↓
+
+Glue Job 5
+
+Silver → Gold Semantic
+
+↓
+
+Glue Job 6
+
+Embedding Generation (Optional)
+
+↓
+
+Store Outputs in Amazon S3
+
+
+===========================================================================================
+
+GLUE RESPONSIBILITIES
+===========================================================================================
+
+Read S3
+
+↓
+
+Execute PySpark
+
+↓
+
+Write S3
+
+↓
+
+Generate Logs
+
+↓
+
+Notify Success or Failure
+
+
+Every Glue Job should be independently executable.
+
+A failure in one job should not corrupt completed datasets.
+
+
+===========================================================================================
+
+CI/CD PHILOSOPHY
+===========================================================================================
+
+CI/CD is ONLY responsible for application deployment.
+
+It is NOT responsible for ETL execution.
+
+Data Processing
+
+↓
+
+EMR + Glue
+
+Application Deployment
+
+↓
+
+GitHub Actions
+
+
+===========================================================================================
+
+CI/CD PIPELINE
+===========================================================================================
+
+Developer
+
+↓
+
+Commit Code
+
+↓
+
+Push GitHub
+
+↓
+
+GitHub Actions
+
+↓
+
+Run Unit Tests
+
+↓
+
+Run Linting
+
+↓
+
+Run Static Code Analysis
+
+↓
+
+Build Docker Image
+
+↓
+
+Push Docker Image to Amazon ECR
+
+↓
+
+Deploy Container to Amazon ECS
+
+↓
+
+Restart Streamlit Application
+
+↓
+
+Deployment Complete
+
+
+===========================================================================================
+
+DOCKER WORKFLOW
+===========================================================================================
+
+Purpose
+
+Package the complete Streamlit application into a portable container.
+
+The container should include
+
+Application
+
+Dependencies
+
+Configuration
+
+Retriever
+
+FAISS
+
+Services
+
+Everything required to run the application.
+
+The container should NOT contain
+
+Raw datasets
+
+Bronze
+
+Silver
+
+Gold
+
+These remain inside Amazon S3.
+
+
+===========================================================================================
+
+AMAZON ECR
+===========================================================================================
+
+Purpose
+
+Store Docker images.
+
+Flow
+
+GitHub Actions
+
+↓
+
+Docker Build
+
+↓
+
+Amazon ECR
+
+↓
+
+Amazon ECS
+
+
+===========================================================================================
+
+AMAZON ECS
+===========================================================================================
+
+Purpose
+
+Host the production Streamlit application.
+
+Responsibilities
+
+Run Docker Container
+
+Serve Users
+
+Monitor Container Health
+
+Restart Failed Containers
+
+Scale if required
+
+ECS should never execute Spark jobs.
+
+
+===========================================================================================
+
+APPLICATION EXECUTION FLOW
+===========================================================================================
+
+User
+
+↓
+
+Open Streamlit
+
+↓
+
+Home Page
+
+↓
+
+Choose Module
+
+────────────────────────────────────────────
+
+Option 1
+
+AI Product Search
+
+↓
+
+Semantic Search
+
+↓
+
+Retrieve Product Context
+
+↓
+
+LLM Response
+
+↓
+
+Return Product Recommendation
+
+────────────────────────────────────────────
+
+Option 2
+
+Analytics Dashboard
+
+↓
+
+Load Embedded Tableau Dashboard
+
+↓
+
+Read Gold Visualization Dataset
+
+↓
+
+Display Interactive Dashboard
+
+↓
+
+User Analysis
+
+
+===========================================================================================
+
+TABLEAU RESPONSIBILITIES
+===========================================================================================
+
+Tableau should connect ONLY to
+
+Gold Visualization Dataset
+
+Tableau should never connect to
+
+Raw
+
+Bronze
+
+Silver
+
+Gold Semantic
+
+Embeddings
+
+
+When Gold Visualization is refreshed
+
+↓
+
+Tableau automatically reflects the latest data.
+
+Dashboard design remains unchanged.
+
+
+===========================================================================================
+
+CHATBOT RESPONSIBILITIES
+===========================================================================================
+
+Chatbot reads
+
+Gold Semantic Dataset
+
+↓
+
+Embeddings
+
+↓
+
+FAISS Index
+
+↓
+
+Retriever
+
+↓
+
+LLM
+
+↓
+
+Response
+
+The chatbot should never read dashboard datasets.
+
+
+===========================================================================================
+
+MONITORING
+===========================================================================================
+
+Monitor
+
+Amazon EMR Jobs
+
+AWS Glue Jobs
+
+Spark Execution Time
+
+Pipeline Failures
+
+Validation Failures
+
+Missing Values
+
+Embedding Generation
+
+FAISS Creation
+
+Docker Container
+
+Amazon ECS Health
+
+Application Logs
+
+API Latency
+
+System Metrics
+
+
+===========================================================================================
+
+LOGGING
+===========================================================================================
+
+Every production script should generate
+
+Execution Start Time
+
+Execution End Time
+
+Input Dataset
+
+Output Dataset
+
+Rows Read
+
+Rows Written
+
+Execution Duration
+
+Validation Status
+
+Output Path
+
+Error Details
+
+Warnings
+
+Success Message
+
+
+Logs should be stored in
+
+Amazon S3/logs/
+
+
+===========================================================================================
+
+FINAL PRODUCTION EXECUTION FLOW
+===========================================================================================
+
+
+                     Developer
+
+                         │
+
+                         ▼
+
+                 GitHub Repository
+
+                         │
+
+                         ▼
+
+                 Local Development
+
+                         │
+
+                         ▼
+
+                Notebook Validation
+
+                         │
+
+                         ▼
+
+             Production Business Logic
+
+          src/data_pipeline/
+
+                         │
+
+                         ▼
+
+         scripts/local/ (Validation)
+
+                         │
+
+                         ▼
+
+                  Git Commit
+
+                         │
+
+                         ▼
+
+                  GitHub Push
+
+                         │
+
+                         ▼
+
+               Clone on Amazon EMR
+
+                         │
+
+                         ▼
+
+                scripts/emr/
+
+                         │
+
+                         ▼
+
+                 Read Raw Data (S3)
+
+                         │
+
+                         ▼
+
+                    Bronze Layer
+
+                         │
+
+                         ▼
+
+                    Silver Layer
+
+                         │
+
+            ┌────────────┴────────────┐
+
+            ▼                         ▼
+
+    Visualization Pipeline     Semantic Pipeline
+
+            ▼                         ▼
+
+ Gold Visualization        Gold Semantic
+
+            ▼                         ▼
+
+ Tableau Dashboard       Embeddings + FAISS
+
+            │                         │
+
+            └────────────┬────────────┘
+
+                         ▼
+
+               Streamlit Application
+
+                         │
+
+                         ▼
+
+                Docker Container
+
+                         │
+
+                         ▼
+
+                  Amazon ECR
+
+                         │
+
+                         ▼
+
+                  Amazon ECS
+
+                         │
+
+                         ▼
+
+                    End Users
+
+
+===========================================================================================
+
+PROJECT SUCCESS CRITERIA
+===========================================================================================
+
+The project is considered complete when
+
+✓ Raw dataset validated
+
+✓ Bronze layer created
+
+✓ Silver Product Master created
+
+✓ Complete EDA documented
+
+✓ Business KPIs finalized
+
+✓ Gold Visualization dataset generated
+
+✓ Gold Semantic dataset generated
+
+✓ Embeddings generated
+
+✓ FAISS index created
+
+✓ EMR pipeline validated
+
+✓ Glue jobs automated
+
+✓ Tableau dashboards completed
+
+✓ Tableau embedded in Streamlit
+
+✓ AI Product Search integrated
+
+✓ Streamlit application deployed
+
+✓ Docker container deployed
+
+✓ Amazon ECS deployment successful
+
+✓ CI/CD pipeline operational
+
+✓ Documentation completed
+
+✓ GitHub repository production ready
+
+
+===========================================================================================
+
+END OF PART 3B
+===========================================================================================
+
+Next
+
+PART 4
+
+• Coding Standards
+
+• Testing Strategy
+
+• Team Workflow
+
+• Documentation Standards
+
+• Final Demo Execution Checklist
+
+• Project Maintenance
+
+===========================================================================================
+
+===========================================================================================
+
+PART 4 (Final) BEGINS :
+
+
+===========================================================================================
+PRODUCT INTELLIGENCE PLATFORM
+ENGINEERING DEVELOPMENT GUIDE
+PART 4
+(Development Standards • Testing • Documentation • Demo Execution)
+Version 4.0 (FINAL)
+===========================================================================================
+
+
+PROJECT DEVELOPMENT STANDARDS
+===========================================================================================
+
+The objective of this guide is to ensure that every team member follows the
+same engineering standards throughout the project.
+
+Every notebook
+
+Every production script
+
+Every dashboard
+
+Every documentation update
+
+should follow these standards.
+
+A consistent codebase is easier to understand, maintain and extend.
+
+
+===========================================================================================
+
+CODING STANDARDS
+===========================================================================================
+
+General Rules
+
+✓ Write clean and readable code.
+
+✓ Keep functions small and modular.
+
+✓ Avoid duplicate logic.
+
+✓ Use descriptive variable names.
+
+✓ Use descriptive function names.
+
+✓ Write reusable code.
+
+✓ Add comments only when necessary.
+
+✓ Follow a consistent coding style.
+
+✓ Keep notebooks organized.
+
+✓ Keep production code independent of notebooks.
+
+
+Never
+
+❌ Hardcode paths
+
+❌ Hardcode bucket names
+
+❌ Hardcode credentials
+
+❌ Duplicate business logic
+
+❌ Mix visualization logic with semantic logic
+
+❌ Read Bronze after Silver exists
+
+❌ Read Raw directly for downstream processing
+
+
+
+===========================================================================================
+
+FUNCTION DESIGN
+===========================================================================================
+
+Every function should have
+
+Purpose
+
+Input
+
+Output
+
+Error Handling
+
+Documentation
+
+Example
+
+Load Dataset
+
+↓
+
+Validate Dataset
+
+↓
+
+Transform Dataset
+
+↓
+
+Return Dataset
+
+Avoid large functions performing multiple unrelated tasks.
+
+
+
+===========================================================================================
+
+NOTEBOOK STANDARDS
+===========================================================================================
+
+Every notebook should have
+
+1.
+
+Objective
+
+2.
+
+Dataset Information
+
+3.
+
+Approach
+
+4.
+
+Implementation
+
+5.
+
+Validation
+
+6.
+
+Observations
+
+7.
+
+Business Insights
+
+8.
+
+Conclusion
+
+Every notebook should answer
+
+Why was this notebook created?
+
+What problem does it solve?
+
+What output does it generate?
+
+How will it become production code?
+
+
+
+===========================================================================================
+
+PRODUCTION SCRIPT STANDARDS
+===========================================================================================
+
+Every production script should contain
+
+Purpose
+
+Input Dataset
+
+Output Dataset
+
+Configuration Loading
+
+Logging
+
+Validation
+
+Transformation
+
+Error Handling
+
+Execution Summary
+
+Production scripts should not contain
+
+Exploration
+
+Temporary testing
+
+Unused code
+
+Notebook cells
+
+Debug print statements
+
+
+
+===========================================================================================
+
+LOGGING STANDARDS
+===========================================================================================
+
+Every production script should log
+
+Execution Start
+
+Execution End
+
+Rows Read
+
+Rows Written
+
+Execution Time
+
+Input Path
+
+Output Path
+
+Validation Status
+
+Warning Messages
+
+Error Messages
+
+Success Message
+
+Logs should be stored inside
+
+Amazon S3
+
+↓
+
+logs/
+
+
+
+===========================================================================================
+
+ERROR HANDLING
+===========================================================================================
+
+Every script should validate
+
+Dataset Exists
+
+Schema Exists
+
+Required Columns Exist
+
+Configuration Exists
+
+Output Path Exists
+
+Spark Session Created
+
+Write Successful
+
+If validation fails
+
+↓
+
+Log Error
+
+↓
+
+Stop Execution
+
+↓
+
+Return Meaningful Error Message
+
+Never silently ignore errors.
+
+
+
+===========================================================================================
+
+CONFIGURATION MANAGEMENT
+===========================================================================================
+
+All configurable values should be stored inside
+
+config/
+
+Examples
+
+AWS Region
+
+Bucket Name
+
+Input Paths
+
+Output Paths
+
+Spark Settings
+
+Embedding Model
+
+Vector Dimension
+
+Retriever Settings
+
+Application Settings
+
+Changing environments should never require changing source code.
+
+
+
+===========================================================================================
+
+TESTING STRATEGY
+===========================================================================================
+
+Every stage should be tested independently.
+
+Notebook Testing
+
+↓
+
+Production Script Testing
+
+↓
+
+Local Validation
+
+↓
+
+EMR Validation
+
+↓
+
+Glue Validation
+
+↓
+
+Application Testing
+
+↓
+
+End-to-End Testing
+
+Do not skip intermediate validation.
+
+
+
+===========================================================================================
+
+NOTEBOOK VALIDATION
+===========================================================================================
+
+Validate
+
+Rows
+
+Columns
+
+Schema
+
+Missing Values
+
+Duplicate Values
+
+Statistics
+
+Category Counts
+
+Output Files
+
+Business KPIs
+
+Observations
+
+Notebook output becomes the expected production output.
+
+
+
+===========================================================================================
+
+PRODUCTION SCRIPT VALIDATION
+===========================================================================================
+
+Run
+
+scripts/local/
+
+↓
+
+Compare with Notebook
+
+Validate
+
+Rows
+
+Columns
+
+Schema
+
+Statistics
+
+KPIs
+
+Generated Files
+
+Outputs must match exactly before pushing to GitHub.
+
+
+
+===========================================================================================
+
+EMR VALIDATION
+===========================================================================================
+
+Run
+
+scripts/emr/
+
+Validate
+
+Bronze
+
+Silver
+
+Gold Visualization
+
+Gold Semantic
+
+Embeddings
+
+Reports
+
+Execution Logs
+
+Compare outputs with Local execution.
+
+
+
+===========================================================================================
+
+GLUE VALIDATION
+===========================================================================================
+
+Run each Glue Job independently.
+
+Validate
+
+Successful execution
+
+Output files
+
+Execution logs
+
+S3 outputs
+
+Job duration
+
+Glue jobs should produce identical outputs as EMR.
+
+
+
+===========================================================================================
+
+APPLICATION TESTING
+===========================================================================================
+
+Validate
+
+Home Page
+
+Navigation
+
+Chatbot
+
+Dashboard
+
+Search
+
+Filters
+
+Conversation Memory
+
+Dashboard Loading
+
+Error Messages
+
+Application Responsiveness
+
+Everything should function from a single Streamlit application.
+
+
+
+===========================================================================================
+
+DOCUMENTATION STANDARDS
+===========================================================================================
+
+Every major module should contain
+
+Purpose
+
+Input
+
+Output
+
+Dependencies
+
+Execution Flow
+
+Validation Steps
+
+Example Usage
+
+Every new feature should update
+
+README
+
+Engineering Guide
+
+Architecture Diagram
+
+Change Log
+
+
+
+===========================================================================================
+
+TEAM DEVELOPMENT WORKFLOW
+===========================================================================================
+
+Create Feature Branch
+
+↓
+
+Develop Notebook
+
+↓
+
+Validate Notebook
+
+↓
+
+Create Production Module
+
+↓
+
+Create Local Script
+
+↓
+
+Validate Outputs
+
+↓
+
+Commit
+
+↓
+
+Push
+
+↓
+
+Pull Request
+
+↓
+
+Review
+
+↓
+
+Merge into develop
+
+↓
+
+Merge into main
+
+No developer should push directly to main.
+
+
+
+===========================================================================================
+
+CODE REVIEW CHECKLIST
+===========================================================================================
+
+✓ Code follows project standards
+
+✓ No duplicated logic
+
+✓ Configuration driven
+
+✓ Logging added
+
+✓ Validation included
+
+✓ Documentation updated
+
+✓ Notebook completed
+
+✓ Production script created
+
+✓ Local execution successful
+
+✓ No unnecessary files committed
+
+
+
+===========================================================================================
+
+FINAL DEMO EXECUTION
+===========================================================================================
+
+Step 1
+
+Explain Project Architecture
+
+↓
+
+Step 2
+
+Explain Bronze → Silver → Gold
+
+↓
+
+Step 3
+
+Show GitHub Repository
+
+↓
+
+Step 4
+
+Explain EMR Pipeline
+
+↓
+
+Step 5
+
+Explain AWS Glue Automation
+
+↓
+
+Step 6
+
+Open Streamlit
+
+↓
+
+Step 7
+
+Demonstrate Analytics Dashboard
+
+↓
+
+Show
+
+KPIs
+
+Category Analysis
+
+Store Analysis
+
+Sentiment Analysis
+
+Review Trends
+
+Business Insights
+
+↓
+
+Step 8
+
+Return to Home Page
+
+↓
+
+Step 9
+
+Demonstrate AI Product Search
+
+↓
+
+Ask Natural Language Questions
+
+↓
+
+Show Semantic Retrieval
+
+↓
+
+Explain Product-level Search
+
+↓
+
+Display AI Generated Response
+
+↓
+
+Step 10
+
+Explain Deployment
+
+Docker
+
+↓
+
+Amazon ECS
+
+↓
+
+CI/CD
+
+↓
+
+Step 11
+
+Answer Questions
+
+
+
+===========================================================================================
+
+PROJECT COMPLETION CHECKLIST
+===========================================================================================
+
+Data Pipeline
+
+✓ Validation Completed
+
+✓ Bronze Layer
+
+✓ Silver Layer
+
+✓ EDA Completed
+
+✓ Gold Visualization
+
+✓ Gold Semantic
+
+✓ Embeddings
+
+✓ Reports Generated
+
+────────────────────────────────────────────
+
+Analytics
+
+✓ Tableau Dashboard
+
+✓ Business KPIs
+
+✓ Interactive Filters
+
+✓ Dashboard Validation
+
+────────────────────────────────────────────
+
+AI Search
+
+✓ Semantic Dataset
+
+✓ Product Documents
+
+✓ Embeddings
+
+✓ FAISS Index
+
+✓ Chatbot
+
+────────────────────────────────────────────
+
+Cloud
+
+✓ Amazon S3
+
+✓ Amazon EMR
+
+✓ AWS Glue
+
+✓ Docker
+
+✓ Amazon ECR
+
+✓ Amazon ECS
+
+────────────────────────────────────────────
+
+Application
+
+✓ Streamlit Home Page
+
+✓ AI Product Search
+
+✓ Analytics Dashboard
+
+✓ Tableau Embedded
+
+✓ Navigation Working
+
+────────────────────────────────────────────
+
+Documentation
+
+✓ README
+
+✓ Engineering Guide
+
+✓ Architecture Diagram
+
+✓ Reports
+
+✓ Change Log
+
+✓ Code Documentation
+
+===========================================================================================
+
+END OF ENGINEERING GUIDE
+
+Version 4.0 (FINAL)
+
+===========================================================================================
+
+
