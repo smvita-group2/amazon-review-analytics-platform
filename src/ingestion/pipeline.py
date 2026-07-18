@@ -12,6 +12,11 @@ from src.common.spark_session import create_spark_session
 from src.ingestion.reader import read_json
 from src.ingestion.writer import write_parquet
 from src.ingestion.sampler import create_sample
+from pyspark.sql import functions as F
+from config.datasets.schema import (
+    REVIEWS_COLUMNS,
+    METADATA_COLUMNS,
+)
 
 
 def main():
@@ -28,18 +33,26 @@ def main():
 
     print("\nReading Reviews Dataset...")
 
-    reviews_df = read_json(
-        spark,
-        RAW_REVIEWS_PATH,
+    reviews_df = (
+        read_json(spark, RAW_REVIEWS_PATH)
+        .select(*REVIEWS_COLUMNS)
     )
 
     print(f"Reviews Rows : {reviews_df.count():,}")
 
     print("\nReading Metadata Dataset...")
 
-    metadata_df = read_json(
-        spark,
-        RAW_METADATA_PATH,
+    metadata_df = (
+        read_json(spark, RAW_METADATA_PATH)
+        .select(
+            *METADATA_COLUMNS,
+
+            F.regexp_replace(
+                F.col("price"),
+                "—",
+                ""
+            ).cast("double").alias("price")
+        )
     )
 
     print(f"Metadata Rows : {metadata_df.count():,}")

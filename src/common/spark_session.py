@@ -24,6 +24,7 @@ def create_spark_session(
 
     spark = (
         builder
+        .config("spark.sql.caseSensitive", "true")
         .config("spark.sql.repl.eagerEval.enabled", "true")
         .config("spark.sql.shuffle.partitions", "8")
         .getOrCreate()
