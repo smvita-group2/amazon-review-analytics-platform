@@ -38,7 +38,9 @@ def main():
         .select(*REVIEWS_COLUMNS)
     )
 
-    print(f"Reviews Rows : {reviews_df.count():,}")
+    # print(f"Reviews Rows : {reviews_df.count():,}")
+    print("Reviews Dataset Loaded.")
+
 
     print("\nReading Metadata Dataset...")
 
@@ -55,7 +57,8 @@ def main():
         )
     )
 
-    print(f"Metadata Rows : {metadata_df.count():,}")
+    # print(f"Metadata Rows : {metadata_df.count():,}")
+    print("Metadata Dataset Loaded.")
 
     # ----------------------------------------
     # Bronze Layer
