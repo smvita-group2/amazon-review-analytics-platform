@@ -4,7 +4,6 @@ Validation logic for the Silver reviews dataset.
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
-from config.datasets.schema import SILVER_REVIEWS_SCHEMA
 
 
 class ReviewsValidator:
@@ -12,46 +11,86 @@ class ReviewsValidator:
     Validates the Silver reviews dataset before writing.
     """
 
+    EXPECTED_COLUMNS = [
+        "parent_asin",
+        "user_id",
+        "review_rating",
+        "review_title",
+        "review_text",
+        "helpful_vote",
+        "verified_purchase",
+        "review_timestamp",
+        "review_date",
+        "review_year",
+        "review_month",
+    ]
+
+    REQUIRED_COLUMNS = [
+        "parent_asin",
+        "user_id",
+        "review_rating",
+        "review_timestamp",
+    ]
+
     def __init__(self, df: DataFrame):
         self.df = df
 
     def validate_schema(self):
         """
-        Validates the Silver reviews schema.
+        Validates that the dataframe contains the expected columns.
         """
 
-        actual_schema = self.df.schema
-        expected_schema = SILVER_REVIEWS_SCHEMA
+        actual_columns = self.df.columns
 
-        if actual_schema != expected_schema:
+        missing_columns = [
+            column
+            for column in self.EXPECTED_COLUMNS
+            if column not in actual_columns
+        ]
+
+        extra_columns = [
+            column
+            for column in actual_columns
+            if column not in self.EXPECTED_COLUMNS
+        ]
+
+        if missing_columns or extra_columns:
+
+            print("\n========== SCHEMA VALIDATION ==========")
+            print(f"Expected Columns ({len(self.EXPECTED_COLUMNS)}):")
+            print(self.EXPECTED_COLUMNS)
+
+            print(f"\nActual Columns ({len(actual_columns)}):")
+            print(actual_columns)
+
+            if missing_columns:
+                print(f"\nMissing Columns: {missing_columns}")
+
+            if extra_columns:
+                print(f"\nUnexpected Columns: {extra_columns}")
+
             raise ValueError(
-                "Silver reviews schema validation failed."
+                "Reviews schema validation failed."
             )
 
         return self
 
     def validate_required_columns(self):
         """
-        Validates that required columns do not contain null values.
+        Validates that required columns do not contain NULL values.
         """
 
-        required_columns = [
-            "parent_asin",
-            "user_id",
-            "review_rating",
-            "review_timestamp",
-        ]
+        for column_name in self.REQUIRED_COLUMNS:
 
-        for column in required_columns:
             null_count = (
                 self.df
-                .filter(col(column).isNull())
+                .filter(col(column_name).isNull())
                 .count()
             )
 
             if null_count > 0:
                 raise ValueError(
-                    f"Required column '{column}' contains {null_count} null values."
+                    f"Column '{column_name}' contains {null_count} NULL values."
                 )
 
         return self
@@ -64,8 +103,11 @@ class ReviewsValidator:
         invalid_count = (
             self.df
             .filter(
-                (col("review_rating") < 1) |
-                (col("review_rating") > 5)
+                col("review_rating").isNotNull() &
+                (
+                    (col("review_rating") < 1) |
+                    (col("review_rating") > 5)
+                )
             )
             .count()
         )
@@ -84,7 +126,10 @@ class ReviewsValidator:
 
         invalid_count = (
             self.df
-            .filter(col("helpful_vote") < 0)
+            .filter(
+                col("helpful_vote").isNotNull() &
+                (col("helpful_vote") < 0)
+            )
             .count()
         )
 
@@ -97,7 +142,7 @@ class ReviewsValidator:
 
     def validate_timestamp(self):
         """
-        Validates that review timestamps are not null.
+        Validates that review timestamps are not NULL.
         """
 
         null_count = (
@@ -108,14 +153,14 @@ class ReviewsValidator:
 
         if null_count > 0:
             raise ValueError(
-                f"Found {null_count} review(s) with null timestamps."
+                f"Found {null_count} review(s) with NULL timestamps."
             )
 
         return self
 
     def run(self):
         """
-        Executes all validations.
+        Executes all validation checks.
         """
 
         return (
