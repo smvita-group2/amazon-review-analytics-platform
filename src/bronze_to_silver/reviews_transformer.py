@@ -6,8 +6,8 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     col,
     trim,
-    coalesce,
     lit,
+    when,
     from_unixtime,
     to_date,
     year,
@@ -65,12 +65,20 @@ class ReviewsTransformer:
 
     def clean_helpful_vote(self):
         """
-        Replaces null helpful votes with 0.
+        Replaces null and negative helpful votes with 0.
         """
 
         self.df = self.df.withColumn(
             "helpful_vote",
-            coalesce(col("helpful_vote"), lit(0))
+            when(
+                col("helpful_vote").isNull(),
+                lit(0)
+            ).when(
+                col("helpful_vote") < 0,
+                lit(0)
+            ).otherwise(
+                col("helpful_vote")
+            ).cast("int")
         )
 
         return self
@@ -82,7 +90,9 @@ class ReviewsTransformer:
 
         self.df = self.df.withColumn(
             "review_timestamp",
-            from_unixtime(col("review_timestamp") / 1000).cast("timestamp")
+            from_unixtime(
+                col("review_timestamp") / 1000
+            ).cast("timestamp")
         )
 
         return self
