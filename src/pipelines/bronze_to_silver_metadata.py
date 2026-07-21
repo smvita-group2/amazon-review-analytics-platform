@@ -3,8 +3,8 @@ Pipeline for transforming Bronze metadata into the Silver layer.
 """
 
 from config.datasets.paths import (
-    BRONZE_METADATA_PATH,
-    SILVER_METADATA_PATH,
+    get_bronze_metadata_path,
+    get_silver_metadata_path,
 )
 
 from src.common.spark_session import create_spark_session
