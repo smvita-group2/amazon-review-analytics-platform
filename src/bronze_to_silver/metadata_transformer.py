@@ -89,8 +89,8 @@ class MetadataTransformer:
             .withColumn(
                 "product_image_url",
                 coalesce(
-                    col("images[0].hi_res"),
-                    col("images[0].large")
+                    col("images").getItem(0).getField("hi_res"),
+                    col("images").getItem(0).getField("large")
                 )
             )
             .drop("images")
@@ -149,7 +149,9 @@ class MetadataTransformer:
             .drop("main_category")
             .withColumn(
                 "main_category",
-                trim(col("categories")[0])
+                trim(
+                    col("categories").getItem(0)
+                )
             )
             .withColumn(
                 "sub_category",
