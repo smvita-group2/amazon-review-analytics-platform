@@ -30,7 +30,7 @@ class MetadataValidator:
         "product_title",
     ]
 
-    def _init_(self, df: DataFrame):
+    def __init__(self, df: DataFrame):
         self.df = df
 
     def validate_schema(self):

@@ -12,7 +12,7 @@ class ReviewsValidator:
     Validates the Silver reviews dataset before writing.
     """
 
-    def _init_(self, df: DataFrame):
+    def __init__(self, df: DataFrame):
         self.df = df
 
     def validate_schema(self):
@@ -39,11 +39,15 @@ class ReviewsValidator:
             "parent_asin",
             "user_id",
             "review_rating",
-            "review_timestamp"
+            "review_timestamp",
         ]
 
         for column in required_columns:
-            null_count = self.df.filter(col(column).isNull()).count()
+            null_count = (
+                self.df
+                .filter(col(column).isNull())
+                .count()
+            )
 
             if null_count > 0:
                 raise ValueError(
@@ -57,10 +61,14 @@ class ReviewsValidator:
         Validates that review ratings are between 1 and 5.
         """
 
-        invalid_count = self.df.filter(
-            (col("review_rating") < 1) |
-            (col("review_rating") > 5)
-        ).count()
+        invalid_count = (
+            self.df
+            .filter(
+                (col("review_rating") < 1) |
+                (col("review_rating") > 5)
+            )
+            .count()
+        )
 
         if invalid_count > 0:
             raise ValueError(
@@ -74,9 +82,11 @@ class ReviewsValidator:
         Validates that helpful votes are non-negative.
         """
 
-        invalid_count = self.df.filter(
-            col("helpful_vote") < 0
-        ).count()
+        invalid_count = (
+            self.df
+            .filter(col("helpful_vote") < 0)
+            .count()
+        )
 
         if invalid_count > 0:
             raise ValueError(
@@ -90,9 +100,11 @@ class ReviewsValidator:
         Validates that review timestamps are not null.
         """
 
-        null_count = self.df.filter(
-            col("review_timestamp").isNull()
-        ).count()
+        null_count = (
+            self.df
+            .filter(col("review_timestamp").isNull())
+            .count()
+        )
 
         if null_count > 0:
             raise ValueError(
@@ -106,7 +118,7 @@ class ReviewsValidator:
         Executes all validations.
         """
 
-        (
+        return (
             self.validate_schema()
                 .validate_required_columns()
                 .validate_rating_range()
