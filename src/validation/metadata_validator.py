@@ -25,9 +25,9 @@ class MetadataValidator:
         "product_image_url",
     ]
 
+    # Only fields that must always exist in Silver
     REQUIRED_COLUMNS = [
         "parent_asin",
-        "product_title",
     ]
 
     def __init__(self, df: DataFrame):
