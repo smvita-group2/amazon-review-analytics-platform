@@ -4,10 +4,13 @@ Pipeline for transforming Bronze reviews into the Silver layer.
 
 from src.common.logger import get_logger
 from src.common.spark_session import create_spark_session
+
 from src.ingestion.reader import read_parquet
 from src.ingestion.writer import write_parquet
+
 from src.bronze_to_silver.reviews_transformer import ReviewsTransformer
 from src.validation.reviews_validator import ReviewsValidator
+
 from config.datasets.paths import (
     get_bronze_reviews_path,
     get_silver_reviews_path,
@@ -17,12 +20,18 @@ from config.datasets.paths import (
 logger = get_logger(__name__)
 
 
-def run(dataset_name: str):
+def run(dataset_name: str) -> None:
     """
     Executes the Bronze to Silver reviews pipeline.
+
+    Args:
+        dataset_name: Dataset to process.
     """
 
-    spark = create_spark_session("Bronze To Silver Reviews")
+    spark = create_spark_session(
+        app_name="Bronze to Silver Reviews Pipeline",
+        local=False,
+    )
 
     try:
         logger.info("Starting Bronze to Silver Reviews Pipeline")
@@ -32,7 +41,10 @@ def run(dataset_name: str):
 
         logger.info(f"Reading Bronze reviews from: {bronze_path}")
 
-        reviews_df = read_json(spark, bronze_path)
+        reviews_df = read_parquet(
+            spark=spark,
+            path=bronze_path,
+        )
 
         logger.info("Transforming Bronze reviews")
 
@@ -43,16 +55,20 @@ def run(dataset_name: str):
 
         logger.info("Validating Silver reviews")
 
-        ReviewsValidator(silver_reviews_df).run()
+        ReviewsValidator(
+            silver_reviews_df
+        ).run()
 
         logger.info(f"Writing Silver reviews to: {silver_path}")
 
         write_parquet(
-            silver_reviews_df,
-            silver_path
+            df=silver_reviews_df,
+            output_path=silver_path,
         )
 
-        logger.info("Bronze to Silver Reviews Pipeline completed successfully.")
+        logger.info(
+            "Bronze to Silver Reviews Pipeline completed successfully."
+        )
 
     finally:
         spark.stop()

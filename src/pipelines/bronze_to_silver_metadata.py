@@ -45,7 +45,7 @@ def run(dataset_name: str) -> None:
             f"Reading Bronze metadata from: {bronze_path}"
         )
 
-        df = read_json(
+        df = read_parquet(
             spark=spark,
             path=bronze_path,
         )
