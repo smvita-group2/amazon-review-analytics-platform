@@ -2,6 +2,8 @@
 Pipeline for transforming Bronze reviews into the Silver layer.
 """
 
+import argparse
+
 from src.common.logger import get_logger
 from src.common.spark_session import create_spark_session
 
@@ -34,32 +36,42 @@ def run(dataset_name: str) -> None:
     )
 
     try:
-        logger.info("Starting Bronze to Silver Reviews Pipeline")
+        logger.info(
+            "Starting Bronze to Silver Reviews Pipeline"
+        )
 
         bronze_path = get_bronze_reviews_path(dataset_name)
         silver_path = get_silver_reviews_path(dataset_name)
 
-        logger.info(f"Reading Bronze reviews from: {bronze_path}")
+        logger.info(
+            f"Reading Bronze reviews from: {bronze_path}"
+        )
 
         reviews_df = read_parquet(
             spark=spark,
             path=bronze_path,
         )
 
-        logger.info("Transforming Bronze reviews")
+        logger.info(
+            "Transforming Bronze reviews"
+        )
 
         silver_reviews_df = (
             ReviewsTransformer(reviews_df)
             .transform()
         )
 
-        logger.info("Validating Silver reviews")
+        logger.info(
+            "Validating Silver reviews"
+        )
 
         ReviewsValidator(
             silver_reviews_df
         ).run()
 
-        logger.info(f"Writing Silver reviews to: {silver_path}")
+        logger.info(
+            f"Writing Silver reviews to: {silver_path}"
+        )
 
         write_parquet(
             df=silver_reviews_df,
@@ -75,4 +87,17 @@ def run(dataset_name: str) -> None:
 
 
 if __name__ == "__main__":
-    run("Sports_and_Outdoors")
+
+    parser = argparse.ArgumentParser(
+        description="Bronze to Silver Reviews Pipeline"
+    )
+
+    parser.add_argument(
+        "--dataset",
+        required=True,
+        help="Dataset name to process"
+    )
+
+    args = parser.parse_args()
+
+    run(args.dataset)

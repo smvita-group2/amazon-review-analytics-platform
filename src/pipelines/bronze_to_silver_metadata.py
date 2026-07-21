@@ -2,6 +2,8 @@
 Pipeline for transforming Bronze metadata into the Silver layer.
 """
 
+import argparse
+
 from config.datasets.paths import (
     get_bronze_metadata_path,
     get_silver_metadata_path,
@@ -82,4 +84,17 @@ def run(dataset_name: str) -> None:
 
 
 if __name__ == "__main__":
-    run("Sports_and_Outdoors")
+
+    parser = argparse.ArgumentParser(
+        description="Bronze to Silver Metadata Pipeline"
+    )
+
+    parser.add_argument(
+        "--dataset",
+        required=True,
+        help="Dataset name to process"
+    )
+
+    args = parser.parse_args()
+
+    run(args.dataset)
