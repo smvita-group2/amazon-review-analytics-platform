@@ -22,7 +22,7 @@ def run(dataset_name: str):
     Executes the Bronze to Silver reviews pipeline.
     """
 
-    spark = create_spark_session("BronzeToSilverReviews")
+    spark = create_spark_session("Bronze To Silver Reviews")
 
     try:
         logger.info("Starting Bronze to Silver Reviews Pipeline")
