@@ -10,7 +10,7 @@ from config.datasets.paths import (
 from src.common.logger import get_logger
 from src.common.spark_session import create_spark_session
 
-from src.ingestion.reader import read_json
+from src.ingestion.reader import read_parquet
 from src.ingestion.writer import write_parquet
 
 from src.bronze_to_silver.metadata_transformer import MetadataTransformer
