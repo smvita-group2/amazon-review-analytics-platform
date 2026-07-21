@@ -1,8 +1,6 @@
 # ==========================
 # Data Processing
 # ==========================
-pandas
-numpy
 pyspark
 pyarrow
 
@@ -12,36 +10,11 @@ pyarrow
 boto3
 
 # ==========================
-# Visualization
+# Environment
 # ==========================
-matplotlib
-seaborn
-plotly
-
-# ==========================
-# Dashboard
-# ==========================
-streamlit
-
-# ==========================
-# Machine Learning
-# ==========================
-scikit-learn
-
-# ==========================
-# NLP / Semantic Search
-# ==========================
-sentence-transformers
-faiss-cpu
-
-# ==========================
-# Jupyter Notebook
-# ==========================
-jupyter
-ipykernel
+python-dotenv
 
 # ==========================
 # Utilities
 # ==========================
-python-dotenv
 tqdm
