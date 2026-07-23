@@ -1,7 +1,6 @@
 import boto3
 
 from airflow.exceptions import AirflowException
-from airflow.operators.python import get_current_context
 
 from config.datasets.paths import (
     get_bronze_metadata_path,
@@ -32,37 +31,14 @@ def _check_prefix_exists(s3_uri: str) -> bool:
 def check_bronze_data():
     """
     Verify Bronze Metadata and Bronze Reviews exist.
-    Dataset resolution priority:
-        1. dag_run.conf
-        2. Airflow Variable
-        3. Default ("Appliances")
     """
 
-    context = get_current_context()
-
-    dag_run = context.get("dag_run")
-
     dataset_name = "Appliances"
-
-    if dag_run and dag_run.conf:
-        dataset_name = dag_run.conf.get("dataset", dataset_name)
-
-    print(f"Dataset selected: {dataset_name}")
 
     metadata_path = get_bronze_metadata_path(dataset_name)
     reviews_path = get_bronze_reviews_path(dataset_name)
 
-    if not _check_prefix_exists(metadata_path):
-        raise AirflowException(
-            f"Bronze metadata not found: {metadata_path}"
-        )
-
-    if not _check_prefix_exists(reviews_path):
-        raise AirflowException(
-            f"Bronze reviews not found: {reviews_path}"
-        )
-
-    print("Bronze dataset verified successfully.")    reviews_path = get_bronze_reviews_path(dataset_name)
+    print(f"Checking dataset: {dataset_name}")
 
     if not _check_prefix_exists(metadata_path):
         raise AirflowException(
