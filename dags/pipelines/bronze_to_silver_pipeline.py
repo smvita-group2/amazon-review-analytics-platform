@@ -8,8 +8,11 @@ from airflow.operators.python import PythonOperator
 from dags.config.default_args import default_args
 from dags.utils.s3_checks import check_bronze_data
 
+
 PROJECT_ROOT = "/home/hadoop/amazon-review-analytics-platform"
 DATASET_NAME = "Appliances"
+JAVA_HOME = "/usr/lib/jvm/java-17-amazon-corretto.x86_64"
+
 
 with DAG(
     dag_id="bronze_to_silver_pipeline",
@@ -38,7 +41,18 @@ with DAG(
         bash_command=f"""
         cd {PROJECT_ROOT}
 
+        export JAVA_HOME={JAVA_HOME}
+        export PATH=$JAVA_HOME/bin:$PATH
         export PYTHONPATH={PROJECT_ROOT}
+
+        echo "========== JAVA VERSION =========="
+        java -version
+
+        echo "========== PYTHON VERSION =========="
+        python --version
+
+        echo "========== SPARK VERSION =========="
+        spark-submit --version
 
         spark-submit \
         --conf spark.yarn.appMasterEnv.PYTHONPATH=$PYTHONPATH \
@@ -53,7 +67,18 @@ with DAG(
         bash_command=f"""
         cd {PROJECT_ROOT}
 
+        export JAVA_HOME={JAVA_HOME}
+        export PATH=$JAVA_HOME/bin:$PATH
         export PYTHONPATH={PROJECT_ROOT}
+
+        echo "========== JAVA VERSION =========="
+        java -version
+
+        echo "========== PYTHON VERSION =========="
+        python --version
+
+        echo "========== SPARK VERSION =========="
+        spark-submit --version
 
         spark-submit \
         --conf spark.yarn.appMasterEnv.PYTHONPATH=$PYTHONPATH \
