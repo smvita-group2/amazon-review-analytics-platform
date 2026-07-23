@@ -52,9 +52,9 @@ with DAG(
         python --version
 
         echo "========== SPARK VERSION =========="
-        spark-submit --version
+        /usr/lib/spark/bin/spark-submit --version
 
-        spark-submit \
+        /usr/lib/spark/bin/spark-submit \
         --conf spark.yarn.appMasterEnv.PYTHONPATH=$PYTHONPATH \
         --conf spark.executorEnv.PYTHONPATH=$PYTHONPATH \
         src/pipelines/bronze_to_silver_metadata.py \
@@ -78,9 +78,9 @@ with DAG(
         python --version
 
         echo "========== SPARK VERSION =========="
-        spark-submit --version
+        /usr/lib/spark/bin/spark-submit --version
 
-        spark-submit \
+        /usr/lib/spark/bin/spark-submit \
         --conf spark.yarn.appMasterEnv.PYTHONPATH=$PYTHONPATH \
         --conf spark.executorEnv.PYTHONPATH=$PYTHONPATH \
         src/pipelines/bronze_to_silver_reviews.py \
