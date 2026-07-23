@@ -28,17 +28,15 @@ def _check_prefix_exists(s3_uri: str) -> bool:
     return "Contents" in response
 
 
-def check_bronze_data():
+def check_bronze_data(dataset_name):
     """
     Verify Bronze Metadata and Bronze Reviews exist.
     """
 
-    dataset_name = "Appliances"
+    print(f"Checking dataset: {dataset_name}")
 
     metadata_path = get_bronze_metadata_path(dataset_name)
     reviews_path = get_bronze_reviews_path(dataset_name)
-
-    print(f"Checking dataset: {dataset_name}")
 
     if not _check_prefix_exists(metadata_path):
         raise AirflowException(
