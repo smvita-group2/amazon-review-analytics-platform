@@ -3,14 +3,15 @@ from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import PythonOperator
 
 from dags.config.default_args import default_args
+from dags.utils.s3_checks import check_bronze_data
 
 
 PROJECT_ROOT = "/home/hadoop/amazon-review-analytics-platform"
+DATASET_NAME = "Appliances"
 JAVA_HOME = "/usr/lib/jvm/java-17-amazon-corretto.x86_64"
-
-DEFAULT_DATASET = "Appliances"
 
 
 with DAG(
@@ -27,13 +28,12 @@ with DAG(
         task_id="start"
     )
 
-    #
-    # TEMPORARILY DISABLED
-    # We'll add the S3 validation back after verifying
-    # dataset parameterization works correctly.
-    #
-    check_bronze = EmptyOperator(
-        task_id="check_bronze_data"
+    check_bronze = PythonOperator(
+        task_id="check_bronze_data",
+        python_callable=check_bronze_data,
+        op_kwargs={
+            "dataset_name": DATASET_NAME,
+        },
     )
 
     bronze_to_silver_metadata = BashOperator(
@@ -44,11 +44,6 @@ with DAG(
         export JAVA_HOME={JAVA_HOME}
         export PATH=$JAVA_HOME/bin:$PATH
         export PYTHONPATH={PROJECT_ROOT}
-
-        DATASET="{{{{ dag_run.conf.get('dataset', '{DEFAULT_DATASET}') if dag_run else '{DEFAULT_DATASET}' }}}}"
-
-        echo "========== DATASET =========="
-        echo $DATASET
 
         echo "========== JAVA VERSION =========="
         java -version
@@ -63,7 +58,7 @@ with DAG(
         --conf spark.yarn.appMasterEnv.PYTHONPATH=$PYTHONPATH \
         --conf spark.executorEnv.PYTHONPATH=$PYTHONPATH \
         src/pipelines/bronze_to_silver_metadata.py \
-        --dataset "$DATASET"
+        --dataset {DATASET_NAME}
         """,
     )
 
@@ -76,11 +71,6 @@ with DAG(
         export PATH=$JAVA_HOME/bin:$PATH
         export PYTHONPATH={PROJECT_ROOT}
 
-        DATASET="{{{{ dag_run.conf.get('dataset', '{DEFAULT_DATASET}') if dag_run else '{DEFAULT_DATASET}' }}}}"
-
-        echo "========== DATASET =========="
-        echo $DATASET
-
         echo "========== JAVA VERSION =========="
         java -version
 
@@ -91,4 +81,26 @@ with DAG(
         /usr/lib/spark/bin/spark-submit --version
 
         /usr/lib/spark/bin/spark-submit \
-        --conf spark.yarn.appMaster
+        --conf spark.yarn.appMasterEnv.PYTHONPATH=$PYTHONPATH \
+        --conf spark.executorEnv.PYTHONPATH=$PYTHONPATH \
+        src/pipelines/bronze_to_silver_reviews.py \
+        --dataset {DATASET_NAME}
+        """,
+    )
+
+    validate_silver = EmptyOperator(
+        task_id="validate_silver"
+    )
+
+    end = EmptyOperator(
+        task_id="end"
+    )
+
+    (
+        start
+        >> check_bronze
+        >> bronze_to_silver_metadata
+        >> bronze_to_silver_reviews
+        >> validate_silver
+        >> end
+    )
