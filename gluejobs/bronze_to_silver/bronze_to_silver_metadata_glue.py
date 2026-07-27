@@ -28,6 +28,7 @@ from pyspark.sql.functions import (
     slice,
     trim,
     when,
+    lit,
 )
 
 from pyspark.sql.types import DecimalType
@@ -150,8 +151,13 @@ class MetadataTransformer:
     into the standardized Silver schema.
     """
 
-    def __init__(self, df: DataFrame):
+    def __init__(
+        self,
+        df: DataFrame,
+        dataset_name: str,
+    ):
         self.df = df
+        self.dataset_name = dataset_name
 
     def rename_columns(self):
 
@@ -256,9 +262,7 @@ class MetadataTransformer:
             .drop("main_category")
             .withColumn(
                 "main_category",
-                trim(
-                    col("categories").getItem(0)
-                ),
+                lit(self.dataset_name),
             )
             .withColumn(
                 "sub_category",
@@ -526,7 +530,7 @@ def run_pipeline(dataset_name: str) -> None:
     logger.info("Applying metadata transformations...")
 
     df = (
-        MetadataTransformer(df)
+        MetadataTransformer(df,dataset_name,)
         .transform()
     )
  
@@ -546,6 +550,53 @@ def run_pipeline(dataset_name: str) -> None:
 
     df.unpersist()
     
+    logger.info(
+        f"{dataset_name} completed successfully."
+    )# ==========================================================
+# Pipeline
+# ==========================================================
+
+def run_pipeline(dataset_name: str) -> None:
+
+    logger.info("=" * 80)
+    logger.info(f"Processing Dataset : {dataset_name}")
+    logger.info("=" * 80)
+
+    bronze_path = get_bronze_metadata_path(dataset_name)
+    silver_path = get_silver_metadata_path(dataset_name)
+
+    df = read_parquet(bronze_path)
+
+    logger.info("Applying metadata transformations...")
+
+    df = (
+        MetadataTransformer(
+            df,
+            dataset_name,
+        )
+        .transform()
+    )
+
+    df.cache()
+
+    logger.info("Running validation checks...")
+
+    try:
+
+        (
+            MetadataValidator(df)
+            .run()
+        )
+
+        write_parquet(
+            df=df,
+            output_path=silver_path,
+        )
+
+    finally:
+
+        df.unpersist()
+
     logger.info(
         f"{dataset_name} completed successfully."
     )

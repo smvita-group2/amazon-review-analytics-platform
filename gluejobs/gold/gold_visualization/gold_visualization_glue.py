@@ -86,7 +86,6 @@ END_YEAR = 2023
 
 MIN_HELPFUL_VOTES = 2
 
-MIN_PRODUCT_REVIEW_THRESHOLD = 100
 
 # ==========================================================
 # S3 Paths
@@ -161,10 +160,14 @@ class GoldVisualizationTransformer:
 
         return self
 
-    def drop_unused_columns(self):
+    def clean_store(self):
 
-        self.df = self.df.drop(
-            "review_timestamp",
+        self.df = self.df.withColumn(
+            "store",
+            coalesce(
+                col("store"),
+                lit("Unknown"),
+            ),
         )
 
         return self
@@ -296,11 +299,11 @@ class GoldVisualizationTransformer:
                     "No Votes",
                 )
                 .when(
-                    helpful_votes <= 5,
+                    helpful_votes <= 10,
                     "Low",
                 )
                 .when(
-                    helpful_votes <= 20,
+                    helpful_votes <= 50,
                     "Medium",
                 )
                 .otherwise(
@@ -321,10 +324,6 @@ class GoldVisualizationTransformer:
         self.df = (
             self.df
             .withColumn(
-                "review_count_threshold_met",
-                product_rating_count >= MIN_PRODUCT_REVIEW_THRESHOLD,
-            )
-            .withColumn(
                 "product_review_volume_category",
                 when(
                     product_rating_count < 100,
@@ -342,6 +341,19 @@ class GoldVisualizationTransformer:
 
         return self
 
+    def drop_unused_columns(self):
+
+        self.df = self.df.drop(
+            "review_timestamp",
+            "product_price",
+            "description_text",
+            "features_text",
+            "review_title",
+            "review_text",
+        )
+
+        return self
+
     def reorder_columns(self):
 
         self.df = self.df.select(
@@ -354,17 +366,17 @@ class GoldVisualizationTransformer:
 
         return (
             self.apply_year_filter()
-                .drop_unused_columns()
+                .clean_store()
                 .add_time_features()
                 .add_review_features()
                 .add_rating_features()
                 .add_purchase_features()
                 .add_helpfulness_features()
                 .add_product_features()
+                .drop_unused_columns()
                 .reorder_columns()
                 .df
         )
-
 # ==========================================================
 # Gold Visualization Schema
 # ==========================================================
@@ -380,7 +392,6 @@ GOLD_VISUALIZATION_COLUMNS = [
     "store",
     "main_category",
     "sub_category",
-    "product_price",
     "product_average_rating",
     "product_rating_count",
     "product_image_url",
@@ -391,8 +402,6 @@ GOLD_VISUALIZATION_COLUMNS = [
 
     "user_id",
     "review_rating",
-    "review_title",
-    "review_text",
     "helpful_vote",
     "verified_purchase",
 
@@ -411,9 +420,6 @@ GOLD_VISUALIZATION_COLUMNS = [
     # ===========================
     # Product Description
     # ===========================
-
-    "description_text",
-    "features_text",
 
     # ===========================
     # Review Features
@@ -445,7 +451,7 @@ GOLD_VISUALIZATION_COLUMNS = [
     # Product Features
     # ===========================
 
-    "review_count_threshold_met",
+   
     "product_review_volume_category",
 ]
 
