@@ -1,19 +1,12 @@
 from pyspark.sql import DataFrame, SparkSession
 
 
-def read_json(
+def read_parquet(
     spark: SparkSession,
     path: str,
 ) -> DataFrame:
     """
-    Read a JSON Lines dataset from the specified path.
-
-    Args:
-        spark: Active SparkSession.
-        path: S3 or local path to the JSONL dataset.
-
-    Returns:
-        A Spark DataFrame containing the loaded dataset.
+    Read a Parquet file from S3 or local path.
     """
 
-    return spark.read.json(path)
+    return spark.read.parquet(path)
