@@ -131,8 +131,6 @@ GOLD_VISUALIZATION_COLUMNS = [
 
     "review_rating",
     "rating_category",
-    "review_title",
-    "review_text",
     "review_length",
     "review_word_count",
 
