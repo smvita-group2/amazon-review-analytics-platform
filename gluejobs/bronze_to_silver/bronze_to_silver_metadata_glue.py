@@ -530,46 +530,6 @@ def run_pipeline(dataset_name: str) -> None:
     logger.info("Applying metadata transformations...")
 
     df = (
-        MetadataTransformer(df,dataset_name,)
-        .transform()
-    )
- 
-    df.cache()
-       
-    logger.info("Running validation checks...")
-
-    (
-        MetadataValidator(df)
-        .run()
-    )
-
-    write_parquet(
-        df=df,
-        output_path=silver_path,
-    )
-
-    df.unpersist()
-    
-    logger.info(
-        f"{dataset_name} completed successfully."
-    )# ==========================================================
-# Pipeline
-# ==========================================================
-
-def run_pipeline(dataset_name: str) -> None:
-
-    logger.info("=" * 80)
-    logger.info(f"Processing Dataset : {dataset_name}")
-    logger.info("=" * 80)
-
-    bronze_path = get_bronze_metadata_path(dataset_name)
-    silver_path = get_silver_metadata_path(dataset_name)
-
-    df = read_parquet(bronze_path)
-
-    logger.info("Applying metadata transformations...")
-
-    df = (
         MetadataTransformer(
             df,
             dataset_name,
