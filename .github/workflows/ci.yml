@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - workflows/automate
+
   pull_request:
     branches:
       - develop
@@ -39,9 +40,13 @@ jobs:
         run: |
           flake8 .
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests with Coverage
         run: |
-          pytest
+          pytest --cov=src --cov-report=term-missing
+
+      - name: Security Scan with Bandit
+        run: |
+          bandit -r src
 
       - name: Verify Python
         run: |
