@@ -50,7 +50,7 @@ jobs:
 
       - name: Static Type Checking with MyPy
         run: |
-          mypy src
+          mypy --explicit-package-bases src
 
       - name: Verify Python
         run: |
