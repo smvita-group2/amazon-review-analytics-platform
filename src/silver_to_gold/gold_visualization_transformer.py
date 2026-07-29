@@ -1,6 +1,7 @@
 """
 Transformer for creating the Gold Visualization dataset.
 """
+
 from typing import cast
 
 from pyspark.sql import DataFrame

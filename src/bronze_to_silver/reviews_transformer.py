@@ -1,6 +1,7 @@
 """
 Transformation logic for converting Bronze reviews into the Silver layer.
 """
+
 from typing import cast
 
 from pyspark.sql import DataFrame
