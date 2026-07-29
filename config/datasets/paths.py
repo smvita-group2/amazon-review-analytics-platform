@@ -53,6 +53,7 @@ GOLD_ML_ROOT = f"{GOLD_ROOT}/ml"
 # Bronze Path Builders
 # ============================================================================
 
+
 def get_bronze_metadata_path(dataset_name: str) -> str:
     """
     Returns the Bronze metadata path for the given dataset.
@@ -70,6 +71,7 @@ def get_bronze_reviews_path(dataset_name: str) -> str:
 # ============================================================================
 # Silver Path Builders
 # ============================================================================
+
 
 def get_silver_metadata_path(dataset_name: str) -> str:
     """
@@ -95,6 +97,7 @@ def get_silver_master_path(dataset_name: str) -> str:
 # ============================================================================
 # Gold Path Builders
 # ============================================================================
+
 
 def get_gold_visualization_path(dataset_name: str) -> str:
     """

@@ -23,8 +23,7 @@ def create_spark_session(
         builder = builder.master("local[*]")
 
     spark = (
-        builder
-        .config("spark.sql.caseSensitive", "true")
+        builder.config("spark.sql.caseSensitive", "true")
         .config("spark.sql.shuffle.partitions", "8")
         .getOrCreate()
     )

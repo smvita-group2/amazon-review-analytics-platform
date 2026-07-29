@@ -27,11 +27,7 @@ def empty_strings_to_null(df: DataFrame, columns: list[str]) -> DataFrame:
     for column in columns:
         if column in df.columns and isinstance(df.schema[column].dataType, StringType):
             df = df.withColumn(
-                column,
-                when(
-                    trim(col(column)) == "",
-                    None
-                ).otherwise(col(column))
+                column, when(trim(col(column)) == "", None).otherwise(col(column))
             )
 
     return df

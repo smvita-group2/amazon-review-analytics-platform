@@ -8,31 +8,26 @@ applies metadata transformations and validations,
 and writes the Silver metadata dataset back to Amazon S3.
 """
 
-import sys
 import logging
+import sys
 
-from awsglue.utils import getResolvedOptions
 from awsglue.context import GlueContext
 from awsglue.job import Job
-
+from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
-
 from pyspark.sql import DataFrame
-
 from pyspark.sql.functions import (
     array_join,
-    col,
     coalesce,
+    col,
+    lit,
     regexp_replace,
     size,
     slice,
     trim,
     when,
-    lit,
 )
-
 from pyspark.sql.types import DecimalType
-
 
 # ==========================================================
 # Glue Initialization
@@ -75,10 +70,7 @@ logger = logging.getLogger(__name__)
 # Datasets
 # ==========================================================
 
-DATASETS = [
-    dataset.strip()
-    for dataset in args["datasets"].split(",")
-]
+DATASETS = [dataset.strip() for dataset in args["datasets"].split(",")]
 
 
 # ==========================================================
@@ -116,6 +108,7 @@ def get_silver_metadata_path(dataset_name: str) -> str:
 # Reader
 # ==========================================================
 
+
 def read_parquet(path: str) -> DataFrame:
 
     logger.info(f"Reading Bronze Metadata: {path}")
@@ -127,6 +120,7 @@ def read_parquet(path: str) -> DataFrame:
 # Writer
 # ==========================================================
 
+
 def write_parquet(
     df: DataFrame,
     output_path: str,
@@ -134,16 +128,13 @@ def write_parquet(
 
     logger.info(f"Writing Silver Metadata: {output_path}")
 
-    (
-        df.write
-        .mode("overwrite")
-        .option("compression", "snappy")
-        .parquet(output_path)
-    )
+    (df.write.mode("overwrite").option("compression", "snappy").parquet(output_path))
+
 
 # ==========================================================
 # Metadata Transformer
 # ==========================================================
+
 
 class MetadataTransformer:
     """
@@ -162,8 +153,7 @@ class MetadataTransformer:
     def rename_columns(self):
 
         self.df = (
-            self.df
-            .withColumnRenamed("title", "product_title")
+            self.df.withColumnRenamed("title", "product_title")
             .withColumnRenamed("average_rating", "product_average_rating")
             .withColumnRenamed("rating_number", "product_rating_count")
             .withColumnRenamed("description", "description_text")
@@ -205,17 +195,13 @@ class MetadataTransformer:
 
     def extract_primary_image(self):
 
-        self.df = (
-            self.df
-            .withColumn(
-                "product_image_url",
-                coalesce(
-                    col("images").getItem(0).getField("hi_res"),
-                    col("images").getItem(0).getField("large"),
-                ),
-            )
-            .drop("images")
-        )
+        self.df = self.df.withColumn(
+            "product_image_url",
+            coalesce(
+                col("images").getItem(0).getField("hi_res"),
+                col("images").getItem(0).getField("large"),
+            ),
+        ).drop("images")
 
         return self
 
@@ -224,8 +210,7 @@ class MetadataTransformer:
         self.df = self.df.withColumn(
             "description_text",
             when(
-                col("description_text").isNull()
-                | (size(col("description_text")) == 0),
+                col("description_text").isNull() | (size(col("description_text")) == 0),
                 None,
             ).otherwise(
                 array_join(
@@ -242,8 +227,7 @@ class MetadataTransformer:
         self.df = self.df.withColumn(
             "features_text",
             when(
-                col("features_text").isNull()
-                | (size(col("features_text")) == 0),
+                col("features_text").isNull() | (size(col("features_text")) == 0),
                 None,
             ).otherwise(
                 array_join(
@@ -258,8 +242,7 @@ class MetadataTransformer:
     def standardize_categories(self):
 
         self.df = (
-            self.df
-            .drop("main_category")
+            self.df.drop("main_category")
             .withColumn(
                 "main_category",
                 lit(self.dataset_name),
@@ -267,8 +250,7 @@ class MetadataTransformer:
             .withColumn(
                 "sub_category",
                 when(
-                    col("categories").isNull()
-                    | (size(col("categories")) <= 1),
+                    col("categories").isNull() | (size(col("categories")) <= 1),
                     None,
                 ).otherwise(
                     array_join(
@@ -293,9 +275,7 @@ class MetadataTransformer:
             when(
                 trim(col("store")) == "",
                 None,
-            ).otherwise(
-                trim(col("store"))
-            ),
+            ).otherwise(trim(col("store"))),
         )
 
         return self
@@ -307,9 +287,7 @@ class MetadataTransformer:
             when(
                 trim(col("product_title")) == "",
                 None,
-            ).otherwise(
-                trim(col("product_title"))
-            ),
+            ).otherwise(trim(col("product_title"))),
         )
 
         return self
@@ -336,21 +314,23 @@ class MetadataTransformer:
 
         return (
             self.rename_columns()
-                .drop_unused_columns()
-                .clean_price()
-                .extract_primary_image()
-                .flatten_description()
-                .flatten_features()
-                .standardize_categories()
-                .standardize_store()
-                .clean_product_title()
-                .reorder_columns()
-                .df
+            .drop_unused_columns()
+            .clean_price()
+            .extract_primary_image()
+            .flatten_description()
+            .flatten_features()
+            .standardize_categories()
+            .standardize_store()
+            .clean_product_title()
+            .reorder_columns()
+            .df
         )
+
 
 # ==========================================================
 # Metadata Validator
 # ==========================================================
+
 
 class MetadataValidator:
     """
@@ -383,43 +363,29 @@ class MetadataValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns:
-            raise ValueError(
-                f"Missing columns: {missing_columns}"
-            )
+            raise ValueError(f"Missing columns: {missing_columns}")
 
         if extra_columns:
-            raise ValueError(
-                f"Unexpected columns: {extra_columns}"
-            )
+            raise ValueError(f"Unexpected columns: {extra_columns}")
 
         return self
 
     def validate_duplicate_parent_asin(self):
 
         duplicate_count = (
-            self.df
-            .groupBy("parent_asin")
-            .count()
-            .filter(col("count") > 1)
-            .count()
+            self.df.groupBy("parent_asin").count().filter(col("count") > 1).count()
         )
 
         if duplicate_count > 0:
-            raise ValueError(
-                f"Found {duplicate_count} duplicate parent_asin values."
-            )
+            raise ValueError(f"Found {duplicate_count} duplicate parent_asin values.")
 
         return self
 
@@ -427,77 +393,47 @@ class MetadataValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = (
-                self.df
-                .filter(col(column_name).isNull())
-                .count()
-            )
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
-                raise ValueError(
-                    f"{column_name} contains {null_count} NULL values."
-                )
+                raise ValueError(f"{column_name} contains {null_count} NULL values.")
 
         return self
 
     def validate_rating_range(self):
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("product_average_rating").isNotNull()
-                &
-                (
-                    (col("product_average_rating") < 0)
-                    |
-                    (col("product_average_rating") > 5)
-                )
+        invalid_count = self.df.filter(
+            col("product_average_rating").isNotNull()
+            & (
+                (col("product_average_rating") < 0)
+                | (col("product_average_rating") > 5)
             )
-            .count()
-        )
+        ).count()
 
         if invalid_count > 0:
-            raise ValueError(
-                f"Found {invalid_count} invalid ratings."
-            )
+            raise ValueError(f"Found {invalid_count} invalid ratings.")
 
         return self
 
     def validate_rating_count(self):
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("product_rating_count").isNotNull()
-                &
-                (col("product_rating_count") < 0)
-            )
-            .count()
-        )
+        invalid_count = self.df.filter(
+            col("product_rating_count").isNotNull() & (col("product_rating_count") < 0)
+        ).count()
 
         if invalid_count > 0:
-            raise ValueError(
-                f"Found {invalid_count} negative rating counts."
-            )
+            raise ValueError(f"Found {invalid_count} negative rating counts.")
 
         return self
 
     def validate_price(self):
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("product_price").isNotNull()
-                &
-                (col("product_price") < 0)
-            )
-            .count()
-        )
+        invalid_count = self.df.filter(
+            col("product_price").isNotNull() & (col("product_price") < 0)
+        ).count()
 
         if invalid_count > 0:
-            raise ValueError(
-                f"Found {invalid_count} negative prices."
-            )
+            raise ValueError(f"Found {invalid_count} negative prices.")
 
         return self
 
@@ -505,16 +441,18 @@ class MetadataValidator:
 
         (
             self.validate_schema()
-                .validate_duplicate_parent_asin()
-                .validate_required_columns()
-                .validate_rating_range()
-                .validate_rating_count()
-                .validate_price()
+            .validate_duplicate_parent_asin()
+            .validate_required_columns()
+            .validate_rating_range()
+            .validate_rating_count()
+            .validate_price()
         )
+
 
 # ==========================================================
 # Pipeline
 # ==========================================================
+
 
 def run_pipeline(dataset_name: str) -> None:
 
@@ -529,13 +467,10 @@ def run_pipeline(dataset_name: str) -> None:
 
     logger.info("Applying metadata transformations...")
 
-    df = (
-        MetadataTransformer(
-            df,
-            dataset_name,
-        )
-        .transform()
-    )
+    df = MetadataTransformer(
+        df,
+        dataset_name,
+    ).transform()
 
     df.cache()
 
@@ -543,10 +478,7 @@ def run_pipeline(dataset_name: str) -> None:
 
     try:
 
-        (
-            MetadataValidator(df)
-            .run()
-        )
+        (MetadataValidator(df).run())
 
         write_parquet(
             df=df,
@@ -557,9 +489,8 @@ def run_pipeline(dataset_name: str) -> None:
 
         df.unpersist()
 
-    logger.info(
-        f"{dataset_name} completed successfully."
-    )
+    logger.info(f"{dataset_name} completed successfully.")
+
 
 # ==========================================================
 # Main
@@ -587,4 +518,4 @@ if __name__ == "__main__":
 
         logger.exception("Glue Job Failed")
 
-        raise 
+        raise

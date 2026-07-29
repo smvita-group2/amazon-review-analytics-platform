@@ -2,16 +2,18 @@
 Transformation logic for converting Bronze reviews into the Silver layer.
 """
 
+from typing import cast
+
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     col,
-    trim,
-    lit,
-    when,
     from_unixtime,
+    lit,
+    month,
     to_date,
+    trim,
+    when,
     year,
-    month
 )
 
 
@@ -30,8 +32,7 @@ class ReviewsTransformer:
         """
 
         self.df = (
-            self.df
-            .withColumnRenamed("rating", "review_rating")
+            self.df.withColumnRenamed("rating", "review_rating")
             .withColumnRenamed("title", "review_title")
             .withColumnRenamed("text", "review_text")
             .withColumnRenamed("timestamp", "review_timestamp")
@@ -44,10 +45,7 @@ class ReviewsTransformer:
         Removes leading and trailing whitespace from review titles.
         """
 
-        self.df = self.df.withColumn(
-            "review_title",
-            trim(col("review_title"))
-        )
+        self.df = self.df.withColumn("review_title", trim(col("review_title")))
 
         return self
 
@@ -56,10 +54,7 @@ class ReviewsTransformer:
         Removes leading and trailing whitespace from review text.
         """
 
-        self.df = self.df.withColumn(
-            "review_text",
-            trim(col("review_text"))
-        )
+        self.df = self.df.withColumn("review_text", trim(col("review_text")))
 
         return self
 
@@ -70,15 +65,10 @@ class ReviewsTransformer:
 
         self.df = self.df.withColumn(
             "helpful_vote",
-            when(
-                col("helpful_vote").isNull(),
-                lit(0)
-            ).when(
-                col("helpful_vote") < 0,
-                lit(0)
-            ).otherwise(
-                col("helpful_vote")
-            ).cast("int")
+            when(col("helpful_vote").isNull(), lit(0))
+            .when(col("helpful_vote") < 0, lit(0))
+            .otherwise(col("helpful_vote"))
+            .cast("int"),
         )
 
         return self
@@ -90,9 +80,7 @@ class ReviewsTransformer:
 
         self.df = self.df.withColumn(
             "review_timestamp",
-            from_unixtime(
-                col("review_timestamp") / 1000
-            ).cast("timestamp")
+            from_unixtime(col("review_timestamp") / 1000).cast("timestamp"),
         )
 
         return self
@@ -103,19 +91,9 @@ class ReviewsTransformer:
         """
 
         self.df = (
-            self.df
-            .withColumn(
-                "review_date",
-                to_date(col("review_timestamp"))
-            )
-            .withColumn(
-                "review_year",
-                year(col("review_timestamp"))
-            )
-            .withColumn(
-                "review_month",
-                month(col("review_timestamp"))
-            )
+            self.df.withColumn("review_date", to_date(col("review_timestamp")))
+            .withColumn("review_year", year(col("review_timestamp")))
+            .withColumn("review_month", month(col("review_timestamp")))
         )
 
         return self
@@ -136,7 +114,7 @@ class ReviewsTransformer:
             "review_timestamp",
             "review_date",
             "review_year",
-            "review_month"
+            "review_month",
         )
 
         return self
@@ -146,13 +124,12 @@ class ReviewsTransformer:
         Executes all review transformations.
         """
 
-        return (
-            self.rename_columns()
-                .clean_review_title()
-                .clean_review_text()
-                .clean_helpful_vote()
-                .convert_timestamp()
-                .extract_date_parts()
-                .reorder_columns()
-                .df
-        )
+        self.rename_columns()
+        self.clean_review_title()
+        self.clean_review_text()
+        self.clean_helpful_vote()
+        self.convert_timestamp()
+        self.extract_date_parts()
+        self.reorder_columns()
+
+        return cast(DataFrame, self.df)

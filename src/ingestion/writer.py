@@ -15,8 +15,4 @@ def write_parquet(
         mode: Spark write mode. Default is 'overwrite'.
     """
 
-    (
-        df.write
-        .mode(mode)
-        .parquet(output_path)
-    )
+    (df.write.mode(mode).parquet(output_path))

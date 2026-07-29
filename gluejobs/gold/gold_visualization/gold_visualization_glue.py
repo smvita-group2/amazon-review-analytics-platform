@@ -9,19 +9,17 @@ validates the Gold Visualization dataset,
 and writes the Gold Visualization dataset back to Amazon S3.
 """
 
-import sys
 import logging
+import sys
 
-from awsglue.utils import getResolvedOptions
 from awsglue.context import GlueContext
 from awsglue.job import Job
-
+from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-
 from pyspark.sql.functions import (
-    col,
     coalesce,
+    col,
     concat,
     date_format,
     length,
@@ -70,10 +68,7 @@ logger = logging.getLogger(__name__)
 # Datasets
 # ==========================================================
 
-DATASETS = [
-    dataset.strip()
-    for dataset in args["datasets"].split(",")
-]
+DATASETS = [dataset.strip() for dataset in args["datasets"].split(",")]
 
 # ==========================================================
 # Constants
@@ -105,9 +100,11 @@ def get_silver_master_path(dataset_name: str) -> str:
 def get_gold_visualization_path(dataset_name: str) -> str:
     return f"{GOLD_VISUALIZATION_ROOT}/{dataset_name}"
 
+
 # ==========================================================
 # Reader
 # ==========================================================
+
 
 def read_parquet(path: str) -> DataFrame:
 
@@ -120,25 +117,21 @@ def read_parquet(path: str) -> DataFrame:
 # Writer
 # ==========================================================
 
+
 def write_parquet(
     df: DataFrame,
     output_path: str,
 ) -> None:
 
-    logger.info(
-        f"Writing Gold Visualization: {output_path}"
-    )
+    logger.info(f"Writing Gold Visualization: {output_path}")
 
-    (
-        df.write
-        .mode("overwrite")
-        .option("compression", "snappy")
-        .parquet(output_path)
-    )
+    (df.write.mode("overwrite").option("compression", "snappy").parquet(output_path))
+
 
 # ==========================================================
 # Gold Visualization Transformer
 # ==========================================================
+
 
 class GoldVisualizationTransformer:
     """
@@ -175,8 +168,7 @@ class GoldVisualizationTransformer:
     def add_time_features(self):
 
         self.df = (
-            self.df
-            .withColumn(
+            self.df.withColumn(
                 "review_month_name",
                 date_format(
                     col("review_date"),
@@ -217,28 +209,24 @@ class GoldVisualizationTransformer:
             lit(""),
         )
 
-        self.df = (
-            self.df
-            .withColumn(
-                "review_length",
-                length(
-                    review_text,
-                ),
-            )
-            .withColumn(
-                "review_word_count",
-                when(
-                    length(review_text) == 0,
-                    0,
-                ).otherwise(
-                    size(
-                        split(
-                            review_text,
-                            r"\s+",
-                        )
+        self.df = self.df.withColumn(
+            "review_length",
+            length(
+                review_text,
+            ),
+        ).withColumn(
+            "review_word_count",
+            when(
+                length(review_text) == 0,
+                0,
+            ).otherwise(
+                size(
+                    split(
+                        review_text,
+                        r"\s+",
                     )
-                ),
-            )
+                )
+            ),
         )
 
         return self
@@ -286,30 +274,26 @@ class GoldVisualizationTransformer:
             lit(0),
         )
 
-        self.df = (
-            self.df
-            .withColumn(
-                "is_helpful",
-                helpful_votes >= MIN_HELPFUL_VOTES,
+        self.df = self.df.withColumn(
+            "is_helpful",
+            helpful_votes >= MIN_HELPFUL_VOTES,
+        ).withColumn(
+            "helpful_vote_bucket",
+            when(
+                helpful_votes == 0,
+                "No Votes",
             )
-            .withColumn(
-                "helpful_vote_bucket",
-                when(
-                    helpful_votes == 0,
-                    "No Votes",
-                )
-                .when(
-                    helpful_votes <= 10,
-                    "Low",
-                )
-                .when(
-                    helpful_votes <= 50,
-                    "Medium",
-                )
-                .otherwise(
-                    "High",
-                ),
+            .when(
+                helpful_votes <= 10,
+                "Low",
             )
+            .when(
+                helpful_votes <= 50,
+                "Medium",
+            )
+            .otherwise(
+                "High",
+            ),
         )
 
         return self
@@ -321,22 +305,19 @@ class GoldVisualizationTransformer:
             lit(0),
         )
 
-        self.df = (
-            self.df
-            .withColumn(
-                "product_review_volume_category",
-                when(
-                    product_rating_count < 100,
-                    "Low Volume",
-                )
-                .when(
-                    product_rating_count < 1000,
-                    "Medium Volume",
-                )
-                .otherwise(
-                    "High Volume",
-                ),
+        self.df = self.df.withColumn(
+            "product_review_volume_category",
+            when(
+                product_rating_count < 100,
+                "Low Volume",
             )
+            .when(
+                product_rating_count < 1000,
+                "Medium Volume",
+            )
+            .otherwise(
+                "High Volume",
+            ),
         )
 
         return self
@@ -366,27 +347,27 @@ class GoldVisualizationTransformer:
 
         return (
             self.apply_year_filter()
-                .clean_store()
-                .add_time_features()
-                .add_review_features()
-                .add_rating_features()
-                .add_purchase_features()
-                .add_helpfulness_features()
-                .add_product_features()
-                .drop_unused_columns()
-                .reorder_columns()
-                .df
+            .clean_store()
+            .add_time_features()
+            .add_review_features()
+            .add_rating_features()
+            .add_purchase_features()
+            .add_helpfulness_features()
+            .add_product_features()
+            .drop_unused_columns()
+            .reorder_columns()
+            .df
         )
+
+
 # ==========================================================
 # Gold Visualization Schema
 # ==========================================================
 
 GOLD_VISUALIZATION_COLUMNS = [
-
     # ===========================
     # Product Information
     # ===========================
-
     "parent_asin",
     "product_title",
     "store",
@@ -395,20 +376,16 @@ GOLD_VISUALIZATION_COLUMNS = [
     "product_average_rating",
     "product_rating_count",
     "product_image_url",
-
     # ===========================
     # Review Information
     # ===========================
-
     "user_id",
     "review_rating",
     "helpful_vote",
     "verified_purchase",
-
     # ===========================
     # Date Features
     # ===========================
-
     "review_date",
     "review_year",
     "review_month",
@@ -416,48 +393,37 @@ GOLD_VISUALIZATION_COLUMNS = [
     "review_quarter",
     "review_year_month",
     "review_day_of_week",
-
     # ===========================
     # Product Description
     # ===========================
-
     # ===========================
     # Review Features
     # ===========================
-
     "review_length",
     "review_word_count",
-
     # ===========================
     # Rating Features
     # ===========================
-
     "rating_category",
-
     # ===========================
     # Purchase Features
     # ===========================
-
     "purchase_type",
-
     # ===========================
     # Helpfulness Features
     # ===========================
-
     "is_helpful",
     "helpful_vote_bucket",
-
     # ===========================
     # Product Features
     # ===========================
-
-   
     "product_review_volume_category",
 ]
 
 # ==========================================================
 # Gold Visualization Validator
 # ==========================================================
+
 
 class GoldVisualizationValidator:
     """
@@ -482,32 +448,22 @@ class GoldVisualizationValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns or extra_columns:
 
             logger.error("Schema validation failed.")
 
-            logger.error(
-                f"Missing Columns : {missing_columns}"
-            )
+            logger.error(f"Missing Columns : {missing_columns}")
 
-            logger.error(
-                f"Unexpected Columns : {extra_columns}"
-            )
+            logger.error(f"Unexpected Columns : {extra_columns}")
 
-            raise ValueError(
-                "Gold Visualization schema validation failed."
-            )
+            raise ValueError("Gold Visualization schema validation failed.")
 
         return self
 
@@ -515,19 +471,11 @@ class GoldVisualizationValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = (
-                self.df
-                .filter(
-                    col(column_name).isNull()
-                )
-                .count()
-            )
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
 
-                raise ValueError(
-                    f"{column_name} contains {null_count} NULL values."
-                )
+                raise ValueError(f"{column_name} contains {null_count} NULL values.")
 
         return self
 
@@ -535,23 +483,19 @@ class GoldVisualizationValidator:
 
         if not self.df.take(1):
 
-            raise ValueError(
-                "Gold Visualization DataFrame is empty."
-            )
+            raise ValueError("Gold Visualization DataFrame is empty.")
 
         return self
 
     def run(self):
 
-        return (
-            self.validate_not_empty()
-                .validate_schema()
-                .validate_required_columns()
-        )
+        return self.validate_not_empty().validate_schema().validate_required_columns()
+
 
 # ==========================================================
 # Pipeline
 # ==========================================================
+
 
 def run_pipeline(dataset_name: str) -> None:
 
@@ -566,10 +510,7 @@ def run_pipeline(dataset_name: str) -> None:
 
     logger.info("Applying Gold Visualization transformations...")
 
-    df = (
-        GoldVisualizationTransformer(df)
-        .transform()
-    )
+    df = GoldVisualizationTransformer(df).transform()
 
     df.cache()
 
@@ -577,10 +518,7 @@ def run_pipeline(dataset_name: str) -> None:
 
     try:
 
-        (
-            GoldVisualizationValidator(df)
-            .run()
-        )
+        (GoldVisualizationValidator(df).run())
 
         write_parquet(
             df=df,
@@ -591,9 +529,8 @@ def run_pipeline(dataset_name: str) -> None:
 
         df.unpersist()
 
-    logger.info(
-        f"{dataset_name} completed successfully."
-    )
+    logger.info(f"{dataset_name} completed successfully.")
+
 
 # ==========================================================
 # Main
@@ -619,9 +556,6 @@ if __name__ == "__main__":
 
     except Exception:
 
-        logger.exception(
-            "Gold Visualization Glue Job Failed."
-        )
+        logger.exception("Gold Visualization Glue Job Failed.")
 
         raise
-

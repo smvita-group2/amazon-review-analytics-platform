@@ -5,9 +5,7 @@ Validation logic for the Gold Visualization dataset.
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
-from config.datasets.schema import (
-    GOLD_VISUALIZATION_COLUMNS,
-)
+from config.datasets.schema import GOLD_VISUALIZATION_COLUMNS
 
 
 class GoldVisualizationValidator:
@@ -36,26 +34,18 @@ class GoldVisualizationValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns:
-            raise ValueError(
-                f"Missing columns: {missing_columns}"
-            )
+            raise ValueError(f"Missing columns: {missing_columns}")
 
         if extra_columns:
-            raise ValueError(
-                f"Unexpected columns: {extra_columns}"
-            )
+            raise ValueError(f"Unexpected columns: {extra_columns}")
 
         return self
 
@@ -66,13 +56,7 @@ class GoldVisualizationValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = (
-                self.df
-                .filter(
-                    col(column_name).isNull()
-                )
-                .count()
-            )
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
                 raise ValueError(
@@ -87,9 +71,7 @@ class GoldVisualizationValidator:
         """
 
         if not self.df.take(1):
-            raise ValueError(
-                "Gold Visualization dataset is empty."
-            )
+            raise ValueError("Gold Visualization dataset is empty.")
 
         return self
 
@@ -98,8 +80,4 @@ class GoldVisualizationValidator:
         Executes all Gold Visualization validation checks.
         """
 
-        return (
-            self.validate_schema()
-                .validate_required_columns()
-                .validate_not_empty()
-        )
+        return self.validate_schema().validate_required_columns().validate_not_empty()
