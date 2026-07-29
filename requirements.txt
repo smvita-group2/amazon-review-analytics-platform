@@ -21,3 +21,5 @@ tqdm
 black
 
 isort
+
+flake8

@@ -35,6 +35,10 @@ jobs:
         run: |
           isort --check-only .
 
+      - name: Lint with Flake8
+       run: |
+          flake8 .
+
       - name: Verify Python
         run: |
           python --version
