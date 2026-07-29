@@ -27,6 +27,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Check Code Formatting
+        run: |
+          black --check .
+
       - name: Verify Python
         run: |
           python --version

@@ -17,3 +17,5 @@ python-dotenv
 # Utilities
 # ==========================
 tqdm
+
+black
