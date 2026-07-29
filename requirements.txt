@@ -29,3 +29,5 @@ pytest
 pytest-cov
 
 bandit
+
+mypy

@@ -48,6 +48,10 @@ jobs:
         run: |
           bandit -r src
 
+      - name: Static Type Checking with MyPy
+        run: |
+          mypy src
+
       - name: Verify Python
         run: |
           python --version
