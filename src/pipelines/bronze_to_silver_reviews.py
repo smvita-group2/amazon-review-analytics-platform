@@ -4,7 +4,8 @@ Pipeline for transforming Bronze reviews into the Silver layer.
 
 import argparse
 
-from config.datasets.paths import get_bronze_reviews_path, get_silver_reviews_path
+from config.datasets.paths import (get_bronze_reviews_path,
+                                   get_silver_reviews_path)
 from src.bronze_to_silver.reviews_transformer import ReviewsTransformer
 from src.common.logger import get_logger
 from src.common.spark_session import create_spark_session

@@ -3,25 +3,12 @@ Transformer for creating the Gold Visualization dataset.
 """
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (
-    coalesce,
-    col,
-    concat,
-    date_format,
-    length,
-    lit,
-    quarter,
-    size,
-    split,
-    when,
-)
+from pyspark.sql.functions import (coalesce, col, concat, date_format, length,
+                                   lit, quarter, size, split, when)
 
-from config.datasets.constants import (
-    END_YEAR,
-    MIN_HELPFUL_VOTES,
-    MIN_PRODUCT_REVIEW_THRESHOLD,
-    START_YEAR,
-)
+from config.datasets.constants import (END_YEAR, MIN_HELPFUL_VOTES,
+                                       MIN_PRODUCT_REVIEW_THRESHOLD,
+                                       START_YEAR)
 from config.datasets.schema import GOLD_VISUALIZATION_COLUMNS
 
 

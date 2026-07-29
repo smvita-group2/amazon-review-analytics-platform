@@ -16,16 +16,8 @@ from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (
-    col,
-    from_unixtime,
-    lit,
-    month,
-    to_date,
-    trim,
-    when,
-    year,
-)
+from pyspark.sql.functions import (col, from_unixtime, lit, month, to_date,
+                                   trim, when, year)
 
 # ==========================================================
 # Glue Initialization

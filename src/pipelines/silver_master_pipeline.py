@@ -4,16 +4,15 @@ Pipeline for creating the Silver Master dataset.
 
 import argparse
 
-from config.datasets.paths import (
-    get_silver_master_path,
-    get_silver_metadata_path,
-    get_silver_reviews_path,
-)
+from config.datasets.paths import (get_silver_master_path,
+                                   get_silver_metadata_path,
+                                   get_silver_reviews_path)
 from src.common.logger import get_logger
 from src.common.spark_session import create_spark_session
 from src.ingestion.reader import read_parquet
 from src.ingestion.writer import write_parquet
-from src.silver_to_gold.silver_master_transformer import SilverMasterTransformer
+from src.silver_to_gold.silver_master_transformer import \
+    SilverMasterTransformer
 from src.validation.silver_master_validator import SilverMasterValidator
 
 logger = get_logger(__name__)
