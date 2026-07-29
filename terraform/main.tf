@@ -7,8 +7,14 @@ module "s3" {
   environment   = var.environment
 }
 
-module "iam" {
-  source = "./modules/iam"
+########################################
+# Identity
+########################################
+
+module "emr_iam" {
+  source = "./modules/emr_iam"
 
   project_name = var.project_name
+  environment  = var.environment
 }
+
