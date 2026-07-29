@@ -1,6 +1,7 @@
 """
 Transformation logic for converting Bronze reviews into the Silver layer.
 """
+from typing import cast
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
@@ -122,13 +123,12 @@ class ReviewsTransformer:
         Executes all review transformations.
         """
 
-        return (
-            self.rename_columns()
-            .clean_review_title()
-            .clean_review_text()
-            .clean_helpful_vote()
-            .convert_timestamp()
-            .extract_date_parts()
-            .reorder_columns()
-            .df
-        )
+        self.rename_columns()
+        self.clean_review_title()
+        self.clean_review_text()
+        self.clean_helpful_vote()
+        self.convert_timestamp()
+        self.extract_date_parts()
+        self.reorder_columns()
+
+        return cast(DataFrame, self.df)

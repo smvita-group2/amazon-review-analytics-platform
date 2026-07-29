@@ -1,6 +1,7 @@
 """
 Transformation logic for converting Bronze metadata into the Silver layer.
 """
+from typing import cast
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
@@ -191,16 +192,15 @@ class MetadataTransformer:
         Executes all metadata transformations in order.
         """
 
-        return (
-            self.rename_columns()
-            .drop_unused_columns()
-            .clean_price()
-            .extract_primary_image()
-            .flatten_description()
-            .flatten_features()
-            .standardize_categories()
-            .standardize_store()
-            .clean_product_title()
-            .reorder_columns()
-            .df
-        )
+        self.rename_columns()
+        self.drop_unused_columns()
+        self.clean_price()
+        self.extract_primary_image()
+        self.flatten_description()
+        self.flatten_features()
+        self.standardize_categories()
+        self.standardize_store()
+        self.clean_product_title()
+        self.reorder_columns()
+
+        return cast(DataFrame, self.df)

@@ -1,6 +1,7 @@
 """
 Transformer for creating the Gold Visualization dataset.
 """
+from typing import cast
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
@@ -259,15 +260,14 @@ class GoldVisualizationTransformer:
             Gold Visualization DataFrame.
         """
 
-        return (
-            self.apply_year_filter()
-            .drop_unused_columns()
-            .add_time_features()
-            .add_review_features()
-            .add_rating_features()
-            .add_purchase_features()
-            .add_helpfulness_features()
-            .add_product_features()
-            .reorder_columns()
-            .df
-        )
+        self.apply_year_filter()
+        self.drop_unused_columns()
+        self.add_time_features()
+        self.add_review_features()
+        self.add_rating_features()
+        self.add_purchase_features()
+        self.add_helpfulness_features()
+        self.add_product_features()
+        self.reorder_columns()
+
+        return cast(DataFrame, self.df)
