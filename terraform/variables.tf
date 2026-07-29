@@ -26,3 +26,8 @@ variable "create_bucket" {
   type        = bool
   default     = true
 }
+
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
+}
