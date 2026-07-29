@@ -101,6 +101,14 @@ def get_product_summary_path(dataset_name: str) -> str:
     )
 
 
+def get_product_year_summary_path(dataset_name: str) -> str:
+
+    return (
+        f"{GOLD_AGGREGATES_ROOT}"
+        f"/product_year_summary/dataset={dataset_name}"
+    )
+
+
 def get_monthly_summary_path(dataset_name: str) -> str:
 
     return (
@@ -348,6 +356,296 @@ class GoldAggregateTransformer:
                 "total_reviews",
                 ascending=False,
             )
+        )# ==========================================================
+# Gold Aggregate Transformer
+# ==========================================================
+
+class GoldAggregateTransformer:
+    """
+    Creates aggregated datasets for Business Intelligence.
+    """
+
+    def __init__(self, df: DataFrame):
+        self.df = df
+
+    # ======================================================
+    # Product Summary (Lifetime)
+    # ======================================================
+
+    def product_summary(self) -> DataFrame:
+
+        return (
+            self.df
+            .groupBy(
+                "parent_asin",
+                "product_title",
+                "store",
+                "main_category",
+                "sub_category",
+                "product_average_rating",
+                "product_rating_count",
+                "product_image_url",
+            )
+            .agg(
+                round(
+                    avg("review_rating"),
+                    2,
+                ).alias("average_review_rating"),
+
+                count("*").alias("total_reviews"),
+
+                round(
+                    avg("helpful_vote"),
+                    2,
+                ).alias("average_helpful_votes"),
+
+                round(
+                    avg("review_length"),
+                    2,
+                ).alias("average_review_length"),
+
+                round(
+                    avg(
+                        when(
+                            col("verified_purchase"),
+                            1,
+                        ).otherwise(0)
+                    ) * 100,
+                    2,
+                ).alias("verified_purchase_percentage"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Positive",
+                        1,
+                    ).otherwise(0)
+                ).alias("positive_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Neutral",
+                        1,
+                    ).otherwise(0)
+                ).alias("neutral_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Negative",
+                        1,
+                    ).otherwise(0)
+                ).alias("negative_reviews"),
+            )
+        )
+
+    # ======================================================
+    # Product Year Summary
+    # ======================================================
+
+    def product_year_summary(self) -> DataFrame:
+
+        return (
+            self.df
+            .groupBy(
+                "review_year",
+                "parent_asin",
+                "product_title",
+                "store",
+                "main_category",
+                "sub_category",
+                "product_average_rating",
+                "product_rating_count",
+                "product_image_url",
+            )
+            .agg(
+                round(
+                    avg("review_rating"),
+                    2,
+                ).alias("average_review_rating"),
+
+                count("*").alias("total_reviews"),
+
+                round(
+                    avg("helpful_vote"),
+                    2,
+                ).alias("average_helpful_votes"),
+
+                round(
+                    avg("review_length"),
+                    2,
+                ).alias("average_review_length"),
+
+                round(
+                    avg(
+                        when(
+                            col("verified_purchase"),
+                            1,
+                        ).otherwise(0)
+                    ) * 100,
+                    2,
+                ).alias("verified_purchase_percentage"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Positive",
+                        1,
+                    ).otherwise(0)
+                ).alias("positive_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Neutral",
+                        1,
+                    ).otherwise(0)
+                ).alias("neutral_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Negative",
+                        1,
+                    ).otherwise(0)
+                ).alias("negative_reviews"),
+            )
+            .orderBy(
+                "review_year",
+                ascending=True,
+            )
+        )
+
+    # ======================================================
+    # Monthly Summary
+    # ======================================================
+
+    def monthly_summary(self) -> DataFrame:
+
+        return (
+            self.df
+            .groupBy(
+                "review_year",
+                "review_month",
+                "review_year_month",
+                "main_category",
+            )
+            .agg(
+                count("*").alias("total_reviews"),
+
+                round(
+                    avg("review_rating"),
+                    2,
+                ).alias("average_rating"),
+
+                round(
+                    avg("review_length"),
+                    2,
+                ).alias("average_review_length"),
+
+                round(
+                    avg(
+                        when(
+                            col("verified_purchase"),
+                            1,
+                        ).otherwise(0)
+                    ) * 100,
+                    2,
+                ).alias("verified_purchase_percentage"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Positive",
+                        1,
+                    ).otherwise(0)
+                ).alias("positive_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Neutral",
+                        1,
+                    ).otherwise(0)
+                ).alias("neutral_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Negative",
+                        1,
+                    ).otherwise(0)
+                ).alias("negative_reviews"),
+            )
+            .orderBy(
+                "review_year",
+                "review_month",
+            )
+        )
+
+    # ======================================================
+    # Category Summary
+    # ======================================================
+
+    def category_summary(self) -> DataFrame:
+
+        return (
+            self.df
+            .groupBy(
+                "review_year",
+                "main_category",
+                "sub_category",
+            )
+            .agg(
+                countDistinct(
+                    "parent_asin",
+                ).alias("total_products"),
+
+                count("*").alias("total_reviews"),
+
+                round(
+                    avg("review_rating"),
+                    2,
+                ).alias("average_rating"),
+
+                round(
+                    avg("helpful_vote"),
+                    2,
+                ).alias("average_helpful_votes"),
+
+                round(
+                    avg("review_length"),
+                    2,
+                ).alias("average_review_length"),
+
+                round(
+                    avg(
+                        when(
+                            col("verified_purchase"),
+                            1,
+                        ).otherwise(0)
+                    ) * 100,
+                    2,
+                ).alias("verified_purchase_percentage"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Positive",
+                        1,
+                    ).otherwise(0)
+                ).alias("positive_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Neutral",
+                        1,
+                    ).otherwise(0)
+                ).alias("neutral_reviews"),
+
+                sum(
+                    when(
+                        col("rating_category") == "Negative",
+                        1,
+                    ).otherwise(0)
+                ).alias("negative_reviews"),
+            )
+            .orderBy(
+                "review_year",
+                "total_reviews",
+                ascending=False,
+            )
         )
 
 # ==========================================================
@@ -413,6 +711,8 @@ def run_pipeline(dataset_name: str) -> None:
 
     product_summary_df = transformer.product_summary()
 
+    product_year_summary_df = transformer.product_year_summary()
+
     monthly_summary_df = transformer.monthly_summary()
 
     category_summary_df = transformer.category_summary()
@@ -423,6 +723,12 @@ def run_pipeline(dataset_name: str) -> None:
             product_summary_df,
             get_product_summary_path(dataset_name),
             "Product Summary",
+        ),
+
+        (
+            product_year_summary_df,
+            get_product_year_summary_path(dataset_name),
+            "Product Year Summary",
         ),
 
         (
