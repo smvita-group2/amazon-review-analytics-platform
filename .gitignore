@@ -4,9 +4,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyc
-*.pyo
-*.pyd
 
 # ==================================================
 # Virtual Environments
@@ -36,7 +33,7 @@ airflow-venv/
 .idea/
 
 # ==================================================
-# OS
+# Operating System
 # ==================================================
 .DS_Store
 Thumbs.db
@@ -55,7 +52,7 @@ logs/
 *.err
 
 # ==================================================
-# Pytest / Coverage
+# Testing & Coverage
 # ==================================================
 .pytest_cache/
 .coverage
@@ -65,11 +62,12 @@ htmlcov/
 .mypy_cache/
 
 # ==================================================
-# Build & Packaging
+# Build Artifacts (ONLY root build folder)
 # ==================================================
-build/
+/build/
 dist/
 *.egg-info/
+*.zip
 
 # ==================================================
 # Temporary Files
@@ -88,7 +86,6 @@ spark-temp/
 
 # ==================================================
 # Local Data
-# Keep only sample/demo data in Git
 # ==================================================
 data/raw/
 data/bronze/
@@ -124,7 +121,6 @@ airflow.cfg
 airflow-webserver.pid
 airflow-scheduler.pid
 
-# Airflow runtime
 airflow-runtime/logs/
 airflow-runtime/pids/
 
@@ -134,21 +130,3 @@ airflow-runtime/pids/
 .terraform/
 *.tfstate
 *.tfstate.*
-
-# =================================================
-
-
-# Build Artifacts
-build/
-
-*.zip
-
-# Python
-__pycache__/
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
-
-# macOS
-.DS_Store
