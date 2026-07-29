@@ -41,26 +41,18 @@ class MetadataValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns:
-            raise ValueError(
-                f"Missing columns: {missing_columns}"
-            )
+            raise ValueError(f"Missing columns: {missing_columns}")
 
         if extra_columns:
-            raise ValueError(
-                f"Unexpected columns: {extra_columns}"
-            )
+            raise ValueError(f"Unexpected columns: {extra_columns}")
 
         return self
 
@@ -70,17 +62,14 @@ class MetadataValidator:
         """
 
         duplicate_count = (
-            self.df
-            .groupBy("parent_asin")
+            self.df.groupBy("parent_asin")
             .agg(count("*").alias("record_count"))
             .filter(col("record_count") > 1)
             .count()
         )
 
         if duplicate_count > 0:
-            raise ValueError(
-                f"Found {duplicate_count} duplicate parent_asin values."
-            )
+            raise ValueError(f"Found {duplicate_count} duplicate parent_asin values.")
 
         return self
 
@@ -91,11 +80,7 @@ class MetadataValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = (
-                self.df
-                .filter(col(column_name).isNull())
-                .count()
-            )
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
                 raise ValueError(
@@ -109,17 +94,13 @@ class MetadataValidator:
         Validates that product ratings are between 0 and 5.
         """
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("product_average_rating").isNotNull() &
-                (
-                    (col("product_average_rating") < 0) |
-                    (col("product_average_rating") > 5)
-                )
+        invalid_count = self.df.filter(
+            col("product_average_rating").isNotNull()
+            & (
+                (col("product_average_rating") < 0)
+                | (col("product_average_rating") > 5)
             )
-            .count()
-        )
+        ).count()
 
         if invalid_count > 0:
             raise ValueError(
@@ -133,14 +114,9 @@ class MetadataValidator:
         Validates that product_rating_count is not negative.
         """
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("product_rating_count").isNotNull() &
-                (col("product_rating_count") < 0)
-            )
-            .count()
-        )
+        invalid_count = self.df.filter(
+            col("product_rating_count").isNotNull() & (col("product_rating_count") < 0)
+        ).count()
 
         if invalid_count > 0:
             raise ValueError(
@@ -154,14 +130,9 @@ class MetadataValidator:
         Validates that product_price is not negative.
         """
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("product_price").isNotNull() &
-                (col("product_price") < 0)
-            )
-            .count()
-        )
+        invalid_count = self.df.filter(
+            col("product_price").isNotNull() & (col("product_price") < 0)
+        ).count()
 
         if invalid_count > 0:
             raise ValueError(
@@ -177,9 +148,9 @@ class MetadataValidator:
 
         return (
             self.validate_schema()
-                .validate_duplicate_parent_asin()
-                .validate_required_columns()
-                .validate_rating_range()
-                .validate_rating_count()
-                .validate_price()
+            .validate_duplicate_parent_asin()
+            .validate_required_columns()
+            .validate_rating_range()
+            .validate_rating_count()
+            .validate_price()
         )

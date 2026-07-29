@@ -37,8 +37,7 @@ class MetadataTransformer:
         """
 
         self.df = (
-            self.df
-            .withColumnRenamed("title", "product_title")
+            self.df.withColumnRenamed("title", "product_title")
             .withColumnRenamed("average_rating", "product_average_rating")
             .withColumnRenamed("rating_number", "product_rating_count")
             .withColumnRenamed("description", "description_text")
@@ -54,11 +53,7 @@ class MetadataTransformer:
         """
 
         self.df = self.df.drop(
-            "author",
-            "bought_together",
-            "subtitle",
-            "videos",
-            "details"
+            "author", "bought_together", "subtitle", "videos", "details"
         )
 
         return self
@@ -70,11 +65,9 @@ class MetadataTransformer:
 
         self.df = self.df.withColumn(
             "product_price",
-            regexp_replace(
-                col("product_price"),
-                r"[^0-9.]",
-                ""
-            ).cast(DecimalType(PRICE_PRECISION, PRICE_SCALE))
+            regexp_replace(col("product_price"), r"[^0-9.]", "").cast(
+                DecimalType(PRICE_PRECISION, PRICE_SCALE)
+            ),
         )
 
         return self
@@ -84,17 +77,13 @@ class MetadataTransformer:
         Extracts the primary product image URL.
         """
 
-        self.df = (
-            self.df
-            .withColumn(
-                "product_image_url",
-                coalesce(
-                    col("images").getItem(0).getField("hi_res"),
-                    col("images").getItem(0).getField("large")
-                )
-            )
-            .drop("images")
-        )
+        self.df = self.df.withColumn(
+            "product_image_url",
+            coalesce(
+                col("images").getItem(0).getField("hi_res"),
+                col("images").getItem(0).getField("large"),
+            ),
+        ).drop("images")
 
         return self
 
@@ -107,12 +96,9 @@ class MetadataTransformer:
         self.df = self.df.withColumn(
             "description_text",
             when(
-                col("description_text").isNull() |
-                (size(col("description_text")) == 0),
-                None
-            ).otherwise(
-                array_join(col("description_text"), " ")
-            )
+                col("description_text").isNull() | (size(col("description_text")) == 0),
+                None,
+            ).otherwise(array_join(col("description_text"), " ")),
         )
 
         return self
@@ -126,15 +112,8 @@ class MetadataTransformer:
         self.df = self.df.withColumn(
             "features_text",
             when(
-                col("features_text").isNull() |
-                (size(col("features_text")) == 0),
-                None
-            ).otherwise(
-                array_join(
-                    col("features_text"),
-                    CATEGORY_SEPARATOR
-                )
-            )
+                col("features_text").isNull() | (size(col("features_text")) == 0), None
+            ).otherwise(array_join(col("features_text"), CATEGORY_SEPARATOR)),
         )
 
         return self
@@ -145,30 +124,18 @@ class MetadataTransformer:
         """
 
         self.df = (
-            self.df
-            .drop("main_category")
-            .withColumn(
-                "main_category",
-                trim(
-                    col("categories").getItem(0)
-                )
-            )
+            self.df.drop("main_category")
+            .withColumn("main_category", trim(col("categories").getItem(0)))
             .withColumn(
                 "sub_category",
                 when(
-                    col("categories").isNull() |
-                    (size(col("categories")) <= 1),
-                    None
+                    col("categories").isNull() | (size(col("categories")) <= 1), None
                 ).otherwise(
                     array_join(
-                        slice(
-                            col("categories"),
-                            2,
-                            size(col("categories")) - 1
-                        ),
-                        CATEGORY_SEPARATOR
+                        slice(col("categories"), 2, size(col("categories")) - 1),
+                        CATEGORY_SEPARATOR,
                     )
-                )
+                ),
             )
             .drop("categories")
         )
@@ -182,13 +149,7 @@ class MetadataTransformer:
         """
 
         self.df = self.df.withColumn(
-            "store",
-            when(
-                trim(col("store")) == "",
-                None
-            ).otherwise(
-                trim(col("store"))
-            )
+            "store", when(trim(col("store")) == "", None).otherwise(trim(col("store")))
         )
 
         return self
@@ -201,12 +162,9 @@ class MetadataTransformer:
 
         self.df = self.df.withColumn(
             "product_title",
-            when(
-                trim(col("product_title")) == "",
-                None
-            ).otherwise(
+            when(trim(col("product_title")) == "", None).otherwise(
                 trim(col("product_title"))
-            )
+            ),
         )
 
         return self
@@ -239,14 +197,14 @@ class MetadataTransformer:
 
         return (
             self.rename_columns()
-                .drop_unused_columns()
-                .clean_price()
-                .extract_primary_image()
-                .flatten_description()
-                .flatten_features()
-                .standardize_categories()
-                .standardize_store()
-                .clean_product_title()
-                .reorder_columns()
-                .df
+            .drop_unused_columns()
+            .clean_price()
+            .extract_primary_image()
+            .flatten_description()
+            .flatten_features()
+            .standardize_categories()
+            .standardize_store()
+            .clean_product_title()
+            .reorder_columns()
+            .df
         )

@@ -8,7 +8,6 @@ from airflow.operators.python import PythonOperator
 from dags.config.default_args import default_args
 from dags.utils.s3_checks import check_bronze_data
 
-
 PROJECT_ROOT = "/home/hadoop/amazon-review-analytics-platform"
 DATASET_NAME = "Appliances"
 JAVA_HOME = "/usr/lib/jvm/java-17-amazon-corretto.x86_64"
@@ -24,9 +23,7 @@ with DAG(
     tags=["amazon", "spark", "etl"],
 ) as dag:
 
-    start = EmptyOperator(
-        task_id="start"
-    )
+    start = EmptyOperator(task_id="start")
 
     check_bronze = PythonOperator(
         task_id="check_bronze_data",
@@ -88,13 +85,9 @@ with DAG(
         """,
     )
 
-    validate_silver = EmptyOperator(
-        task_id="validate_silver"
-    )
+    validate_silver = EmptyOperator(task_id="validate_silver")
 
-    end = EmptyOperator(
-        task_id="end"
-    )
+    end = EmptyOperator(task_id="end")
 
     (
         start

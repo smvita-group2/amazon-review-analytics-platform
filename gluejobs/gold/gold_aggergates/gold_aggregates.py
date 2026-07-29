@@ -66,10 +66,7 @@ logger = logging.getLogger(__name__)
 # Datasets
 # ==========================================================
 
-DATASETS = [
-    dataset.strip()
-    for dataset in args["datasets"].split(",")
-]
+DATASETS = [dataset.strip() for dataset in args["datasets"].split(",")]
 
 # ==========================================================
 # Constants
@@ -95,29 +92,23 @@ def get_gold_visualization_path(dataset_name: str) -> str:
 
 def get_product_summary_path(dataset_name: str) -> str:
 
-    return (
-        f"{GOLD_AGGREGATES_ROOT}"
-        f"/product_summary/dataset={dataset_name}"
-    )
+    return f"{GOLD_AGGREGATES_ROOT}" f"/product_summary/dataset={dataset_name}"
 
 
 def get_monthly_summary_path(dataset_name: str) -> str:
 
-    return (
-        f"{GOLD_AGGREGATES_ROOT}"
-        f"/monthly_summary/dataset={dataset_name}"
-    )
+    return f"{GOLD_AGGREGATES_ROOT}" f"/monthly_summary/dataset={dataset_name}"
 
 
 def get_category_summary_path(dataset_name: str) -> str:
 
-    return (
-        f"{GOLD_AGGREGATES_ROOT}"
-        f"/category_summary/dataset={dataset_name}"
-    )
+    return f"{GOLD_AGGREGATES_ROOT}" f"/category_summary/dataset={dataset_name}"
+
+
 # ==========================================================
 # Reader
 # ==========================================================
+
 
 def read_parquet(path: str) -> DataFrame:
 
@@ -130,26 +121,22 @@ def read_parquet(path: str) -> DataFrame:
 # Writer
 # ==========================================================
 
+
 def write_parquet(
     df: DataFrame,
     output_path: str,
     table_name: str,
 ) -> None:
 
-    logger.info(
-        f"Writing {table_name}: {output_path}"
-    )
+    logger.info(f"Writing {table_name}: {output_path}")
 
-    (
-        df.write
-        .mode("overwrite")
-        .option("compression", "snappy")
-        .parquet(output_path)
-    )
+    (df.write.mode("overwrite").option("compression", "snappy").parquet(output_path))
+
 
 # ==========================================================
 # Gold Aggregate Transformer
 # ==========================================================
+
 
 class GoldAggregateTransformer:
     """
@@ -161,115 +148,99 @@ class GoldAggregateTransformer:
 
     def product_summary(self) -> DataFrame:
 
-        return (
-            self.df
-            .groupBy(
-                "parent_asin",
-                "product_title",
-                "store",
-                "main_category",
-                "sub_category",
-                "product_average_rating",
-                "product_rating_count",
-                "product_image_url",
-            )
-            .agg(
-                round(
-                    avg("review_rating"),
-                    2,
-                ).alias("average_review_rating"),
-
-                count("*").alias("total_reviews"),
-
-                round(
-                    avg("helpful_vote"),
-                    2,
-                ).alias("average_helpful_votes"),
-
-                round(
-                    avg("review_length"),
-                    2,
-                ).alias("average_review_length"),
-
-                round(
-                    avg(
-                        when(
-                            col("verified_purchase"),
-                            1,
-                        ).otherwise(0)
-                    ) * 100,
-                    2,
-                ).alias("verified_purchase_percentage"),
-
-                sum(
+        return self.df.groupBy(
+            "parent_asin",
+            "product_title",
+            "store",
+            "main_category",
+            "sub_category",
+            "product_average_rating",
+            "product_rating_count",
+            "product_image_url",
+        ).agg(
+            round(
+                avg("review_rating"),
+                2,
+            ).alias("average_review_rating"),
+            count("*").alias("total_reviews"),
+            round(
+                avg("helpful_vote"),
+                2,
+            ).alias("average_helpful_votes"),
+            round(
+                avg("review_length"),
+                2,
+            ).alias("average_review_length"),
+            round(
+                avg(
                     when(
-                        col("rating_category") == "Positive",
+                        col("verified_purchase"),
                         1,
                     ).otherwise(0)
-                ).alias("positive_reviews"),
-
-                sum(
-                    when(
-                        col("rating_category") == "Neutral",
-                        1,
-                    ).otherwise(0)
-                ).alias("neutral_reviews"),
-
-                sum(
-                    when(
-                        col("rating_category") == "Negative",
-                        1,
-                    ).otherwise(0)
-                ).alias("negative_reviews"),
-            )
+                )
+                * 100,
+                2,
+            ).alias("verified_purchase_percentage"),
+            sum(
+                when(
+                    col("rating_category") == "Positive",
+                    1,
+                ).otherwise(0)
+            ).alias("positive_reviews"),
+            sum(
+                when(
+                    col("rating_category") == "Neutral",
+                    1,
+                ).otherwise(0)
+            ).alias("neutral_reviews"),
+            sum(
+                when(
+                    col("rating_category") == "Negative",
+                    1,
+                ).otherwise(0)
+            ).alias("negative_reviews"),
         )
 
     def monthly_summary(self) -> DataFrame:
 
         return (
-            self.df
-            .groupBy(
+            self.df.groupBy(
                 "review_year",
                 "review_month",
                 "review_year_month",
             )
             .agg(
                 count("*").alias("total_reviews"),
-
                 round(
                     avg("review_rating"),
                     2,
                 ).alias("average_rating"),
-
                 round(
                     avg("review_length"),
                     2,
                 ).alias("average_review_length"),
-
                 round(
                     avg(
                         when(
                             col("verified_purchase"),
                             1,
                         ).otherwise(0)
-                    ) * 100,
+                    )
+                    * 100,
                     2,
                 ).alias("verified_purchase_percentage"),
-
                 sum(
                     when(
                         col("rating_category") == "Positive",
                         1,
                     ).otherwise(0)
                 ).alias("positive_reviews"),
-
                 sum(
                     when(
                         col("rating_category") == "Neutral",
                         1,
                     ).otherwise(0)
                 ).alias("neutral_reviews"),
-
                 sum(
                     when(
                         col("rating_category") == "Negative",
@@ -286,8 +257,7 @@ class GoldAggregateTransformer:
     def category_summary(self) -> DataFrame:
 
         return (
-            self.df
-            .groupBy(
+            self.df.groupBy(
                 "main_category",
                 "sub_category",
             )
@@ -295,48 +265,41 @@ class GoldAggregateTransformer:
                 countDistinct(
                     "parent_asin",
                 ).alias("total_products"),
-
                 count("*").alias("total_reviews"),
-
                 round(
                     avg("review_rating"),
                     2,
                 ).alias("average_rating"),
-
                 round(
                     avg("helpful_vote"),
                     2,
                 ).alias("average_helpful_votes"),
-
                 round(
                     avg("review_length"),
                     2,
                 ).alias("average_review_length"),
-
                 round(
                     avg(
                         when(
                             col("verified_purchase"),
                             1,
                         ).otherwise(0)
-                    ) * 100,
+                    )
+                    * 100,
                     2,
                 ).alias("verified_purchase_percentage"),
-
                 sum(
                     when(
                         col("rating_category") == "Positive",
                         1,
                     ).otherwise(0)
                 ).alias("positive_reviews"),
-
                 sum(
                     when(
                         col("rating_category") == "Neutral",
                         1,
                     ).otherwise(0)
                 ).alias("neutral_reviews"),
-
                 sum(
                     when(
                         col("rating_category") == "Negative",
@@ -350,9 +313,11 @@ class GoldAggregateTransformer:
             )
         )
 
+
 # ==========================================================
 # Aggregate Validator
 # ==========================================================
+
 
 class AggregateValidator:
 
@@ -368,9 +333,7 @@ class AggregateValidator:
 
         if not self.df.take(1):
 
-            raise ValueError(
-                f"{self.table_name} is empty."
-            )
+            raise ValueError(f"{self.table_name} is empty.")
 
         return self
 
@@ -378,22 +341,19 @@ class AggregateValidator:
 
         if len(self.df.columns) == 0:
 
-            raise ValueError(
-                f"{self.table_name} has no columns."
-            )
+            raise ValueError(f"{self.table_name} has no columns.")
 
         return self
 
     def run(self):
 
-        return (
-            self
-            .validate_not_empty()
-            .validate_columns()
-        )
+        return self.validate_not_empty().validate_columns()
+
+
 # ==========================================================
 # Pipeline
 # ==========================================================
+
 
 def run_pipeline(dataset_name: str) -> None:
 
@@ -403,9 +363,7 @@ def run_pipeline(dataset_name: str) -> None:
 
     visualization_path = get_gold_visualization_path(dataset_name)
 
-    logger.info(
-        f"Input Path : {visualization_path}"
-    )
+    logger.info(f"Input Path : {visualization_path}")
 
     df = read_parquet(visualization_path)
 
@@ -418,19 +376,16 @@ def run_pipeline(dataset_name: str) -> None:
     category_summary_df = transformer.category_summary()
 
     datasets = [
-
         (
             product_summary_df,
             get_product_summary_path(dataset_name),
             "Product Summary",
         ),
-
         (
             monthly_summary_df,
             get_monthly_summary_path(dataset_name),
             "Monthly Summary",
         ),
-
         (
             category_summary_df,
             get_category_summary_path(dataset_name),
@@ -442,13 +397,9 @@ def run_pipeline(dataset_name: str) -> None:
 
         aggregate_df = aggregate_df.coalesce(1)
 
-        logger.info(
-            f"Validating {table_name}..."
-        )
+        logger.info(f"Validating {table_name}...")
 
-        logger.info(
-            f"Output Path : {output_path}"
-        )
+        logger.info(f"Output Path : {output_path}")
 
         try:
 
@@ -456,8 +407,7 @@ def run_pipeline(dataset_name: str) -> None:
                 AggregateValidator(
                     aggregate_df,
                     table_name,
-                )
-                .run()
+                ).run()
             )
 
             write_parquet(
@@ -466,21 +416,16 @@ def run_pipeline(dataset_name: str) -> None:
                 table_name=table_name,
             )
 
-            logger.info(
-                f"{table_name} written successfully."
-            )
+            logger.info(f"{table_name} written successfully.")
 
         except Exception:
 
-            logger.exception(
-                f"Failed while processing {table_name}"
-            )
+            logger.exception(f"Failed while processing {table_name}")
 
             raise
 
-    logger.info(
-        f"{dataset_name} completed successfully."
-    )
+    logger.info(f"{dataset_name} completed successfully.")
+
 
 # ==========================================================
 # Main
@@ -506,9 +451,6 @@ if __name__ == "__main__":
 
     except Exception:
 
-        logger.exception(
-            "Gold Aggregates Glue Job Failed."
-        )
+        logger.exception("Gold Aggregates Glue Job Failed.")
 
         raise
-

@@ -25,12 +25,10 @@ class SilverMasterTransformer:
         datasets into a single Silver Master dataset.
         """
 
-        master_df = (
-            self.reviews_df.join(
-                self.metadata_df,
-                on="parent_asin",
-                how="inner",
-            )
+        master_df = self.reviews_df.join(
+            self.metadata_df,
+            on="parent_asin",
+            how="inner",
         )
 
         return master_df
@@ -38,6 +36,7 @@ class SilverMasterTransformer:
     """
 Transformation logic for creating the Silver Master dataset.
 """
+
 
 from pyspark.sql import DataFrame
 
@@ -62,13 +61,10 @@ class SilverMasterTransformer:
         datasets into a single Silver Master dataset.
         """
 
-        master_df = (
-            self.reviews_df.join(
-                self.metadata_df,
-                on="parent_asin",
-                how="inner",
-            )
+        master_df = self.reviews_df.join(
+            self.metadata_df,
+            on="parent_asin",
+            how="inner",
         )
 
         return master_df
-

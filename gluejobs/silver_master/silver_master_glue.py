@@ -57,10 +57,7 @@ logger = logging.getLogger(__name__)
 # Datasets
 # ==========================================================
 
-DATASETS = [
-    dataset.strip()
-    for dataset in args["datasets"].split(",")
-]
+DATASETS = [dataset.strip() for dataset in args["datasets"].split(",")]
 
 
 # ==========================================================
@@ -99,35 +96,33 @@ def get_silver_master_path(dataset_name: str) -> str:
 # Reader
 # ==========================================================
 
+
 def read_parquet(path: str) -> DataFrame:
 
     logger.info(f"Reading: {path}")
 
     return spark.read.parquet(path)
 
+
 # ==========================================================
 # Writer
 # ==========================================================
+
 
 def write_parquet(
     df: DataFrame,
     output_path: str,
 ) -> None:
 
-    logger.info(
-        f"Writing Silver Master: {output_path}"
-    )
+    logger.info(f"Writing Silver Master: {output_path}")
 
-    (
-        df.write
-        .mode("overwrite")
-        .option("compression", "snappy")
-        .parquet(output_path)
-    )
+    (df.write.mode("overwrite").option("compression", "snappy").parquet(output_path))
+
 
 # ==========================================================
 # Silver Master Transformer
 # ==========================================================
+
 
 class SilverMasterTransformer:
     """
@@ -149,17 +144,17 @@ class SilverMasterTransformer:
         datasets into a single Silver Master dataset.
         """
 
-        return (
-            self.reviews_df.join(
-                self.metadata_df,
-                on="parent_asin",
-                how="inner",
-            )
+        return self.reviews_df.join(
+            self.metadata_df,
+            on="parent_asin",
+            how="inner",
         )
+
 
 # ==========================================================
 # Silver Master Validator
 # ==========================================================
+
 
 class SilverMasterValidator:
     """
@@ -204,32 +199,22 @@ class SilverMasterValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns or extra_columns:
 
             logger.error("Schema validation failed.")
 
-            logger.error(
-                f"Missing Columns : {missing_columns}"
-            )
+            logger.error(f"Missing Columns : {missing_columns}")
 
-            logger.error(
-                f"Unexpected Columns : {extra_columns}"
-            )
+            logger.error(f"Unexpected Columns : {extra_columns}")
 
-            raise ValueError(
-                "Silver Master schema validation failed."
-            )
+            raise ValueError("Silver Master schema validation failed.")
 
         return self
 
@@ -237,17 +222,11 @@ class SilverMasterValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = (
-                self.df
-                .filter(col(column_name).isNull())
-                .count()
-            )
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
 
-                raise ValueError(
-                    f"{column_name} contains {null_count} NULL values."
-                )
+                raise ValueError(f"{column_name} contains {null_count} NULL values.")
 
         return self
 
@@ -255,28 +234,23 @@ class SilverMasterValidator:
 
         if not self.df.take(1):
 
-            raise ValueError(
-                "Silver Master DataFrame is empty."
-            )
+            raise ValueError("Silver Master DataFrame is empty.")
 
         return self
 
     def run(self):
 
-        return (
-            self.validate_not_empty()
-                .validate_schema()
-                .validate_required_columns()
-        )
+        return self.validate_not_empty().validate_schema().validate_required_columns()
+
+
 # ==========================================================
 # Pipeline
 # ==========================================================
 
+
 def run_pipeline(dataset_name: str) -> None:
 
-    logger.info(
-        f"Processing Dataset : {dataset_name}"
-    )
+    logger.info(f"Processing Dataset : {dataset_name}")
 
     reviews_path = get_silver_reviews_path(dataset_name)
 
@@ -288,21 +262,16 @@ def run_pipeline(dataset_name: str) -> None:
 
     metadata_df = read_parquet(metadata_path)
 
-    master_df = (
-        SilverMasterTransformer(
-            reviews_df=reviews_df,
-            metadata_df=metadata_df,
-        )
-        .transform()
-    )
+    master_df = SilverMasterTransformer(
+        reviews_df=reviews_df,
+        metadata_df=metadata_df,
+    ).transform()
 
     master_df.cache()
 
     try:
 
-        SilverMasterValidator(
-            master_df
-        ).run()
+        SilverMasterValidator(master_df).run()
 
         write_parquet(
             df=master_df,
@@ -313,19 +282,17 @@ def run_pipeline(dataset_name: str) -> None:
 
         master_df.unpersist()
 
-    logger.info(
-        f"Completed Dataset : {dataset_name}"
-    )
+    logger.info(f"Completed Dataset : {dataset_name}")
+
 
 # ==========================================================
 # Main
 # ==========================================================
 
+
 def main():
 
-    logger.info(
-        "Starting Silver Master Glue Job"
-    )
+    logger.info("Starting Silver Master Glue Job")
 
     try:
 
@@ -333,21 +300,16 @@ def main():
 
             run_pipeline(dataset_name)
 
-        logger.info(
-            "Silver Master Glue Job Completed Successfully."
-        )
+        logger.info("Silver Master Glue Job Completed Successfully.")
 
         job.commit()
 
     except Exception:
 
-        logger.exception(
-            "Silver Master Glue Job Failed."
-        )
+        logger.exception("Silver Master Glue Job Failed.")
 
         raise
 
 
 if __name__ == "__main__":
     main()
-

@@ -33,32 +33,20 @@ def main():
 
     print("\nReading Reviews Dataset...")
 
-    reviews_df = (
-        read_json(spark, RAW_REVIEWS_PATH)
-        .select(*REVIEWS_COLUMNS)
-    )
+    reviews_df = read_json(spark, RAW_REVIEWS_PATH).select(*REVIEWS_COLUMNS)
 
-    #testing
+    # testing
     # print(f"Reviews Rows : {reviews_df.count():,}")
     print("Reviews Dataset Loaded.")
 
-
     print("\nReading Metadata Dataset...")
 
-    metadata_df = (
-        read_json(spark, RAW_METADATA_PATH)
-        .select(
-            *METADATA_COLUMNS,
-
-            F.regexp_replace(
-                F.col("price"),
-                "—",
-                ""
-            ).cast("double").alias("price")
-        )
+    metadata_df = read_json(spark, RAW_METADATA_PATH).select(
+        *METADATA_COLUMNS,
+        F.regexp_replace(F.col("price"), "—", "").cast("double").alias("price")
     )
 
-    #testing
+    # testing
     # print(f"Metadata Rows : {metadata_df.count():,}")
     print("Metadata Dataset Loaded.")
 

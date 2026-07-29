@@ -18,7 +18,6 @@ from src.ingestion.writer import write_parquet
 from src.bronze_to_silver.metadata_transformer import MetadataTransformer
 from src.validation.metadata_validator import MetadataValidator
 
-
 logger = get_logger(__name__)
 
 
@@ -36,16 +35,12 @@ def run(dataset_name: str) -> None:
     )
 
     try:
-        logger.info(
-            "Starting Bronze to Silver Metadata Pipeline"
-        )
+        logger.info("Starting Bronze to Silver Metadata Pipeline")
 
         bronze_path = get_bronze_metadata_path(dataset_name)
         silver_path = get_silver_metadata_path(dataset_name)
 
-        logger.info(
-            f"Reading Bronze metadata from: {bronze_path}"
-        )
+        logger.info(f"Reading Bronze metadata from: {bronze_path}")
 
         df = read_parquet(
             spark=spark,
@@ -54,30 +49,20 @@ def run(dataset_name: str) -> None:
 
         logger.info("Transforming metadata...")
 
-        df = (
-            MetadataTransformer(df)
-            .transform()
-        )
+        df = MetadataTransformer(df).transform()
 
         logger.info("Validating metadata...")
 
-        (
-            MetadataValidator(df)
-            .run()
-        )
+        (MetadataValidator(df).run())
 
-        logger.info(
-            f"Writing Silver metadata to: {silver_path}"
-        )
+        logger.info(f"Writing Silver metadata to: {silver_path}")
 
         write_parquet(
             df=df,
             output_path=silver_path,
         )
 
-        logger.info(
-            "Bronze to Silver Metadata Pipeline completed successfully."
-        )
+        logger.info("Bronze to Silver Metadata Pipeline completed successfully.")
 
     finally:
         spark.stop()
@@ -85,15 +70,9 @@ def run(dataset_name: str) -> None:
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(
-        description="Bronze to Silver Metadata Pipeline"
-    )
+    parser = argparse.ArgumentParser(description="Bronze to Silver Metadata Pipeline")
 
-    parser.add_argument(
-        "--dataset",
-        required=True,
-        help="Dataset name to process"
-    )
+    parser.add_argument("--dataset", required=True, help="Dataset name to process")
 
     args = parser.parse_args()
 

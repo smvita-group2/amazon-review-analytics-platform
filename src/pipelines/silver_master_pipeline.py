@@ -24,7 +24,6 @@ from src.validation.silver_master_validator import (
     SilverMasterValidator,
 )
 
-
 logger = get_logger(__name__)
 
 
@@ -42,65 +41,45 @@ def run(dataset_name: str) -> None:
     )
 
     try:
-        logger.info(
-            "Starting Silver Master Pipeline"
-        )
+        logger.info("Starting Silver Master Pipeline")
 
         reviews_path = get_silver_reviews_path(dataset_name)
         metadata_path = get_silver_metadata_path(dataset_name)
         master_path = get_silver_master_path(dataset_name)
 
-        logger.info(
-            f"Reading Silver reviews from: {reviews_path}"
-        )
+        logger.info(f"Reading Silver reviews from: {reviews_path}")
 
         reviews_df = read_parquet(
             spark=spark,
             path=reviews_path,
         )
 
-        logger.info(
-            f"Reading Silver metadata from: {metadata_path}"
-        )
+        logger.info(f"Reading Silver metadata from: {metadata_path}")
 
         metadata_df = read_parquet(
             spark=spark,
             path=metadata_path,
         )
 
-        logger.info(
-            "Creating Silver Master dataset..."
-        )
+        logger.info("Creating Silver Master dataset...")
 
-        master_df = (
-            SilverMasterTransformer(
-                reviews_df=reviews_df,
-                metadata_df=metadata_df,
-            )
-            .transform()
-        )
+        master_df = SilverMasterTransformer(
+            reviews_df=reviews_df,
+            metadata_df=metadata_df,
+        ).transform()
 
-        logger.info(
-            "Validating Silver Master dataset..."
-        )
+        logger.info("Validating Silver Master dataset...")
 
-        (
-            SilverMasterValidator(master_df)
-            .run()
-        )
+        (SilverMasterValidator(master_df).run())
 
-        logger.info(
-            f"Writing Silver Master to: {master_path}"
-        )
+        logger.info(f"Writing Silver Master to: {master_path}")
 
         write_parquet(
             df=master_df,
             output_path=master_path,
         )
 
-        logger.info(
-            "Silver Master Pipeline completed successfully."
-        )
+        logger.info("Silver Master Pipeline completed successfully.")
 
     finally:
         spark.stop()
@@ -108,15 +87,9 @@ def run(dataset_name: str) -> None:
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(
-        description="Silver Master Pipeline"
-    )
+    parser = argparse.ArgumentParser(description="Silver Master Pipeline")
 
-    parser.add_argument(
-        "--dataset",
-        required=True,
-        help="Dataset name to process"
-    )
+    parser.add_argument("--dataset", required=True, help="Dataset name to process")
 
     args = parser.parse_args()
 

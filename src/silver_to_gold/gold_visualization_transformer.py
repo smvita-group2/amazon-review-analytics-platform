@@ -76,8 +76,7 @@ class GoldVisualizationTransformer:
         """
 
         self.df = (
-            self.df
-            .withColumn(
+            self.df.withColumn(
                 "review_month_name",
                 date_format(
                     col("review_date"),
@@ -121,23 +120,19 @@ class GoldVisualizationTransformer:
             lit(""),
         )
 
-        self.df = (
-            self.df
-            .withColumn(
-                "review_length",
-                length(
+        self.df = self.df.withColumn(
+            "review_length",
+            length(
+                review_text,
+            ),
+        ).withColumn(
+            "review_word_count",
+            size(
+                split(
                     review_text,
-                ),
-            )
-            .withColumn(
-                "review_word_count",
-                size(
-                    split(
-                        review_text,
-                        r"\s+",
-                    )
-                ),
-            )
+                    r"\s+",
+                )
+            ),
         )
 
         return self
@@ -194,30 +189,26 @@ class GoldVisualizationTransformer:
             lit(0),
         )
 
-        self.df = (
-            self.df
-            .withColumn(
-                "is_helpful",
-                helpful_votes >= MIN_HELPFUL_VOTES,
+        self.df = self.df.withColumn(
+            "is_helpful",
+            helpful_votes >= MIN_HELPFUL_VOTES,
+        ).withColumn(
+            "helpful_vote_bucket",
+            when(
+                helpful_votes == 0,
+                "No Votes",
             )
-            .withColumn(
-                "helpful_vote_bucket",
-                when(
-                    helpful_votes == 0,
-                    "No Votes",
-                )
-                .when(
-                    helpful_votes <= 5,
-                    "Low",
-                )
-                .when(
-                    helpful_votes <= 20,
-                    "Medium",
-                )
-                .otherwise(
-                    "High",
-                ),
+            .when(
+                helpful_votes <= 5,
+                "Low",
             )
+            .when(
+                helpful_votes <= 20,
+                "Medium",
+            )
+            .otherwise(
+                "High",
+            ),
         )
 
         return self
@@ -232,26 +223,22 @@ class GoldVisualizationTransformer:
             lit(0),
         )
 
-        self.df = (
-            self.df
-            .withColumn(
-                "review_count_threshold_met",
-                product_rating_count >= MIN_PRODUCT_REVIEW_THRESHOLD,
+        self.df = self.df.withColumn(
+            "review_count_threshold_met",
+            product_rating_count >= MIN_PRODUCT_REVIEW_THRESHOLD,
+        ).withColumn(
+            "product_review_volume_category",
+            when(
+                product_rating_count < 100,
+                "Low Volume",
             )
-            .withColumn(
-                "product_review_volume_category",
-                when(
-                    product_rating_count < 100,
-                    "Low Volume",
-                )
-                .when(
-                    product_rating_count < 1000,
-                    "Medium Volume",
-                )
-                .otherwise(
-                    "High Volume",
-                ),
+            .when(
+                product_rating_count < 1000,
+                "Medium Volume",
             )
+            .otherwise(
+                "High Volume",
+            ),
         )
 
         return self
@@ -277,13 +264,13 @@ class GoldVisualizationTransformer:
 
         return (
             self.apply_year_filter()
-                .drop_unused_columns()
-                .add_time_features()
-                .add_review_features()
-                .add_rating_features()
-                .add_purchase_features()
-                .add_helpfulness_features()
-                .add_product_features()
-                .reorder_columns()
-                .df
+            .drop_unused_columns()
+            .add_time_features()
+            .add_review_features()
+            .add_rating_features()
+            .add_purchase_features()
+            .add_helpfulness_features()
+            .add_product_features()
+            .reorder_columns()
+            .df
         )

@@ -39,13 +39,9 @@ def check_bronze_data(dataset_name):
     reviews_path = get_bronze_reviews_path(dataset_name)
 
     if not _check_prefix_exists(metadata_path):
-        raise AirflowException(
-            f"Bronze metadata not found: {metadata_path}"
-        )
+        raise AirflowException(f"Bronze metadata not found: {metadata_path}")
 
     if not _check_prefix_exists(reviews_path):
-        raise AirflowException(
-            f"Bronze reviews not found: {reviews_path}"
-        )
+        raise AirflowException(f"Bronze reviews not found: {reviews_path}")
 
     print("Bronze dataset verified successfully.")

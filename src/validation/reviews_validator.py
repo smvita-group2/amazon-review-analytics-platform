@@ -43,15 +43,11 @@ class ReviewsValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns or extra_columns:
@@ -69,9 +65,7 @@ class ReviewsValidator:
             if extra_columns:
                 print(f"\nUnexpected Columns: {extra_columns}")
 
-            raise ValueError(
-                "Reviews schema validation failed."
-            )
+            raise ValueError("Reviews schema validation failed.")
 
         return self
 
@@ -82,11 +76,7 @@ class ReviewsValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = (
-                self.df
-                .filter(col(column_name).isNull())
-                .count()
-            )
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
                 raise ValueError(
@@ -100,22 +90,13 @@ class ReviewsValidator:
         Validates that review ratings are between 1 and 5.
         """
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("review_rating").isNotNull() &
-                (
-                    (col("review_rating") < 1) |
-                    (col("review_rating") > 5)
-                )
-            )
-            .count()
-        )
+        invalid_count = self.df.filter(
+            col("review_rating").isNotNull()
+            & ((col("review_rating") < 1) | (col("review_rating") > 5))
+        ).count()
 
         if invalid_count > 0:
-            raise ValueError(
-                f"Found {invalid_count} review(s) with invalid ratings."
-            )
+            raise ValueError(f"Found {invalid_count} review(s) with invalid ratings.")
 
         return self
 
@@ -124,14 +105,9 @@ class ReviewsValidator:
         Validates that helpful votes are non-negative.
         """
 
-        invalid_count = (
-            self.df
-            .filter(
-                col("helpful_vote").isNotNull() &
-                (col("helpful_vote") < 0)
-            )
-            .count()
-        )
+        invalid_count = self.df.filter(
+            col("helpful_vote").isNotNull() & (col("helpful_vote") < 0)
+        ).count()
 
         if invalid_count > 0:
             raise ValueError(
@@ -145,16 +121,10 @@ class ReviewsValidator:
         Validates that review timestamps are not NULL.
         """
 
-        null_count = (
-            self.df
-            .filter(col("review_timestamp").isNull())
-            .count()
-        )
+        null_count = self.df.filter(col("review_timestamp").isNull()).count()
 
         if null_count > 0:
-            raise ValueError(
-                f"Found {null_count} review(s) with NULL timestamps."
-            )
+            raise ValueError(f"Found {null_count} review(s) with NULL timestamps.")
 
         return self
 
@@ -165,8 +135,8 @@ class ReviewsValidator:
 
         return (
             self.validate_schema()
-                .validate_required_columns()
-                .validate_rating_range()
-                .validate_helpful_vote()
-                .validate_timestamp()
+            .validate_required_columns()
+            .validate_rating_range()
+            .validate_helpful_vote()
+            .validate_timestamp()
         )
