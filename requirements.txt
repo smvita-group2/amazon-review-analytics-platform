@@ -19,3 +19,5 @@ python-dotenv
 tqdm
 
 black
+
+isort
