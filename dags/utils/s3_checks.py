@@ -1,11 +1,8 @@
 import boto3
-
 from airflow.exceptions import AirflowException
 
-from config.datasets.paths import (
-    get_bronze_metadata_path,
-    get_bronze_reviews_path,
-)
+from config.datasets.paths import (get_bronze_metadata_path,
+                                   get_bronze_reviews_path)
 
 
 def _check_prefix_exists(s3_uri: str) -> bool:

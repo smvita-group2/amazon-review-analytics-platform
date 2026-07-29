@@ -1,22 +1,13 @@
-from config.datasets.paths import (
-    RAW_REVIEWS_PATH,
-    RAW_METADATA_PATH,
-    BRONZE_REVIEWS_PATH,
-    BRONZE_METADATA_PATH,
-    SAMPLE_REVIEWS_PATH,
-    SAMPLE_METADATA_PATH,
-)
-
-from src.common.spark_session import create_spark_session
-
-from src.ingestion.reader import read_json
-from src.ingestion.writer import write_parquet
-from src.ingestion.sampler import create_sample
 from pyspark.sql import functions as F
-from config.datasets.schema import (
-    REVIEWS_COLUMNS,
-    METADATA_COLUMNS,
-)
+
+from config.datasets.paths import (BRONZE_METADATA_PATH, BRONZE_REVIEWS_PATH,
+                                   RAW_METADATA_PATH, RAW_REVIEWS_PATH,
+                                   SAMPLE_METADATA_PATH, SAMPLE_REVIEWS_PATH)
+from config.datasets.schema import METADATA_COLUMNS, REVIEWS_COLUMNS
+from src.common.spark_session import create_spark_session
+from src.ingestion.reader import read_json
+from src.ingestion.sampler import create_sample
+from src.ingestion.writer import write_parquet
 
 
 def main():

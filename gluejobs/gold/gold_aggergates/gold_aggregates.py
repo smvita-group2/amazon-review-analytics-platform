@@ -9,25 +9,16 @@ validates each aggregate,
 and writes them back to Amazon S3.
 """
 
-import sys
 import logging
+import sys
 
-from awsglue.utils import getResolvedOptions
 from awsglue.context import GlueContext
 from awsglue.job import Job
-
+from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-
-from pyspark.sql.functions import (
-    avg,
-    col,
-    count,
-    countDistinct,
-    round,
-    sum,
-    when,
-)
+from pyspark.sql.functions import (avg, col, count, countDistinct, round, sum,
+                                   when)
 
 # ==========================================================
 # Glue Initialization

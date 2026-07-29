@@ -5,9 +5,7 @@ Validation logic for the Gold Visualization dataset.
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
-from config.datasets.schema import (
-    GOLD_VISUALIZATION_COLUMNS,
-)
+from config.datasets.schema import GOLD_VISUALIZATION_COLUMNS
 
 
 class GoldVisualizationValidator:

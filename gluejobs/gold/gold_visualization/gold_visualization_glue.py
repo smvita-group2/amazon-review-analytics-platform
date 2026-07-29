@@ -9,28 +9,16 @@ validates the Gold Visualization dataset,
 and writes the Gold Visualization dataset back to Amazon S3.
 """
 
-import sys
 import logging
+import sys
 
-from awsglue.utils import getResolvedOptions
 from awsglue.context import GlueContext
 from awsglue.job import Job
-
+from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-
-from pyspark.sql.functions import (
-    col,
-    coalesce,
-    concat,
-    date_format,
-    length,
-    lit,
-    quarter,
-    size,
-    split,
-    when,
-)
+from pyspark.sql.functions import (coalesce, col, concat, date_format, length,
+                                   lit, quarter, size, split, when)
 
 # ==========================================================
 # Glue Initialization

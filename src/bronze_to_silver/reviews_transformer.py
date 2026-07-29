@@ -3,16 +3,8 @@ Transformation logic for converting Bronze reviews into the Silver layer.
 """
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (
-    col,
-    trim,
-    lit,
-    when,
-    from_unixtime,
-    to_date,
-    year,
-    month,
-)
+from pyspark.sql.functions import (col, from_unixtime, lit, month, to_date,
+                                   trim, when, year)
 
 
 class ReviewsTransformer:

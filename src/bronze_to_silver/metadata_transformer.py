@@ -3,23 +3,12 @@ Transformation logic for converting Bronze metadata into the Silver layer.
 """
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (
-    array_join,
-    col,
-    coalesce,
-    regexp_replace,
-    size,
-    slice,
-    trim,
-    when,
-)
+from pyspark.sql.functions import (array_join, coalesce, col, regexp_replace,
+                                   size, slice, trim, when)
 from pyspark.sql.types import DecimalType
 
-from config.datasets.constants import (
-    CATEGORY_SEPARATOR,
-    PRICE_PRECISION,
-    PRICE_SCALE,
-)
+from config.datasets.constants import (CATEGORY_SEPARATOR, PRICE_PRECISION,
+                                       PRICE_SCALE)
 
 
 class MetadataTransformer:
