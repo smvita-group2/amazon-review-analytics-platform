@@ -2,8 +2,9 @@
 
 set -euo pipefail
 
-ARTIFACT_NAME="amazon-review-analytics-platform.zip"
 BUILD_DIR="build"
+SHORT_SHA=$(git rev-parse --short HEAD)
+ARTIFACT_NAME="amazon-review-analytics-platform-${SHORT_SHA}.zip"
 
 echo "=================================="
 echo " Amazon Review Analytics Platform "
@@ -24,7 +25,8 @@ Amazon Review Analytics Platform
 ====================================
 
 Build Time (UTC): $(date -u)
-Git Commit      : $(git rev-parse --short HEAD)
+Git Commit      : $(git rev-parse HEAD)
+Git Short SHA   : ${SHORT_SHA}
 Git Branch      : $(git rev-parse --abbrev-ref HEAD)
 
 EOF
@@ -34,10 +36,8 @@ echo "Copying project files..."
 
 cp -R src "$BUILD_DIR/"
 cp -R config "$BUILD_DIR/"
-
 cp requirements.txt "$BUILD_DIR/"
 
-# Copy README only if it exists
 if [ -f README.md ]; then
     cp README.md "$BUILD_DIR/"
 fi
@@ -55,7 +55,7 @@ echo "Creating deployment artifact..."
 (
     cd "$BUILD_DIR"
 
-    rm -f "$ARTIFACT_NAME"
+    rm -f *.zip
 
     zip -rq "$ARTIFACT_NAME" .
 )
@@ -66,11 +66,10 @@ echo " Deployment Artifact Created"
 echo "=================================="
 
 echo
-echo "Artifact Location:"
+echo "Artifact:"
 echo "$BUILD_DIR/$ARTIFACT_NAME"
 
 echo
-echo "Build Directory Contents:"
 ls -lh "$BUILD_DIR"
 
 echo

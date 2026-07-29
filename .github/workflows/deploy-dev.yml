@@ -44,8 +44,8 @@ jobs:
       - name: Upload GitHub Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: amazon-review-analytics-platform
-          path: build/amazon-review-analytics-platform.zip
+          name: deployment-${{ github.sha }}
+          path: build/*.zip
 
       - name: Deploy to S3
         run: |

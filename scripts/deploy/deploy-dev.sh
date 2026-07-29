@@ -5,7 +5,9 @@ set -euo pipefail
 BUCKET="${S3_BUCKET:?S3_BUCKET is not set}"
 PREFIX="${S3_ARTIFACT_PREFIX:?S3_ARTIFACT_PREFIX is not set}"
 
-ARTIFACT="build/amazon-review-analytics-platform.zip"
+SHORT_SHA=$(git rev-parse --short HEAD)
+ARTIFACT_NAME="amazon-review-analytics-platform-${SHORT_SHA}.zip"
+ARTIFACT="build/${ARTIFACT_NAME}"
 
 echo "=================================="
 echo " Amazon Review Analytics Platform "
@@ -21,21 +23,24 @@ fi
 
 if [ ! -f "$ARTIFACT" ]; then
     echo "ERROR: Deployment artifact not found."
-    echo "Run ./scripts/build/package.sh first."
     exit 1
 fi
 
 echo "Uploading artifact..."
+echo "Artifact : ${ARTIFACT_NAME}"
+echo "Bucket   : ${BUCKET}"
+echo "Prefix   : ${PREFIX}"
 
 aws s3 cp \
     "$ARTIFACT" \
-    "s3://$BUCKET/$PREFIX/"
+    "s3://${BUCKET}/${PREFIX}/${ARTIFACT_NAME}"
 
 echo
-echo "Verifying upload..."
+echo "Upload completed."
 
-aws s3 ls \
-    "s3://$BUCKET/$PREFIX/"
+echo
+echo "Artifacts currently in S3:"
+aws s3 ls "s3://${BUCKET}/${PREFIX}/"
 
 echo
 echo "Deployment Successful"
