@@ -26,23 +26,11 @@ resource "aws_emr_cluster" "this" {
   master_instance_group {
     instance_type  = var.master_instance_type
     instance_count = var.master_instance_count
-
-    ebs_config {
-      size                 = 100
-      type                 = "gp3"
-      volumes_per_instance = 1
-    }
   }
 
   core_instance_group {
     instance_type  = var.core_instance_type
     instance_count = var.core_instance_count
-
-    ebs_config {
-      size                 = 100
-      type                 = "gp3"
-      volumes_per_instance = 1
-    }
   }
 
   auto_termination_policy {
