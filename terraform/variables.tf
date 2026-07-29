@@ -31,3 +31,18 @@ variable "vpc_id" {
   description = "VPC ID"
   type        = string
 }
+
+variable "subnet_id" {
+  description = "Subnet ID for EMR"
+  type        = string
+}
+
+variable "master_instance_type" {
+  type    = string
+  default = "m5.xlarge"
+}
+
+variable "core_instance_type" {
+  type    = string
+  default = "m5.xlarge"
+}
