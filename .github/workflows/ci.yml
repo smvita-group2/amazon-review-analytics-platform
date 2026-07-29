@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-
+      - workflows/automate
   pull_request:
     branches:
       - develop
@@ -36,10 +36,9 @@ jobs:
           isort --check-only .
 
       - name: Lint with Flake8
-       run: |
+        run: |
           flake8 .
 
       - name: Verify Python
         run: |
           python --version
-          pip --version
