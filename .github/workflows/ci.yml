@@ -17,7 +17,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Verify Repository
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify Python
         run: |
-          pwd
-          ls -la
+          python --version
+          pip --version
