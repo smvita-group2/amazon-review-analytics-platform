@@ -16,8 +16,17 @@ from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (array_join, coalesce, col, lit,
-                                   regexp_replace, size, slice, trim, when)
+from pyspark.sql.functions import (
+    array_join,
+    coalesce,
+    col,
+    lit,
+    regexp_replace,
+    size,
+    slice,
+    trim,
+    when,
+)
 from pyspark.sql.types import DecimalType
 
 # ==========================================================

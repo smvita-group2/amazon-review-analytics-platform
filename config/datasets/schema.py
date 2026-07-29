@@ -2,9 +2,17 @@
 Dataset schemas and expected column definitions used throughout the project.
 """
 
-from pyspark.sql.types import (BooleanType, DateType, DoubleType, IntegerType,
-                               LongType, StringType, StructField, StructType,
-                               TimestampType)
+from pyspark.sql.types import (
+    BooleanType,
+    DateType,
+    DoubleType,
+    IntegerType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
 
 # ---------------------------------------------------------------------
 # Bronze Columns

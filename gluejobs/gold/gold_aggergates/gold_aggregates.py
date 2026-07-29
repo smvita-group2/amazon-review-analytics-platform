@@ -17,8 +17,7 @@ from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import (avg, col, count, countDistinct, round, sum,
-                                   when)
+from pyspark.sql.functions import avg, col, count, countDistinct, round, sum, when
 
 # ==========================================================
 # Glue Initialization
