@@ -16,8 +16,8 @@ vpc_id    = "vpc-023ac2f6325567736"
 subnet_id = "subnet-00e3d0807c2aa3752"
 
 # EMR
-master_instance_type  = "m5.large"
+master_instance_type  = "m4.xlarge"
 master_instance_count = 1
 
-core_instance_type    = "m5.large"
+core_instance_type    = "m4.xlarge"
 core_instance_count   = 1
