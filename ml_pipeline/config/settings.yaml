@@ -1,0 +1,31 @@
+project:
+  name: "Amazon Review Analytics"
+
+aws:
+  region: "us-east-1"
+  bucket_name: "amazon-review-analytics-group-2"
+
+paths:
+  input:
+    gold_ml_hybrid: "gold/ml-hybrid-rag/cleaned"
+
+  output:
+    product_documents: "ml/product_documents"
+    embeddings: "ml/embeddings"
+    chromadb: "ml/chromadb"
+
+embedding:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  batch_size: 64
+  normalize_embeddings: true
+
+chromadb:
+  collection_name: "amazon_products"
+
+retrieval:
+  top_k: 10
+  rerank_top_k: 5
+
+gemini:
+  model_name: "gemini-2.5-flash"
+  temperature: 0.2
