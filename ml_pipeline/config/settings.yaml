@@ -5,30 +5,27 @@ aws:
   region: "us-east-1"
   bucket_name: "amazon-review-analytics-group-2"
 
-paths:
-  input:
-    gold_ml_hybrid: "gold/ml-hybrid-rag/cleaned"
+# ==========================================================
+# S3 Paths
+# ==========================================================
 
-  output:
-    product_documents: "ml/product_documents"
-    embeddings: "ml/embeddings"
-    chromadb: "ml/chromadb"
+paths:
+  cleaned: "gold/ml-hybrid-rag/cleaned"
+  product_documents: "gold/ml-hybrid-rag/product_documents"
+  embeddings: "gold/ml-hybrid-rag/embeddings"
+  bm25: "gold/ml-hybrid-rag/bm25"
+  chromadb_backup: "gold/ml-hybrid-rag/chromadb_backup"
+
+# ==========================================================
+# Embedding Configuration
+# ==========================================================
 
 embedding:
   model_name: "sentence-transformers/all-MiniLM-L6-v2"
-  batch_size: 64
+  dimension: 384
+  batch_size: 32
   normalize_embeddings: true
-
-chromadb:
-  collection_name: "amazon_products"
-
-retrieval:
-  top_k: 10
-  rerank_top_k: 5
-
-gemini:
-  model_name: "gemini-2.5-flash"
-  temperature: 0.2
+  show_progress_bar: true
 
 # ==========================================================
 # Review Selection
@@ -38,9 +35,44 @@ review_selection:
   helpful_reviews: 10
   recent_reviews: 5
 
-embedding:
-  model_name: sentence-transformers/all-MiniLM-L6-v2
-  dimension: 384
+# ==========================================================
+# ChromaDB
+# ==========================================================
+
+chromadb:
+  persist_directory: "/home/hadoop/ml-hybrid-rag/chromadb"
+
+# ==========================================================
+# Retrieval
+# ==========================================================
+
+retrieval:
+  top_k_semantic: 10
+  top_k_bm25: 10
+  final_top_k: 5
+  normalize_query_embeddings: true
+
+# ==========================================================
+# BM25
+# ==========================================================
+
+bm25:
+  lowercase: true
+
+# ==========================================================
+# Reranker
+# ==========================================================
+
+reranker:
+  model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
   batch_size: 32
-  normalize_embeddings: true
-  show_progress_bar: true
+  max_length: 512
+  show_progress_bar: false
+
+# ==========================================================
+# Gemini
+# ==========================================================
+
+gemini:
+  model_name: "gemini-2.5-flash"
+  temperature: 0.2
