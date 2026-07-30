@@ -26,14 +26,6 @@ module "emr_iam" {
   environment  = var.environment
 }
 
-module "security_groups" {
-  source = "./modules/security_groups"
-
-  project_name = var.project_name
-  environment  = var.environment
-  vpc_id       = var.vpc_id
-}
-
 module "emr" {
   source = "./modules/emr"
 
@@ -42,12 +34,8 @@ module "emr" {
 
   subnet_id = var.subnet_id
 
-  service_role     = module.emr_iam.service_role_arn
-  instance_profile = module.emr_iam.instance_profile_name
-
-  master_security_group  = module.security_groups.master_security_group_id
-  core_security_group    = module.security_groups.core_security_group_id
-  service_security_group = module.security_groups.service_security_group_id
+  service_role     = "EMR_DefaultRole_V2"
+  instance_profile = "EMR_EC2_DefaultRole"
 
   log_uri = "s3://${module.s3.bucket_name}/logs/"
 

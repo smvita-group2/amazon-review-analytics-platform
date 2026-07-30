@@ -17,10 +17,6 @@ resource "aws_emr_cluster" "this" {
   ec2_attributes {
     subnet_id        = var.subnet_id
     instance_profile = var.instance_profile
-
-    emr_managed_master_security_group = var.master_security_group
-    emr_managed_slave_security_group  = var.core_security_group
-    service_access_security_group     = var.service_security_group
   }
 
   master_instance_group {

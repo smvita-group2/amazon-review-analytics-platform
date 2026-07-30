@@ -23,21 +23,6 @@ variable "instance_profile" {
   type        = string
 }
 
-variable "master_security_group" {
-  description = "Master security group"
-  type        = string
-}
-
-variable "core_security_group" {
-  description = "Core security group"
-  type        = string
-}
-
-variable "service_security_group" {
-  description = "Service security group"
-  type        = string
-}
-
 variable "log_uri" {
   description = "S3 Log URI"
   type        = string
@@ -55,16 +40,16 @@ variable "master_instance_type" {
   default     = "m5.xlarge"
 }
 
-variable "core_instance_type" {
-  description = "Core Instance Type"
-  type        = string
-  default     = "m5.xlarge"
-}
-
 variable "master_instance_count" {
   description = "Master node count"
   type        = number
   default     = 1
+}
+
+variable "core_instance_type" {
+  description = "Core Instance Type"
+  type        = string
+  default     = "m5.xlarge"
 }
 
 variable "core_instance_count" {

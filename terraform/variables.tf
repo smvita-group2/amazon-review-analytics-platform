@@ -46,3 +46,14 @@ variable "core_instance_type" {
   type    = string
   default = "m5.xlarge"
 }
+
+variable "artifact_bucket" {
+  description = "S3 bucket containing deployment artifacts"
+  type        = string
+}
+
+variable "artifact_prefix" {
+  description = "Artifact folder"
+  type        = string
+  default     = "artifacts/develop"
+}
