@@ -39,12 +39,12 @@ variable "subnet_id" {
 
 variable "master_instance_type" {
   type    = string
-  default = "m5.xlarge"
+  default = "m4.xlarge"
 }
 
 variable "core_instance_type" {
   type    = string
-  default = "m5.xlarge"
+  default = "m4.xlarge"
 }
 
 variable "artifact_bucket" {
