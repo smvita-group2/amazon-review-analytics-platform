@@ -33,6 +33,9 @@ FEATURES_TEXT = "features_text"
 
 PRODUCT_IMAGE_URL = "product_image_url"
 
+PRODUCT_REVIEW_COUNT = "product_review_count"
+
+
 # ==========================================================
 # Generated Columns
 # ==========================================================
@@ -54,6 +57,7 @@ METADATA_MAIN_CATEGORY = "main_category"
 METADATA_SUB_CATEGORY = "sub_category"
 METADATA_PRODUCT_AVERAGE_RATING = "product_average_rating"
 
+
 # ==========================================================
 # File Formats
 # ==========================================================
@@ -63,3 +67,5 @@ PARQUET = "parquet"
 CSV = "csv"
 
 JSON = "json"
+
+

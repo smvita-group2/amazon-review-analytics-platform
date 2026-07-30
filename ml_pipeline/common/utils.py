@@ -1,144 +1,105 @@
 """
-Amazon S3 Utilities
+Common Utility Functions
 
-Provides helper functions for interacting with
-Amazon S3.
+Contains reusable helper functions shared across
+the ML pipeline.
 """
 
 from pathlib import Path
+from typing import Iterable
 
-import boto3
-
-from common.config import get_setting
 from common.logger import get_logger
 
 logger = get_logger(__name__)
 
-# ==========================================================
-# AWS Configuration
-# ==========================================================
-
-_REGION = get_setting(
-    "aws",
-    "region",
-)
-
-_BUCKET = get_setting(
-    "aws",
-    "bucket_name",
-)
-
-s3_client = boto3.client(
-    "s3",
-    region_name=_REGION,
-)
 
 # ==========================================================
-# Upload File
+# Ensure Directory Exists
 # ==========================================================
 
-
-def upload_file(
-    local_file: str | Path,
-    s3_key: str,
-) -> None:
+def ensure_directory(path: str | Path) -> Path:
     """
-    Upload a local file to Amazon S3.
+    Create a directory if it does not already exist.
     """
 
-    local_file = Path(local_file)
+    directory = Path(path)
 
-    logger.info(
-        f"Uploading {local_file} -> s3://{_BUCKET}/{s3_key}"
-    )
-
-    s3_client.upload_file(
-        str(local_file),
-        _BUCKET,
-        s3_key,
-    )
-
-
-# ==========================================================
-# Download File
-# ==========================================================
-
-
-def download_file(
-    s3_key: str,
-    local_file: str | Path,
-) -> None:
-    """
-    Download a file from Amazon S3.
-    """
-
-    local_file = Path(local_file)
-
-    local_file.parent.mkdir(
+    directory.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    logger.info(
-        f"Downloading s3://{_BUCKET}/{s3_key}"
-    )
-
-    s3_client.download_file(
-        _BUCKET,
-        s3_key,
-        str(local_file),
-    )
+    return directory
 
 
 # ==========================================================
-# Check Object Exists
+# Chunk Iterable
 # ==========================================================
 
-
-def object_exists(
-    s3_key: str,
-) -> bool:
+def chunk_iterable(
+    iterable: Iterable,
+    chunk_size: int,
+):
     """
-    Check whether an object exists in Amazon S3.
+    Yield successive chunks from an iterable.
     """
 
-    try:
+    iterable = list(iterable)
 
-        s3_client.head_object(
-            Bucket=_BUCKET,
-            Key=s3_key,
-        )
+    for index in range(
+        0,
+        len(iterable),
+        chunk_size,
+    ):
 
-        return True
-
-    except Exception:
-
-        return False
+        yield iterable[
+            index:index + chunk_size
+        ]
 
 
 # ==========================================================
-# List Objects
+# Safe String
 # ==========================================================
 
-
-def list_objects(
-    prefix: str,
-) -> list[str]:
+def safe_string(value) -> str:
     """
-    List all object keys under a prefix.
+    Convert a value to a clean string.
     """
 
-    response = s3_client.list_objects_v2(
-        Bucket=_BUCKET,
-        Prefix=prefix,
-    )
+    if value is None:
 
-    contents = response.get(
-        "Contents",
-        [],
-    )
+        return ""
 
-    return [
-        obj["Key"]
-        for obj in contents
-    ]
+    return str(value).strip()
+
+
+# ==========================================================
+# Format Rating
+# ==========================================================
+
+def format_rating(value) -> str:
+    """
+    Format product rating.
+    """
+
+    if value is None:
+
+        return "N/A"
+
+    return f"{float(value):.1f}"
+
+
+# ==========================================================
+# Format Integer
+# ==========================================================
+
+def format_number(value) -> str:
+    """
+    Format integer with thousands separator.
+    """
+
+    if value is None:
+
+        return "0"
+
+    return f"{int(value):,}"

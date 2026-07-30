@@ -29,3 +29,18 @@ retrieval:
 gemini:
   model_name: "gemini-2.5-flash"
   temperature: 0.2
+
+# ==========================================================
+# Review Selection
+# ==========================================================
+
+review_selection:
+  helpful_reviews: 10
+  recent_reviews: 5
+
+embedding:
+  model_name: sentence-transformers/all-MiniLM-L6-v2
+  dimension: 384
+  batch_size: 32
+  normalize_embeddings: true
+  show_progress_bar: true
