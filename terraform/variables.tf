@@ -57,3 +57,15 @@ variable "artifact_prefix" {
   type        = string
   default     = "artifacts/develop"
 }
+
+variable "master_instance_count" {
+  description = "Master node count"
+  type        = number
+  default     = 1
+}
+
+variable "core_instance_count" {
+  description = "Core node count"
+  type        = number
+  default     = 1
+}

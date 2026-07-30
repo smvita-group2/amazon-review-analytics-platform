@@ -19,13 +19,6 @@ module "s3" {
 # Identity
 ########################################
 
-module "emr_iam" {
-  source = "./modules/emr_iam"
-
-  project_name = var.project_name
-  environment  = var.environment
-}
-
 module "emr" {
   source = "./modules/emr"
 
@@ -39,8 +32,11 @@ module "emr" {
 
   log_uri = "s3://${module.s3.bucket_name}/logs/"
 
-  master_instance_type = var.master_instance_type
-  core_instance_type   = var.core_instance_type
+  master_instance_type  = var.master_instance_type
+  master_instance_count = var.master_instance_count
+
+  core_instance_type    = var.core_instance_type
+  core_instance_count   = var.core_instance_count
 }
 
 module "glue" {
