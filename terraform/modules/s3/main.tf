@@ -9,11 +9,6 @@ resource "aws_s3_bucket" "this" {
   }
 }
 
-data "aws_s3_bucket" "existing" {
-  count  = var.create_bucket ? 0 : 1
-  bucket = var.bucket_name
-}
-
 resource "aws_s3_bucket_versioning" "this" {
   count  = var.create_bucket ? 1 : 0
   bucket = aws_s3_bucket.this[0].id

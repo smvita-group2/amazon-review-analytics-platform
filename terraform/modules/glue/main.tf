@@ -1,14 +1,13 @@
-data "aws_iam_role" "glue_role" {
-  name = "LabRole"
-}
-
 resource "aws_glue_catalog_database" "this" {
   name = var.database_name
 }
 
 resource "aws_glue_crawler" "this" {
   name          = var.crawler_name
-  role          = data.aws_iam_role.glue_role.arn
+
+  # Use the existing LabRole directly
+  role          = "arn:aws:iam::471112764802:role/LabRole"
+
   database_name = aws_glue_catalog_database.this.name
 
   s3_target {

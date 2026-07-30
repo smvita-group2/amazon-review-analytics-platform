@@ -7,5 +7,5 @@ output "crawler_name" {
 }
 
 output "crawler_role_arn" {
-  value = data.aws_iam_role.glue_role.arn
+  value = "arn:aws:iam::471112764802:role/LabRole"
 }

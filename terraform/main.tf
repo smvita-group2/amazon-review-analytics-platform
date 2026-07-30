@@ -27,7 +27,7 @@ module "emr" {
 
   subnet_id = var.subnet_id
 
-  service_role = "EMR_DefaultRole"
+  service_role     = "EMR_DefaultRole"
   instance_profile = "EMR_EC2_DefaultRole"
 
   log_uri = "s3://${module.s3.bucket_name}/logs/"
@@ -35,8 +35,8 @@ module "emr" {
   master_instance_type  = var.master_instance_type
   master_instance_count = var.master_instance_count
 
-  core_instance_type    = var.core_instance_type
-  core_instance_count   = var.core_instance_count
+  core_instance_type  = var.core_instance_type
+  core_instance_count = var.core_instance_count
 }
 
 module "glue" {
