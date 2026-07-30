@@ -59,7 +59,7 @@ resource "aws_emr_cluster" "this" {
     ManagedBy   = "Terraform"
   }
 
-    lifecycle {
+  lifecycle {
     ignore_changes = [
       log_uri
     ]

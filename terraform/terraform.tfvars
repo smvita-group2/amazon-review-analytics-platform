@@ -19,5 +19,5 @@ subnet_id = "subnet-00e3d0807c2aa3752"
 master_instance_type  = "m4.xlarge"
 master_instance_count = 1
 
-core_instance_type    = "m4.xlarge"
-core_instance_count   = 1
+core_instance_type  = "m4.xlarge"
+core_instance_count = 1

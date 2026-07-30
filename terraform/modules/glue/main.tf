@@ -3,10 +3,10 @@ resource "aws_glue_catalog_database" "this" {
 }
 
 resource "aws_glue_crawler" "this" {
-  name          = var.crawler_name
+  name = var.crawler_name
 
   # Use the existing LabRole directly
-  role          = "arn:aws:iam::471112764802:role/LabRole"
+  role = "arn:aws:iam::471112764802:role/LabRole"
 
   database_name = aws_glue_catalog_database.this.name
 
