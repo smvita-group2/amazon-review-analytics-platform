@@ -27,7 +27,7 @@ module "emr" {
 
   subnet_id = var.subnet_id
 
-  service_role     = "EMR_DefaultRole_V2"
+  service_role = "EMR_DefaultRole"
   instance_profile = "EMR_EC2_DefaultRole"
 
   log_uri = "s3://${module.s3.bucket_name}/logs/"
