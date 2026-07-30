@@ -5,13 +5,14 @@ on:
     branches:
       - develop
       - workflows/automate
+      - feat/terrafrom
 
   pull_request:
     branches:
       - develop
 
 jobs:
-  ci:
+  python-ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,29 +30,48 @@ jobs:
           pip install -r requirements.txt
 
       - name: Check Code Formatting
-        run: |
-          black --check .
+        run: black --check .
 
       - name: Check Import Sorting
-        run: |
-          isort --check-only .
+        run: isort --check-only .
 
       - name: Lint with Flake8
-        run: |
-          flake8 .
+        run: flake8 .
 
       - name: Run Unit Tests with Coverage
-        run: |
-          pytest --cov=src --cov-report=term-missing
+        run: pytest --cov=src --cov-report=term-missing
 
       - name: Security Scan with Bandit
-        run: |
-          bandit -r src
+        run: bandit -r src
 
       - name: Static Type Checking with MyPy
-        run: |
-          mypy --explicit-package-bases src
+        run: mypy --explicit-package-bases src
 
       - name: Verify Python
-        run: |
-          python --version
+        run: python --version
+
+  terraform-ci:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -lock=false -input=false
