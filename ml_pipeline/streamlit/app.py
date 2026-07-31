@@ -3,13 +3,15 @@ Hybrid RAG Platform for Intelligent Product Search
 
 Enterprise Streamlit Dashboard
 """
+
 import os
 import sys
 import time
 import streamlit as st
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pipeline import Pipeline    # noqa: E402
+from pipeline import Pipeline  # noqa: E402
 
 # ==========================================================
 # Page Configuration
