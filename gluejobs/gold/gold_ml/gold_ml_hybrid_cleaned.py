@@ -14,14 +14,13 @@ import sys
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
-from pyspark.sql.column import Column
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-
+from pyspark.sql.column import Column
 from pyspark.sql.functions import (
     col,
-    trim,
     regexp_replace,
+    trim,
     when,
 )
 
