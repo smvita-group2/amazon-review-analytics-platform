@@ -81,7 +81,22 @@ class Pipeline:
                 prompt=prompt,
             )
 
-            logger.info("Pipeline execution completed successfully.")
+            logger.info(
+                "Pipeline execution completed successfully."
+            )
+
+            # ==============================
+            # DEBUG
+            # ==============================
+
+            print("\n========== FIRST DOCUMENT ==========")
+
+            if documents:
+                print(documents[0])
+            else:
+                print("No documents returned.")
+
+            print("====================================\n")
 
             return {
                 "query": query,
@@ -91,6 +106,8 @@ class Pipeline:
 
         except Exception:
 
-            logger.exception("Pipeline execution failed.")
+            logger.exception(
+                "Pipeline execution failed."
+            )
 
             raise
