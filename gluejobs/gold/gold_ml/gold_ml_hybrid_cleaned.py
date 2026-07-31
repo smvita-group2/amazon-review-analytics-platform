@@ -14,14 +14,13 @@ import sys
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
-from pyspark.sql.column import Column
 from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
-
+from pyspark.sql.column import Column
 from pyspark.sql.functions import (
     col,
-    trim,
     regexp_replace,
+    trim,
     when,
 )
 
@@ -83,6 +82,7 @@ SILVER_MASTER_ROOT = f"{S3_ROOT}/silver/master"
 
 GOLD_ML_HYBRID_ROOT = f"{S3_ROOT}/gold/ml-hybrid-rag/cleaned"
 
+
 def get_silver_master_path(dataset_name: str) -> str:
     return f"{SILVER_MASTER_ROOT}/{dataset_name}"
 
@@ -90,9 +90,11 @@ def get_silver_master_path(dataset_name: str) -> str:
 def get_gold_ml_hybrid_path(dataset_name: str) -> str:
     return f"{GOLD_ML_HYBRID_ROOT}/{dataset_name}"
 
+
 # ==========================================================
 # Reader
 # ==========================================================
+
 
 def read_parquet(path: str) -> DataFrame:
 
@@ -100,9 +102,11 @@ def read_parquet(path: str) -> DataFrame:
 
     return spark.read.parquet(path)
 
+
 # ==========================================================
 # Writer
 # ==========================================================
+
 
 def write_parquet(
     df: DataFrame,
@@ -111,12 +115,8 @@ def write_parquet(
 
     logger.info(f"Writing Gold ML Hybrid Cleaned Dataset: {output_path}")
 
-    (
-        df.write
-        .mode("overwrite")
-        .option("compression", "snappy")
-        .parquet(output_path)
-    )
+    (df.write.mode("overwrite").option("compression", "snappy").parquet(output_path))
+
 
 # ==========================================================
 # Gold ML Hybrid Transformer
@@ -202,7 +202,7 @@ class GoldMLHybridTransformer:
         # Decode common HTML entities
         cleaned = regexp_replace(cleaned, "&amp;", "&")
         cleaned = regexp_replace(cleaned, r"&nbsp;|&#160;", " ")
-        cleaned = regexp_replace(cleaned, "&quot;", "\"")
+        cleaned = regexp_replace(cleaned, "&quot;", '"')
         cleaned = regexp_replace(cleaned, "&apos;", "'")
         cleaned = regexp_replace(cleaned, "&lt;", "<")
         cleaned = regexp_replace(cleaned, "&gt;", ">")
@@ -250,8 +250,7 @@ class GoldMLHybridTransformer:
     def drop_invalid_rows(self):
 
         self.df = self.df.filter(
-            (col("review_text") != "") &
-            (col("product_title") != "")
+            (col("review_text") != "") & (col("product_title") != "")
         )
 
         return self
@@ -267,8 +266,7 @@ class GoldMLHybridTransformer:
     def transform(self) -> DataFrame:
 
         return (
-            self
-            .select_columns()
+            self.select_columns()
             .remove_duplicates()
             .clean_text_columns()
             .handle_null_values()
@@ -276,6 +274,8 @@ class GoldMLHybridTransformer:
             .drop_unused_columns()
             .df
         )
+
+
 # ==========================================================
 # Gold ML Hybrid Validator
 # ==========================================================
@@ -320,15 +320,11 @@ class GoldMLHybridValidator:
         actual_columns = self.df.columns
 
         missing_columns = [
-            column
-            for column in self.EXPECTED_COLUMNS
-            if column not in actual_columns
+            column for column in self.EXPECTED_COLUMNS if column not in actual_columns
         ]
 
         extra_columns = [
-            column
-            for column in actual_columns
-            if column not in self.EXPECTED_COLUMNS
+            column for column in actual_columns if column not in self.EXPECTED_COLUMNS
         ]
 
         if missing_columns or extra_columns:
@@ -347,15 +343,11 @@ class GoldMLHybridValidator:
 
         for column_name in self.REQUIRED_COLUMNS:
 
-            null_count = self.df.filter(
-                col(column_name).isNull()
-            ).count()
+            null_count = self.df.filter(col(column_name).isNull()).count()
 
             if null_count > 0:
 
-                raise ValueError(
-                    f"{column_name} contains {null_count} NULL values."
-                )
+                raise ValueError(f"{column_name} contains {null_count} NULL values.")
 
         return self
 
@@ -369,12 +361,9 @@ class GoldMLHybridValidator:
 
     def run(self):
 
-        return (
-            self
-            .validate_not_empty()
-            .validate_schema()
-            .validate_required_columns()
-        )
+        return self.validate_not_empty().validate_schema().validate_required_columns()
+
+
 # ==========================================================
 # Pipeline
 # ==========================================================
@@ -433,21 +422,16 @@ def main():
 
             run_pipeline(dataset_name)
 
-        logger.info(
-            "Gold ML Hybrid Glue Job Completed Successfully."
-        )
+        logger.info("Gold ML Hybrid Glue Job Completed Successfully.")
 
         job.commit()
 
     except Exception:
 
-        logger.exception(
-            "Gold ML Hybrid Glue Job Failed."
-        )
+        logger.exception("Gold ML Hybrid Glue Job Failed.")
 
         raise
 
 
 if __name__ == "__main__":
     main()
-
