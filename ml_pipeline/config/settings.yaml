@@ -6,15 +6,15 @@ aws:
   bucket_name: "amazon-review-analytics-group-2"
 
 # ==========================================================
-# S3 Paths
+# Local Data Paths
 # ==========================================================
 
 paths:
-  cleaned: "gold/ml-hybrid-rag/cleaned"
-  product_documents: "gold/ml-hybrid-rag/product_documents"
-  embeddings: "gold/ml-hybrid-rag/embeddings"
-  bm25: "gold/ml-hybrid-rag/bm25"
-  chromadb_backup: "gold/ml-hybrid-rag/chromadb_backup"
+  cleaned: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/cleaned_data"
+  product_documents: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/product_documents"
+  embeddings: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/embeddings"
+  bm25: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/bm25"
+  chromadb_backup: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/chromadb"
 
 # ==========================================================
 # Embedding Configuration
@@ -32,15 +32,15 @@ embedding:
 # ==========================================================
 
 review_selection:
-  helpful_reviews: 10
-  recent_reviews: 5
-
+  helpful_reviews: 5
+  recent_reviews: 3
+  
 # ==========================================================
 # ChromaDB
 # ==========================================================
 
 chromadb:
-  persist_directory: "/home/hadoop/ml-hybrid-rag/chromadb"
+  persist_directory: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/chromadb"
 
 # ==========================================================
 # Retrieval

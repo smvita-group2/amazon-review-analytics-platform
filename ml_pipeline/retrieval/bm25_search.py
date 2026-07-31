@@ -43,10 +43,11 @@ class BM25Search:
             "lowercase",
         )
 
+        # Load BM25 directory from settings.yaml -> paths -> bm25
         self.input_directory = Path(
             get_setting(
+                "paths",
                 "bm25",
-                "directory",
             )
         )
 
@@ -63,7 +64,9 @@ class BM25Search:
 
         if not self.input_file.exists():
 
-            raise FileNotFoundError(f"BM25 index not found: {self.input_file}")
+            raise FileNotFoundError(
+                f"BM25 index not found: {self.input_file}"
+            )
 
         logger.info(
             "Loading BM25 index for '%s'.",
@@ -75,9 +78,7 @@ class BM25Search:
             "rb",
         ) as file:
 
-            bundle = pickle.load(
-                file,
-            )
+            bundle = pickle.load(file)
 
         self.bm25 = bundle["bm25"]
         self.documents = bundle["documents"]
@@ -101,7 +102,9 @@ class BM25Search:
 
         if not query:
 
-            logger.warning("Received an empty query.")
+            logger.warning(
+                "Received an empty query."
+            )
 
             return []
 
@@ -133,10 +136,11 @@ class BM25Search:
             -top_k,
         )[-top_k:]
 
-        top_indices = top_indices[np.argsort(scores[top_indices])[::-1]]
-
-        documents = self.documents
-        metadata = self.metadata
+        top_indices = top_indices[
+            np.argsort(
+                scores[top_indices]
+            )[::-1]
+        ]
 
         results = []
 
@@ -144,12 +148,14 @@ class BM25Search:
 
             results.append(
                 {
-                    PARENT_ASIN_KEY: metadata[index].get(
+                    PARENT_ASIN_KEY: self.metadata[index].get(
                         PARENT_ASIN_KEY,
                     ),
-                    DOCUMENT: documents[index],
-                    METADATA: metadata[index],
-                    SIMILARITY_SCORE: float(scores[index]),
+                    DOCUMENT: self.documents[index],
+                    METADATA: self.metadata[index],
+                    SIMILARITY_SCORE: float(
+                        scores[index]
+                    ),
                 }
             )
 

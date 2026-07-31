@@ -7,9 +7,7 @@ a CrossEncoder model.
 
 from operator import itemgetter
 
-from retrieval.cross_encoder_model import (
-    CrossEncoderModel,
-)
+from retrieval.cross_encoder_model import CrossEncoderModel
 
 from common.config import get_setting
 from common.constants import (
@@ -30,9 +28,10 @@ class Reranker:
         self,
     ) -> None:
 
+        # Number of documents to keep after reranking
         self.top_k = get_setting(
-            "reranker",
-            "top_k",
+            "retrieval",
+            "final_top_k",
         )
 
         self.batch_size = get_setting(
@@ -53,10 +52,15 @@ class Reranker:
         results: list[dict],
         top_k: int | None = None,
     ) -> list[dict]:
+        """
+        Re-rank retrieved documents using the CrossEncoder.
+        """
 
         if not results:
 
-            logger.warning("No documents available for reranking.")
+            logger.warning(
+                "No documents available for reranking."
+            )
 
             return []
 
@@ -78,16 +82,18 @@ class Reranker:
             show_progress_bar=self.show_progress_bar,
         )
 
-        reranked_results = [result.copy() for result in results]
+        reranked_results = []
 
         for result, score in zip(
-            reranked_results,
+            results,
             scores,
         ):
 
-            result[RERANK_SCORE] = float(
-                score,
-            )
+            item = result.copy()
+
+            item[RERANK_SCORE] = float(score)
+
+            reranked_results.append(item)
 
         reranked_results.sort(
             key=itemgetter(

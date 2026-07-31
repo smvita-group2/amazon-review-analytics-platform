@@ -90,7 +90,7 @@ class ChromaDBManager:
         metadatas: list[dict],
     ) -> None:
         """
-        Add documents to ChromaDB.
+        Add documents to ChromaDB in batches.
         """
 
         if not ids:
@@ -99,20 +99,42 @@ class ChromaDBManager:
 
             return
 
+        total_documents = len(ids)
+
+        max_batch_size = self.client.get_max_batch_size()
+
         logger.info(
-            "Adding %d documents to '%s'.",
-            len(ids),
+            "Adding %d documents to '%s' in batches of %d.",
+            total_documents,
             self.collection_name,
+            max_batch_size,
         )
 
-        self.collection.add(
-            ids=ids,
-            documents=documents,
-            embeddings=embeddings,
-            metadatas=metadatas,
-        )
+        for start in range(0, total_documents, max_batch_size):
 
-        logger.info("Documents added successfully.")
+            end = min(
+                start + max_batch_size,
+                total_documents,
+            )
+
+            logger.info(
+                "Inserting batch %d-%d of %d",
+                start + 1,
+                end,
+                total_documents,
+            )
+
+            self.collection.add(
+                ids=ids[start:end],
+                documents=documents[start:end],
+                embeddings=embeddings[start:end],
+                metadatas=metadatas[start:end],
+            )
+
+        logger.info(
+            "Successfully added %d documents.",
+            total_documents,
+        )
 
     def query(
         self,

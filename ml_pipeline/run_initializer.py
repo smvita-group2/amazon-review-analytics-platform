@@ -26,7 +26,8 @@ from initialize_pipeline import InitializePipeline
 from common.config import get_setting
 from common.constants import CATEGORIES
 from common.logger import get_logger
-from common.s3_utils import upload_directory
+# from common.config import get_setting
+# from common.s3_utils import upload_directory
 
 # ==========================================================
 # Logger
@@ -92,53 +93,12 @@ def main() -> None:
     logger.info("=" * 80)
 
     # ======================================================
-    # Backup ChromaDB
-    # ======================================================
+# Backup ChromaDB
+# ======================================================
 
-    if successful_categories:
-
-        logger.info("Backing up ChromaDB to Amazon S3...")
-
-        try:
-
-            upload_directory(
-                local_directory=get_setting(
-                    "chromadb",
-                    "persist_directory",
-                ),
-                s3_prefix=get_setting(
-                    "paths",
-                    "chromadb_backup",
-                ),
-            )
-
-            logger.info("ChromaDB backup completed successfully.")
-
-        except Exception:
-
-            logger.exception("Failed to back up ChromaDB.")
-
-    else:
-
-        logger.warning(
-            "Skipping ChromaDB backup because no categories were processed successfully."
-        )
-
-    logger.info("=" * 80)
-
-    logger.info("Offline initialization pipeline completed.")
-
-    logger.info(
-        "Successful Categories (%d): %s",
-        len(successful_categories),
-        successful_categories,
-    )
-
-    logger.info(
-        "Failed Categories (%d): %s",
-        len(failed_categories),
-        failed_categories,
-    )
+logger.info(
+    "Skipping ChromaDB backup to S3 (local execution)."
+)
 
 
 # ==========================================================

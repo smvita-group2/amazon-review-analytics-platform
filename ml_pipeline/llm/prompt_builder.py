@@ -6,14 +6,14 @@ retrieved product documents.
 """
 
 from common.constants import (
-    AVERAGE_RATING_KEY,
-    FINAL_CATEGORY_KEY,
-    PRICE_KEY,
-    PRODUCT_DOCUMENT_KEY,
-    PRODUCT_NAME_KEY,
-    REVIEW_COUNT_KEY,
-    STORE_KEY,
-    SUB_CATEGORY_KEY,
+    DOCUMENT,
+    MAIN_CATEGORY,
+    METADATA,
+    PRODUCT_AVERAGE_RATING,
+    PRODUCT_REVIEW_COUNT,
+    PRODUCT_TITLE,
+    STORE,
+    SUB_CATEGORY,
 )
 
 
@@ -93,80 +93,44 @@ Answer
 
         sections = []
 
-        for index, document in enumerate(
+        for index, result in enumerate(
             documents,
             start=1,
         ):
 
-            product_name = document.get(
-                PRODUCT_NAME_KEY,
-                "Unknown",
-            )
-
-            category = document.get(
-                FINAL_CATEGORY_KEY,
-                "Unknown",
-            )
-
-            sub_category = document.get(
-                SUB_CATEGORY_KEY,
-                "Unknown",
-            )
-
-            store = document.get(
-                STORE_KEY,
-                "Unknown",
-            )
-
-            price = document.get(
-                PRICE_KEY,
-                "Unknown",
-            )
-
-            rating = document.get(
-                AVERAGE_RATING_KEY,
-                "Unknown",
-            )
-
-            review_count = document.get(
-                REVIEW_COUNT_KEY,
-                "Unknown",
-            )
-
-            description = document.get(
-                PRODUCT_DOCUMENT_KEY,
-                "",
+            metadata = result.get(
+                METADATA,
+                {},
             )
 
             section = f"""
 Product {index}
 
 Name:
-{product_name}
+{metadata.get(PRODUCT_TITLE, "Unknown")}
 
 Category:
-{category}
+{metadata.get(MAIN_CATEGORY, "Unknown")}
 
 Sub Category:
-{sub_category}
+{metadata.get(SUB_CATEGORY, "Unknown")}
 
 Store:
-{store}
-
-Price:
-{price}
+{metadata.get(STORE, "Unknown")}
 
 Average Rating:
-{rating}
+{metadata.get(PRODUCT_AVERAGE_RATING, "Unknown")}
 
 Review Count:
-{review_count}
+{metadata.get(PRODUCT_REVIEW_COUNT, "Unknown")}
 
 Information:
-{description}
+{result.get(DOCUMENT, "")}
 """.strip()
 
-            sections.append(section)
+            sections.append(
+                section,
+            )
 
         return "\n\n".join(
             sections,
