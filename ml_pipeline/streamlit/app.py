@@ -3,16 +3,16 @@ Hybrid RAG Platform for Intelligent Product Search
 
 Enterprise Streamlit Dashboard
 """
-
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from pipeline import Pipeline
+
 import time
 
 import streamlit as st
-from pipeline import Pipeline
 
 # ==========================================================
 # Page Configuration
@@ -780,9 +780,6 @@ st.markdown(
 Enterprise Big Data Engineering Project
 </p>
 
-<p>
-Sentence Transformers • ChromaDB • BM25 • Reciprocal Rank Fusion • CrossEncoder • Gemini 2.5 Flash
-</p>
 
 </div>
 """,

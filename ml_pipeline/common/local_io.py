@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from common.config import get_setting
 from common.logger import get_logger
 
 logger = get_logger(__name__)

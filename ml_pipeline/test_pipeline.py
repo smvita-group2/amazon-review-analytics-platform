@@ -60,27 +60,38 @@ def main():
                 print(f"RESULT #{i}")
                 print(f"{'=' * 100}")
 
-                print(f"Product          : {metadata.get('product_title', 'N/A')}")
-                print(f"Store            : {metadata.get('store', 'N/A')}")
-                print(f"Category         : {metadata.get('main_category', 'N/A')}")
-                print(f"Sub Category     : {metadata.get('sub_category', 'N/A')}")
+                print(f"Product          : " f"{metadata.get('product_title', 'N/A')}")
+
+                print(f"Store            : " f"{metadata.get('store', 'N/A')}")
+
+                print(f"Category         : " f"{metadata.get('main_category', 'N/A')}")
+
+                print(f"Sub Category     : " f"{metadata.get('sub_category', 'N/A')}")
 
                 print(
-                    f"Average Rating   : {metadata.get('product_average_rating', 'N/A')}"
-                )
-                print(
-                    f"Rating Count     : {metadata.get('product_rating_count', 'N/A')}"
-                )
-                print(
-                    f"Review Count     : {metadata.get('product_review_count', 'N/A')}"
+                    f"Average Rating   : "
+                    f"{metadata.get('product_average_rating', 'N/A')}"
                 )
 
-                print(f"Parent ASIN      : {metadata.get('parent_asin', 'N/A')}")
-
-                print(f"Image URL        : {metadata.get('product_image_url', 'N/A')}")
+                print(
+                    f"Rating Count     : "
+                    f"{metadata.get('product_rating_count', 'N/A')}"
+                )
 
                 print(
-                    f"Relevance        : {format_score(document.get('rerank_score'))}"
+                    f"Review Count     : "
+                    f"{metadata.get('product_review_count', 'N/A')}"
+                )
+
+                print(f"Parent ASIN      : " f"{metadata.get('parent_asin', 'N/A')}")
+
+                print(
+                    f"Image URL        : " f"{metadata.get('product_image_url', 'N/A')}"
+                )
+
+                print(
+                    f"Relevance        : "
+                    f"{format_score(document.get('rerank_score'))}"
                 )
 
                 preview = document.get(
@@ -109,6 +120,7 @@ def main():
 
                 print("\nMetadata Keys")
                 print("-" * 100)
+
                 print(
                     sorted(
                         metadata.keys(),

@@ -8,17 +8,12 @@ be embedded into the vector database.
 import pandas as pd
 
 from common.constants import (
-    HELPFUL_VOTE,
     MAIN_CATEGORY,
     PRODUCT_AVERAGE_RATING,
     PRODUCT_RATING_COUNT,
     PRODUCT_TITLE,
-    REVIEW_RATING,
-    REVIEW_TEXT,
-    REVIEW_TITLE,
     STORE,
     SUB_CATEGORY,
-    VERIFIED_PURCHASE,
 )
 from common.logger import get_logger
 from common.utils import (

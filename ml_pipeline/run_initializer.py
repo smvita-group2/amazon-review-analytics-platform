@@ -23,7 +23,6 @@ Backup ChromaDB
 
 from initialize_pipeline import InitializePipeline
 
-from common.config import get_setting
 from common.constants import CATEGORIES
 from common.logger import get_logger
 
