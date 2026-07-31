@@ -17,10 +17,14 @@ Embeddings
 ChromaDB
     ↓
 BM25
+    ↓
+Backup ChromaDB
 """
 
+from common.config import get_setting
 from common.constants import CATEGORIES
 from common.logger import get_logger
+from common.s3_utils import upload_directory
 
 from initialize_pipeline import InitializePipeline
 
@@ -75,7 +79,7 @@ def main() -> None:
                 category,
             )
 
-        except Exception as error:
+        except Exception:
 
             failed_categories.append(
                 category,
@@ -86,14 +90,57 @@ def main() -> None:
                 category,
             )
 
-            logger.exception(error)
-
             continue
 
-    logger.info("=" * 80)
+    logger.info(
+        "=" * 80
+    )
+
+    # ======================================================
+    # Backup ChromaDB
+    # ======================================================
+
+    if successful_categories:
+
+        logger.info(
+            "Backing up ChromaDB to Amazon S3..."
+        )
+
+        try:
+
+            upload_directory(
+                local_directory=get_setting(
+                    "chromadb",
+                    "persist_directory",
+                ),
+                s3_prefix=get_setting(
+                    "paths",
+                    "chromadb_backup",
+                ),
+            )
+
+            logger.info(
+                "ChromaDB backup completed successfully."
+            )
+
+        except Exception:
+
+            logger.exception(
+                "Failed to back up ChromaDB."
+            )
+
+    else:
+
+        logger.warning(
+            "Skipping ChromaDB backup because no categories were processed successfully."
+        )
 
     logger.info(
-        "Initialization completed."
+        "=" * 80
+    )
+
+    logger.info(
+        "Offline initialization pipeline completed."
     )
 
     logger.info(

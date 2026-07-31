@@ -49,13 +49,95 @@ def upload_file(
     local_file = Path(local_file)
 
     logger.info(
-        f"Uploading {local_file} -> s3://{_BUCKET}/{s3_key}"
+        "Uploading '%s' to s3://%s/%s",
+        local_file,
+        _BUCKET,
+        s3_key,
     )
 
     s3_client.upload_file(
         str(local_file),
         _BUCKET,
         s3_key,
+    )
+
+
+# ==========================================================
+# Upload Bytes
+# ==========================================================
+
+
+def upload_bytes(
+    data: bytes,
+    s3_key: str,
+) -> None:
+    """
+    Upload bytes directly to Amazon S3.
+    """
+
+    logger.info(
+        "Uploading object to s3://%s/%s",
+        _BUCKET,
+        s3_key,
+    )
+
+    s3_client.put_object(
+        Bucket=_BUCKET,
+        Key=s3_key,
+        Body=data,
+    )
+
+
+# ==========================================================
+# Upload Directory
+# ==========================================================
+
+
+def upload_directory(
+    local_directory: str | Path,
+    s3_prefix: str,
+) -> None:
+    """
+    Upload an entire directory to Amazon S3.
+    """
+
+    local_directory = Path(local_directory)
+
+    if not local_directory.exists():
+
+        raise FileNotFoundError(
+            f"Directory not found: {local_directory}"
+        )
+
+    logger.info(
+        "Uploading directory '%s' to s3://%s/%s",
+        local_directory,
+        _BUCKET,
+        s3_prefix,
+    )
+
+    for file_path in local_directory.rglob("*"):
+
+        if not file_path.is_file():
+
+            continue
+
+        relative_path = file_path.relative_to(
+            local_directory,
+        )
+
+        s3_key = (
+            f"{s3_prefix}/{relative_path.as_posix()}"
+        )
+
+        s3_client.upload_file(
+            str(file_path),
+            _BUCKET,
+            s3_key,
+        )
+
+    logger.info(
+        "Directory upload completed."
     )
 
 
@@ -80,13 +162,80 @@ def download_file(
     )
 
     logger.info(
-        f"Downloading s3://{_BUCKET}/{s3_key}"
+        "Downloading s3://%s/%s",
+        _BUCKET,
+        s3_key,
     )
 
     s3_client.download_file(
         _BUCKET,
         s3_key,
         str(local_file),
+    )
+
+
+# ==========================================================
+# Download Directory
+# ==========================================================
+
+
+def download_directory(
+    s3_prefix: str,
+    local_directory: str | Path,
+) -> None:
+    """
+    Download an entire directory from Amazon S3.
+    """
+
+    local_directory = Path(local_directory)
+
+    local_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    logger.info(
+        "Downloading directory s3://%s/%s",
+        _BUCKET,
+        s3_prefix,
+    )
+
+    response = s3_client.list_objects_v2(
+        Bucket=_BUCKET,
+        Prefix=s3_prefix,
+    )
+
+    for obj in response.get(
+        "Contents",
+        [],
+    ):
+
+        key = obj["Key"]
+
+        relative_path = Path(
+            key.removeprefix(
+                f"{s3_prefix}/"
+            )
+        )
+
+        destination = (
+            local_directory
+            / relative_path
+        )
+
+        destination.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        s3_client.download_file(
+            _BUCKET,
+            key,
+            str(destination),
+        )
+
+    logger.info(
+        "Directory download completed."
     )
 
 

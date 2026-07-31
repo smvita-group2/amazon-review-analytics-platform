@@ -16,11 +16,24 @@ pyarrow==21.0.0
 scikit-learn==1.7.1
 
 # ----------------------------------------------------------
-# Embedding & Reranking Models
+# Embedding & Transformers
 # ----------------------------------------------------------
 sentence-transformers==5.1.0
 transformers==4.56.1
-torch==2.8.0
+
+# NOTE:
+# Install PyTorch separately depending on your environment.
+# Windows + NVIDIA GPU:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+#
+# CPU:
+# pip install torch torchvision torchaudio
+#
+# EMR GPU:
+# Install the matching CUDA wheel.
+#
+# EMR CPU:
+# pip install torch torchvision torchaudio
 
 # ----------------------------------------------------------
 # Vector Database

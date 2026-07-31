@@ -13,8 +13,7 @@ should live here.
 
 CATEGORIES = (
     "Appliances",
-    "Musical_Instruments",
-    "Video_Games",
+    
 )
 
 # ==========================================================
