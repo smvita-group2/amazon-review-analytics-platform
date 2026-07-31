@@ -56,11 +56,7 @@ class ProductDocumentFormatter:
             self._format_reviews(reviews),
         ]
 
-        return "\n\n".join(
-            section
-            for section in sections
-            if section.strip()
-        )
+        return "\n\n".join(section for section in sections if section.strip())
 
     # ======================================================
     # Product Information
@@ -156,10 +152,7 @@ class ProductDocumentFormatter:
 
             if len(review_text) > self.MAX_REVIEW_LENGTH:
 
-                review_text = (
-                    review_text[: self.MAX_REVIEW_LENGTH].rstrip()
-                    + "..."
-                )
+                review_text = review_text[: self.MAX_REVIEW_LENGTH].rstrip() + "..."
 
             lines.extend(
                 [

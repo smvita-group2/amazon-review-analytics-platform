@@ -88,9 +88,7 @@ class ProductDocumentBuilder:
                 documents.append(document)
 
             except Exception:
-                logger.exception(
-                    "Failed to build product document."
-                )
+                logger.exception("Failed to build product document.")
 
         logger.info(
             "Successfully built %d product documents.",

@@ -49,10 +49,7 @@ class BM25Builder:
             exist_ok=True,
         )
 
-        self.output_file = (
-            self.output_directory
-            / f"{category}.pkl"
-        )
+        self.output_file = self.output_directory / f"{category}.pkl"
 
     def build(
         self,
@@ -70,45 +67,28 @@ class BM25Builder:
 
         if PRODUCT_DOCUMENT not in dataframe.columns:
 
-            raise ValueError(
-                f"Missing required column: {PRODUCT_DOCUMENT}"
-            )
+            raise ValueError(f"Missing required column: {PRODUCT_DOCUMENT}")
 
         logger.info(
             "Building BM25 index for '%s'.",
             self.category,
         )
 
-        documents = (
-            dataframe[PRODUCT_DOCUMENT]
-            .fillna("")
-            .astype(str)
-            .tolist()
-        )
+        documents = dataframe[PRODUCT_DOCUMENT].fillna("").astype(str).tolist()
 
         corpus = documents
 
         if self.lowercase:
 
-            corpus = [
-                document.lower()
-                for document in corpus
-            ]
+            corpus = [document.lower() for document in corpus]
 
-        tokenized_corpus = [
-            document.split()
-            for document in corpus
-        ]
+        tokenized_corpus = [document.split() for document in corpus]
 
         bm25 = BM25Okapi(
             tokenized_corpus,
         )
 
-        metadata = dataframe[
-            list(CHROMA_METADATA_FIELDS)
-        ].to_dict(
-            orient="records"
-        )
+        metadata = dataframe[list(CHROMA_METADATA_FIELDS)].to_dict(orient="records")
 
         bundle = {
             "bm25": bm25,

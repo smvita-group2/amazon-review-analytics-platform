@@ -57,9 +57,7 @@ class Reranker:
 
         if not results:
 
-            logger.warning(
-                "No documents available for reranking."
-            )
+            logger.warning("No documents available for reranking.")
 
             return []
 
@@ -109,10 +107,7 @@ class Reranker:
 
         if final_results:
 
-            raw_scores = [
-                result[RERANK_SCORE]
-                for result in final_results
-            ]
+            raw_scores = [result[RERANK_SCORE] for result in final_results]
 
             min_score = min(raw_scores)
             max_score = max(raw_scores)
@@ -126,12 +121,7 @@ class Reranker:
                 else:
 
                     normalized = (
-                        (
-                            result[RERANK_SCORE] - min_score
-                        )
-                        / (
-                            max_score - min_score
-                        )
+                        (result[RERANK_SCORE] - min_score) / (max_score - min_score)
                     ) * 100
 
                     result[RERANK_SCORE] = round(

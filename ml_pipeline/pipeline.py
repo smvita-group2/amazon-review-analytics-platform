@@ -81,9 +81,7 @@ class Pipeline:
                 prompt=prompt,
             )
 
-            logger.info(
-                "Pipeline execution completed successfully."
-            )
+            logger.info("Pipeline execution completed successfully.")
 
             # ==============================
             # DEBUG
@@ -106,8 +104,6 @@ class Pipeline:
 
         except Exception:
 
-            logger.exception(
-                "Pipeline execution failed."
-            )
+            logger.exception("Pipeline execution failed.")
 
             raise

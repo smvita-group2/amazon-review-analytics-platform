@@ -28,9 +28,7 @@ def main():
 
     while True:
 
-        query = input(
-            "\nEnter Query (type 'exit' to quit): "
-        ).strip()
+        query = input("\nEnter Query (type 'exit' to quit): ").strip()
 
         if query.lower() == "exit":
             break
@@ -62,18 +60,10 @@ def main():
                 print(f"RESULT #{i}")
                 print(f"{'=' * 100}")
 
-                print(
-                    f"Product          : {metadata.get('product_title', 'N/A')}"
-                )
-                print(
-                    f"Store            : {metadata.get('store', 'N/A')}"
-                )
-                print(
-                    f"Category         : {metadata.get('main_category', 'N/A')}"
-                )
-                print(
-                    f"Sub Category     : {metadata.get('sub_category', 'N/A')}"
-                )
+                print(f"Product          : {metadata.get('product_title', 'N/A')}")
+                print(f"Store            : {metadata.get('store', 'N/A')}")
+                print(f"Category         : {metadata.get('main_category', 'N/A')}")
+                print(f"Sub Category     : {metadata.get('sub_category', 'N/A')}")
 
                 print(
                     f"Average Rating   : {metadata.get('product_average_rating', 'N/A')}"
@@ -85,13 +75,9 @@ def main():
                     f"Review Count     : {metadata.get('product_review_count', 'N/A')}"
                 )
 
-                print(
-                    f"Parent ASIN      : {metadata.get('parent_asin', 'N/A')}"
-                )
+                print(f"Parent ASIN      : {metadata.get('parent_asin', 'N/A')}")
 
-                print(
-                    f"Image URL        : {metadata.get('product_image_url', 'N/A')}"
-                )
+                print(f"Image URL        : {metadata.get('product_image_url', 'N/A')}")
 
                 print(
                     f"Relevance        : {format_score(document.get('rerank_score'))}"
@@ -111,10 +97,7 @@ def main():
 
                     if len(preview) > 400:
 
-                        preview = (
-                            preview[:400]
-                            + "..."
-                        )
+                        preview = preview[:400] + "..."
 
                 else:
 

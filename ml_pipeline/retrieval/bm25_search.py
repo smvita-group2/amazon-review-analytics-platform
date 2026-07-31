@@ -64,9 +64,7 @@ class BM25Search:
 
         if not self.input_file.exists():
 
-            raise FileNotFoundError(
-                f"BM25 index not found: {self.input_file}"
-            )
+            raise FileNotFoundError(f"BM25 index not found: {self.input_file}")
 
         logger.info(
             "Loading BM25 index for '%s'.",
@@ -102,9 +100,7 @@ class BM25Search:
 
         if not query:
 
-            logger.warning(
-                "Received an empty query."
-            )
+            logger.warning("Received an empty query.")
 
             return []
 
@@ -136,11 +132,7 @@ class BM25Search:
             -top_k,
         )[-top_k:]
 
-        top_indices = top_indices[
-            np.argsort(
-                scores[top_indices]
-            )[::-1]
-        ]
+        top_indices = top_indices[np.argsort(scores[top_indices])[::-1]]
 
         results = []
 
@@ -153,9 +145,7 @@ class BM25Search:
                     ),
                     DOCUMENT: self.documents[index],
                     METADATA: self.metadata[index],
-                    SIMILARITY_SCORE: float(
-                        scores[index]
-                    ),
+                    SIMILARITY_SCORE: float(scores[index]),
                 }
             )
 

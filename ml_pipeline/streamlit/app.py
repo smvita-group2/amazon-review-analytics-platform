@@ -3,23 +3,17 @@ Hybrid RAG Platform for Intelligent Product Search
 
 Enterprise Streamlit Dashboard
 """
+
 import os
 import sys
 
-sys.path.append(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.abspath(__file__)
-        )
-    )
-)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import time
 
 import streamlit as st
 
 from pipeline import Pipeline
-
 
 # ==========================================================
 # Page Configuration
@@ -36,6 +30,7 @@ st.set_page_config(
 # ==========================================================
 # Cache Heavy Objects
 # ==========================================================
+
 
 @st.cache_resource(show_spinner=False)
 def load_pipeline(category: str):
@@ -299,9 +294,7 @@ category = "Appliances"
 
 st.sidebar.title("🛒 Hybrid RAG")
 
-st.sidebar.caption(
-    "Amazon Appliances Product Search Platform"
-)
+st.sidebar.caption("Amazon Appliances Product Search Platform")
 
 st.sidebar.markdown("---")
 
@@ -314,17 +307,11 @@ st.sidebar.markdown("---")
 st.sidebar.subheader("💡 Example Queries")
 
 examples = [
-
     "best black dishwasher",
-
     "energy efficient refrigerator",
-
     "front load washing machine",
-
     "quiet microwave oven",
-
     "stainless steel gas range",
-
 ]
 
 for item in examples:
@@ -349,8 +336,7 @@ st.sidebar.success("Google Gemini 2.5 Flash")
 
 st.sidebar.markdown("---")
 
-st.sidebar.info(
-    """
+st.sidebar.info("""
 Search Amazon appliance products using a Hybrid Retrieval-Augmented
 Generation (Hybrid RAG) pipeline.
 
@@ -358,8 +344,7 @@ The system combines semantic retrieval with keyword search, fuses both
 result sets using Reciprocal Rank Fusion (RRF), reranks the candidates
 with a CrossEncoder model, and generates grounded responses using
 Google Gemini 2.5 Flash based only on the retrieved product information.
-"""
-)
+""")
 
 # ==========================================================
 # Hero
@@ -390,15 +375,10 @@ Google Gemini 2.5 Flash.
 m1, m2, m3, m4 = st.columns(4)
 
 cards = [
-
     ("Category", "Appliances"),
-
     ("Retrieval", "Hybrid"),
-
     ("LLM", "Gemini 2.5"),
-
     ("Status", "Online"),
-
 ]
 
 for column, (title, value) in zip(
@@ -446,9 +426,7 @@ left, middle, right = st.columns([6, 1, 1])
 
 with left:
 
-    st.caption(
-        "Natural language product search powered by Hybrid RAG."
-    )
+    st.caption("Natural language product search powered by Hybrid RAG.")
 
 with middle:
 
@@ -485,9 +463,7 @@ if search_clicked:
 
     if not query.strip():
 
-        st.warning(
-            "Please enter a question before searching."
-        )
+        st.warning("Please enter a question before searching.")
 
         st.stop()
 
@@ -689,9 +665,7 @@ if st.session_state.result:
 
                 with st.container(border=True):
 
-                    left, right = st.columns(
-                        [1, 3]
-                    )
+                    left, right = st.columns([1, 3])
 
                     with left:
 
@@ -711,21 +685,13 @@ if st.session_state.result:
 
                     with right:
 
-                        st.markdown(
-                            f"### {index}. {title}"
-                        )
+                        st.markdown(f"### {index}. {title}")
 
-                        st.caption(
-                            f"🏪 {store}"
-                        )
+                        st.caption(f"🏪 {store}")
 
-                        st.caption(
-                            f"📂 {category_name}"
-                        )
+                        st.caption(f"📂 {category_name}")
 
-                        st.caption(
-                            f"📁 {sub_category}"
-                        )
+                        st.caption(f"📁 {sub_category}")
 
                         m1, m2, m3 = st.columns(3)
 

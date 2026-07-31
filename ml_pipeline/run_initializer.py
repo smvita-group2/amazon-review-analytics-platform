@@ -26,6 +26,7 @@ from initialize_pipeline import InitializePipeline
 from common.config import get_setting
 from common.constants import CATEGORIES
 from common.logger import get_logger
+
 # from common.config import get_setting
 # from common.s3_utils import upload_directory
 
@@ -93,12 +94,12 @@ def main() -> None:
     logger.info("=" * 80)
 
     # ======================================================
+
+
 # Backup ChromaDB
 # ======================================================
 
-logger.info(
-    "Skipping ChromaDB backup to S3 (local execution)."
-)
+logger.info("Skipping ChromaDB backup to S3 (local execution).")
 
 
 # ==========================================================
