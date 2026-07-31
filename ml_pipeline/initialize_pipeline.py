@@ -22,29 +22,24 @@ BM25
 """
 
 import pandas as pd
-
-from common.config import get_setting
-from common.logger import get_logger
-
-from common.s3_io import (
-    read_parquet_from_s3,
-    write_parquet_to_s3,
-)
-
 from embeddings.embedding_generator import (
     EmbeddingGenerator,
 )
-
 from product_documents.document_builder import (
     ProductDocumentBuilder,
 )
-
 from retrieval.bm25_builder import (
     BM25Builder,
 )
-
 from vectordb.persistence import (
     Persistence,
+)
+
+from common.config import get_setting
+from common.logger import get_logger
+from common.s3_io import (
+    read_parquet_from_s3,
+    write_parquet_to_s3,
 )
 
 # ==========================================================

@@ -5,6 +5,8 @@ Persists product documents into ChromaDB.
 """
 
 import pandas as pd
+from vectordb.chromadb_manager import ChromaDBManager
+from vectordb.metadata_builder import MetadataBuilder
 
 from common.constants import (
     CHROMA_REQUIRED_COLUMNS,
@@ -13,9 +15,6 @@ from common.constants import (
     PRODUCT_DOCUMENT,
 )
 from common.logger import get_logger
-
-from vectordb.chromadb_manager import ChromaDBManager
-from vectordb.metadata_builder import MetadataBuilder
 
 logger = get_logger(__name__)
 

@@ -6,13 +6,13 @@ Reciprocal Rank Fusion (RRF), and
 CrossEncoder reranking.
 """
 
-from common.config import get_setting
-from common.logger import get_logger
-
 from retrieval.bm25_search import BM25Search
 from retrieval.reranker import Reranker
 from retrieval.rrf import ReciprocalRankFusion
 from retrieval.semantic_search import SemanticSearch
+
+from common.config import get_setting
+from common.logger import get_logger
 
 logger = get_logger(__name__)
 

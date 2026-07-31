@@ -7,16 +7,16 @@ a CrossEncoder model.
 
 from operator import itemgetter
 
+from retrieval.cross_encoder_model import (
+    CrossEncoderModel,
+)
+
 from common.config import get_setting
 from common.constants import (
     DOCUMENT,
     RERANK_SCORE,
 )
 from common.logger import get_logger
-
-from retrieval.cross_encoder_model import (
-    CrossEncoderModel,
-)
 
 logger = get_logger(__name__)
 

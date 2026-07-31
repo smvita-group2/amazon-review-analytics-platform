@@ -6,6 +6,9 @@ Performs semantic retrieval using ChromaDB.
 
 from typing import Any
 
+from embeddings.embedding_model import EmbeddingModel
+from vectordb.chromadb_manager import ChromaDBManager
+
 from common.config import get_setting
 from common.constants import (
     DOCUMENT,
@@ -14,9 +17,6 @@ from common.constants import (
     SIMILARITY_SCORE,
 )
 from common.logger import get_logger
-
-from embeddings.embedding_model import EmbeddingModel
-from vectordb.chromadb_manager import ChromaDBManager
 
 logger = get_logger(__name__)
 

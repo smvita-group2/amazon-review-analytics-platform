@@ -6,14 +6,14 @@ retrieved product documents.
 """
 
 from common.constants import (
-    PRODUCT_NAME_KEY,
-    FINAL_CATEGORY_KEY,
-    SUB_CATEGORY_KEY,
-    STORE_KEY,
-    PRICE_KEY,
     AVERAGE_RATING_KEY,
-    REVIEW_COUNT_KEY,
+    FINAL_CATEGORY_KEY,
+    PRICE_KEY,
     PRODUCT_DOCUMENT_KEY,
+    PRODUCT_NAME_KEY,
+    REVIEW_COUNT_KEY,
+    STORE_KEY,
+    SUB_CATEGORY_KEY,
 )
 
 

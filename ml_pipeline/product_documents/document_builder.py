@@ -5,6 +5,8 @@ Builds one product document per unique product.
 """
 
 import pandas as pd
+from product_documents.formatter import ProductDocumentFormatter
+from product_documents.review_selector import ReviewSelector
 
 from common.constants import (
     MAIN_CATEGORY,
@@ -18,11 +20,7 @@ from common.constants import (
     STORE,
     SUB_CATEGORY,
 )
-
 from common.logger import get_logger
-
-from product_documents.formatter import ProductDocumentFormatter
-from product_documents.review_selector import ReviewSelector
 
 logger = get_logger(__name__)
 

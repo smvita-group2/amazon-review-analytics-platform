@@ -21,12 +21,12 @@ BM25
 Backup ChromaDB
 """
 
+from initialize_pipeline import InitializePipeline
+
 from common.config import get_setting
 from common.constants import CATEGORIES
 from common.logger import get_logger
 from common.s3_utils import upload_directory
-
-from initialize_pipeline import InitializePipeline
 
 # ==========================================================
 # Logger

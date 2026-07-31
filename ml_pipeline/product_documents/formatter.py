@@ -22,7 +22,6 @@ from common.constants import (
     SUB_CATEGORY,
     VERIFIED_PURCHASE,
 )
-
 from common.logger import get_logger
 from common.utils import (
     format_number,

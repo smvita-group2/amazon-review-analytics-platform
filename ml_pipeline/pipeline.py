@@ -5,11 +5,11 @@ Main application pipeline that coordinates
 retrieval and LLM generation.
 """
 
-from common.logger import get_logger
-
 from llm.gemini_client import GeminiClient
 from llm.prompt_builder import PromptBuilder
 from retrieval.hybrid_search import HybridSearch
+
+from common.logger import get_logger
 
 logger = get_logger(__name__)
 
