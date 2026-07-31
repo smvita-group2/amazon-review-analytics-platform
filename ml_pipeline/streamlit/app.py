@@ -12,7 +12,7 @@ import streamlit as st
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pipeline import Pipeline  # noqa: E402
+from ml_pipeline.pipeline import Pipeline # noqa: E402
 
 # ==========================================================
 # Page Configuration

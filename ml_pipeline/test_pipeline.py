@@ -1,4 +1,4 @@
-from pipeline import Pipeline
+from ml_pipeline.pipeline import Pipeline
 
 
 def format_score(score):
