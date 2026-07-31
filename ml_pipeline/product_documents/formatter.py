@@ -7,7 +7,7 @@ be embedded into the vector database.
 
 import pandas as pd
 
-from common.constants import (
+from ml_pipeline.common.constants import (
     MAIN_CATEGORY,
     PRODUCT_AVERAGE_RATING,
     PRODUCT_RATING_COUNT,
@@ -15,8 +15,8 @@ from common.constants import (
     STORE,
     SUB_CATEGORY,
 )
-from common.logger import get_logger
-from common.utils import (
+from ml_pipeline.common.logger import get_logger
+from ml_pipeline.common.utils import (
     format_number,
     format_rating,
     safe_string,

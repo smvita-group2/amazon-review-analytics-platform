@@ -8,13 +8,13 @@ import pandas as pd
 from vectordb.chromadb_manager import ChromaDBManager
 from vectordb.metadata_builder import MetadataBuilder
 
-from common.constants import (
+from ml_pipeline.common.constants import (
     CHROMA_REQUIRED_COLUMNS,
     EMBEDDING,
     PARENT_ASIN,
     PRODUCT_DOCUMENT,
 )
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

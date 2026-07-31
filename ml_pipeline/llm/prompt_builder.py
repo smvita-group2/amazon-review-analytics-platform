@@ -5,7 +5,7 @@ Builds prompts for the Gemini model using
 retrieved product documents.
 """
 
-from common.constants import (
+from ml_pipeline.common.constants import (
     DOCUMENT,
 )
 

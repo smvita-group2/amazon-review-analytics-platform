@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

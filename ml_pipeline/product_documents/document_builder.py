@@ -8,7 +8,7 @@ import pandas as pd
 from product_documents.formatter import ProductDocumentFormatter
 from product_documents.review_selector import ReviewSelector
 
-from common.constants import (
+from ml_pipeline.common.constants import (
     DESCRIPTION_TEXT,
     FEATURES_TEXT,
     MAIN_CATEGORY,
@@ -22,7 +22,7 @@ from common.constants import (
     STORE,
     SUB_CATEGORY,
 )
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -6,17 +6,17 @@ Hybrid RAG system.
 """
 
 import pandas as pd
-from embeddings.embedding_generator import EmbeddingGenerator
+from ml_pipeline.embeddings.embedding_generator import EmbeddingGenerator
 from product_documents.document_builder import ProductDocumentBuilder
-from retrieval.bm25_builder import BM25Builder
+from ml_pipeline.retrieval.bm25_builder import BM25Builder
 from vectordb.persistence import Persistence
 
-from common.config import get_setting
-from common.local_io import (
+from ml_pipeline.common.config import get_setting
+from ml_pipeline.common.local_io import (
     read_parquet_local,
     write_parquet_local,
 )
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 # ==========================================================
 # Logger

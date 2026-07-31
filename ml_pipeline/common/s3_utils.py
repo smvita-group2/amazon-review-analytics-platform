@@ -9,8 +9,8 @@ from pathlib import Path
 
 import boto3
 
-from common.config import get_setting
-from common.logger import get_logger
+from ml_pipeline.common.config import get_setting
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

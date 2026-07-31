@@ -10,12 +10,12 @@ from pathlib import Path
 import pandas as pd
 from rank_bm25 import BM25Okapi
 
-from common.config import get_setting
-from common.constants import (
+from ml_pipeline.common.config import get_setting
+from ml_pipeline.common.constants import (
     CHROMA_METADATA_FIELDS,
     PRODUCT_DOCUMENT,
 )
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

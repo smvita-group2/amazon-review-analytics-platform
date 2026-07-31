@@ -8,7 +8,7 @@ the ML pipeline.
 from pathlib import Path
 from typing import Iterable
 
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

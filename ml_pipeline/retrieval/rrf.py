@@ -7,11 +7,11 @@ Reciprocal Rank Fusion (RRF).
 
 from operator import itemgetter
 
-from common.constants import (
+from ml_pipeline.common.constants import (
     PARENT_ASIN_KEY,
     RRF_SCORE,
 )
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -6,17 +6,17 @@ Performs semantic retrieval using ChromaDB.
 
 from typing import Any
 
-from embeddings.embedding_model import EmbeddingModel
+from ml_pipeline.embeddings.embedding_model import EmbeddingModel
 from vectordb.chromadb_manager import ChromaDBManager
 
-from common.config import get_setting
-from common.constants import (
+from ml_pipeline.common.config import get_setting
+from ml_pipeline.common.constants import (
     DOCUMENT,
     METADATA,
     PARENT_ASIN_KEY,
     SIMILARITY_SCORE,
 )
-from common.logger import get_logger
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 

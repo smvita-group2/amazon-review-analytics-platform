@@ -7,9 +7,9 @@ Singleton wrapper for the Google Gemini model.
 from google import genai
 from google.genai import types
 
-from common.config import get_setting
-from common.logger import get_logger
-from common.secrets import get_secret
+from ml_pipeline.common.config import get_setting
+from ml_pipeline.common.logger import get_logger
+from ml_pipeline.common.secrets import get_secret
 
 logger = get_logger(__name__)
 

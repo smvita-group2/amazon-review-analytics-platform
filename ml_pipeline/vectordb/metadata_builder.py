@@ -6,8 +6,8 @@ Builds metadata dictionaries for ChromaDB.
 
 import pandas as pd
 
-from common.constants import CHROMA_METADATA_FIELDS
-from common.logger import get_logger
+from ml_pipeline.common.constants import CHROMA_METADATA_FIELDS
+from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 
