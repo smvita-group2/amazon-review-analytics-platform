@@ -39,14 +39,13 @@ logger = get_logger(__name__)
 # Main
 # ==========================================================
 
+
 def main() -> None:
     """
     Run the initialization pipeline for all categories.
     """
 
-    logger.info(
-        "Starting offline initialization pipeline..."
-    )
+    logger.info("Starting offline initialization pipeline...")
 
     pipeline = InitializePipeline()
 
@@ -55,9 +54,7 @@ def main() -> None:
 
     for category in CATEGORIES:
 
-        logger.info(
-            "=" * 80
-        )
+        logger.info("=" * 80)
 
         logger.info(
             "Processing category: %s",
@@ -92,9 +89,7 @@ def main() -> None:
 
             continue
 
-    logger.info(
-        "=" * 80
-    )
+    logger.info("=" * 80)
 
     # ======================================================
     # Backup ChromaDB
@@ -102,9 +97,7 @@ def main() -> None:
 
     if successful_categories:
 
-        logger.info(
-            "Backing up ChromaDB to Amazon S3..."
-        )
+        logger.info("Backing up ChromaDB to Amazon S3...")
 
         try:
 
@@ -119,15 +112,11 @@ def main() -> None:
                 ),
             )
 
-            logger.info(
-                "ChromaDB backup completed successfully."
-            )
+            logger.info("ChromaDB backup completed successfully.")
 
         except Exception:
 
-            logger.exception(
-                "Failed to back up ChromaDB."
-            )
+            logger.exception("Failed to back up ChromaDB.")
 
     else:
 
@@ -135,13 +124,9 @@ def main() -> None:
             "Skipping ChromaDB backup because no categories were processed successfully."
         )
 
-    logger.info(
-        "=" * 80
-    )
+    logger.info("=" * 80)
 
-    logger.info(
-        "Offline initialization pipeline completed."
-    )
+    logger.info("Offline initialization pipeline completed.")
 
     logger.info(
         "Successful Categories (%d): %s",

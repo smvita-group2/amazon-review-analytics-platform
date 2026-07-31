@@ -77,9 +77,7 @@ class SemanticSearch:
 
         if not query:
 
-            logger.warning(
-                "Received an empty query."
-            )
+            logger.warning("Received an empty query.")
 
             return []
 
@@ -136,9 +134,7 @@ class SemanticSearch:
             )
 
         semantic_results.sort(
-            key=lambda result: result[
-                SIMILARITY_SCORE
-            ],
+            key=lambda result: result[SIMILARITY_SCORE],
             reverse=True,
         )
 

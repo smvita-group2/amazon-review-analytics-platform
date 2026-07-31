@@ -50,9 +50,7 @@ class CrossEncoderModel:
                 max_length=max_length,
             )
 
-            logger.info(
-                "CrossEncoder loaded successfully."
-            )
+            logger.info("CrossEncoder loaded successfully.")
 
         return cls._model
 

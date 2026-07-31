@@ -48,9 +48,7 @@ class Persistence:
 
         if dataframe.empty:
 
-            logger.warning(
-                "Input dataframe is empty."
-            )
+            logger.warning("Input dataframe is empty.")
 
             return
 
@@ -63,8 +61,7 @@ class Persistence:
         if missing_columns:
 
             raise ValueError(
-                "Missing required columns: "
-                f"{', '.join(missing_columns)}"
+                "Missing required columns: " f"{', '.join(missing_columns)}"
             )
 
         if reset_collection and self.chroma.exists():
@@ -76,27 +73,13 @@ class Persistence:
 
             self.chroma.reset()
 
-        ids = (
-            dataframe[PARENT_ASIN]
-            .astype(str)
-            .tolist()
-        )
+        ids = dataframe[PARENT_ASIN].astype(str).tolist()
 
-        documents = (
-            dataframe[PRODUCT_DOCUMENT]
-            .fillna("")
-            .astype(str)
-            .tolist()
-        )
+        documents = dataframe[PRODUCT_DOCUMENT].fillna("").astype(str).tolist()
 
-        embeddings = (
-            dataframe[EMBEDDING]
-            .tolist()
-        )
+        embeddings = dataframe[EMBEDDING].tolist()
 
-        metadata = MetadataBuilder.build_metadata(
-            dataframe
-        )
+        metadata = MetadataBuilder.build_metadata(dataframe)
 
         logger.info(
             "Persisting %d products into '%s'.",
@@ -111,6 +94,4 @@ class Persistence:
             metadatas=metadata,
         )
 
-        logger.info(
-            "Persistence completed successfully."
-        )
+        logger.info("Persistence completed successfully.")

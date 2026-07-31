@@ -60,17 +60,13 @@ class ProductDocumentBuilder:
 
             try:
 
-                document = self._build_single_document(
-                    reviews_df
-                )
+                document = self._build_single_document(reviews_df)
 
                 documents.append(document)
 
             except Exception:
 
-                logger.exception(
-                    "Failed to build product document."
-                )
+                logger.exception("Failed to build product document.")
 
         logger.info(
             "Successfully built %d product documents.",
@@ -89,9 +85,7 @@ class ProductDocumentBuilder:
 
         product = reviews_df.iloc[0]
 
-        selected_reviews = self.selector.select_reviews(
-            reviews_df
-        )
+        selected_reviews = self.selector.select_reviews(reviews_df)
 
         product_document = self.formatter.build_document(
             product=product,
@@ -104,15 +98,9 @@ class ProductDocumentBuilder:
             STORE: product[STORE],
             MAIN_CATEGORY: product[MAIN_CATEGORY],
             SUB_CATEGORY: product[SUB_CATEGORY],
-            PRODUCT_AVERAGE_RATING: product[
-                PRODUCT_AVERAGE_RATING
-            ],
-            PRODUCT_RATING_COUNT: product[
-                PRODUCT_RATING_COUNT
-            ],
+            PRODUCT_AVERAGE_RATING: product[PRODUCT_AVERAGE_RATING],
+            PRODUCT_RATING_COUNT: product[PRODUCT_RATING_COUNT],
             PRODUCT_REVIEW_COUNT: len(reviews_df),
-            PRODUCT_IMAGE_URL: product[
-                PRODUCT_IMAGE_URL
-            ],
+            PRODUCT_IMAGE_URL: product[PRODUCT_IMAGE_URL],
             PRODUCT_DOCUMENT: product_document,
         }

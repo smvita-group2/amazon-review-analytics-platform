@@ -87,16 +87,10 @@ class GeminiClient:
                 ),
             )
 
-            return (
-                response.text.strip()
-                if response.text
-                else ""
-            )
+            return response.text.strip() if response.text else ""
 
         except Exception:
 
-            logger.exception(
-                "Gemini generation failed."
-            )
+            logger.exception("Gemini generation failed.")
 
             raise

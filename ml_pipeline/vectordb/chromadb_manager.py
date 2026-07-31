@@ -43,9 +43,7 @@ class ChromaDBManager:
 
         self.collection_name = category
 
-        logger.info(
-            "Initializing ChromaDB."
-        )
+        logger.info("Initializing ChromaDB.")
 
         logger.info(
             "Persist Directory : %s",
@@ -97,9 +95,7 @@ class ChromaDBManager:
 
         if not ids:
 
-            logger.warning(
-                "No documents to add."
-            )
+            logger.warning("No documents to add.")
 
             return
 
@@ -116,9 +112,7 @@ class ChromaDBManager:
             metadatas=metadatas,
         )
 
-        logger.info(
-            "Documents added successfully."
-        )
+        logger.info("Documents added successfully.")
 
     def query(
         self,
@@ -166,9 +160,7 @@ class ChromaDBManager:
 
         if not ids:
 
-            logger.warning(
-                "No IDs provided for deletion."
-            )
+            logger.warning("No IDs provided for deletion.")
 
             return
 
@@ -198,9 +190,7 @@ class ChromaDBManager:
 
         self.collection = self._load_collection()
 
-        logger.info(
-            "Collection reset completed."
-        )
+        logger.info("Collection reset completed.")
 
     def get_collection(self) -> Collection:
         """

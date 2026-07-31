@@ -50,9 +50,7 @@ def read_parquet_from_s3(
 
     path = _build_s3_path(s3_key)
 
-    logger.info(
-        f"Reading parquet from {path}"
-    )
+    logger.info(f"Reading parquet from {path}")
 
     return pd.read_parquet(path)
 
@@ -72,9 +70,7 @@ def write_parquet_to_s3(
 
     path = _build_s3_path(s3_key)
 
-    logger.info(
-        f"Writing parquet to {path}"
-    )
+    logger.info(f"Writing parquet to {path}")
 
     dataframe.to_parquet(
         path,
@@ -96,9 +92,7 @@ def read_csv_from_s3(
 
     path = _build_s3_path(s3_key)
 
-    logger.info(
-        f"Reading CSV from {path}"
-    )
+    logger.info(f"Reading CSV from {path}")
 
     return pd.read_csv(path)
 
@@ -118,9 +112,7 @@ def write_csv_to_s3(
 
     path = _build_s3_path(s3_key)
 
-    logger.info(
-        f"Writing CSV to {path}"
-    )
+    logger.info(f"Writing CSV to {path}")
 
     dataframe.to_csv(
         path,

@@ -13,11 +13,7 @@ import yaml
 # Configuration Path
 # ==========================================================
 
-CONFIG_PATH = (
-    Path(__file__).resolve().parent.parent
-    / "config"
-    / "settings.yaml"
-)
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "settings.yaml"
 
 # ==========================================================
 # Configuration Loader

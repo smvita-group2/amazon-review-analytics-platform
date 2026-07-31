@@ -11,10 +11,7 @@ should live here.
 # Categories
 # ==========================================================
 
-CATEGORIES = (
-    "Appliances",
-    
-)
+CATEGORIES = ("Appliances",)
 
 # ==========================================================
 # DataFrame Column Names

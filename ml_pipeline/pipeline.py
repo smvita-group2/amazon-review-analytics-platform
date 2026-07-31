@@ -59,9 +59,7 @@ class Pipeline:
 
         if not query.strip():
 
-            raise ValueError(
-                "Query cannot be empty."
-            )
+            raise ValueError("Query cannot be empty.")
 
         logger.info(
             "Executing pipeline for category '%s'.",
@@ -83,9 +81,7 @@ class Pipeline:
                 prompt=prompt,
             )
 
-            logger.info(
-                "Pipeline execution completed successfully."
-            )
+            logger.info("Pipeline execution completed successfully.")
 
             return {
                 "query": query,
@@ -95,8 +91,6 @@ class Pipeline:
 
         except Exception:
 
-            logger.exception(
-                "Pipeline execution failed."
-            )
+            logger.exception("Pipeline execution failed.")
 
             raise

@@ -50,10 +50,7 @@ class BM25Search:
             )
         )
 
-        self.input_file = (
-            self.input_directory
-            / f"{category}.pkl"
-        )
+        self.input_file = self.input_directory / f"{category}.pkl"
 
         self._load_index()
 
@@ -66,9 +63,7 @@ class BM25Search:
 
         if not self.input_file.exists():
 
-            raise FileNotFoundError(
-                f"BM25 index not found: {self.input_file}"
-            )
+            raise FileNotFoundError(f"BM25 index not found: {self.input_file}")
 
         logger.info(
             "Loading BM25 index for '%s'.",
@@ -106,9 +101,7 @@ class BM25Search:
 
         if not query:
 
-            logger.warning(
-                "Received an empty query."
-            )
+            logger.warning("Received an empty query.")
 
             return []
 
@@ -140,11 +133,7 @@ class BM25Search:
             -top_k,
         )[-top_k:]
 
-        top_indices = top_indices[
-            np.argsort(
-                scores[top_indices]
-            )[::-1]
-        ]
+        top_indices = top_indices[np.argsort(scores[top_indices])[::-1]]
 
         documents = self.documents
         metadata = self.metadata
@@ -155,20 +144,12 @@ class BM25Search:
 
             results.append(
                 {
-                    PARENT_ASIN_KEY: metadata[
-                        index
-                    ].get(
+                    PARENT_ASIN_KEY: metadata[index].get(
                         PARENT_ASIN_KEY,
                     ),
-                    DOCUMENT: documents[
-                        index
-                    ],
-                    METADATA: metadata[
-                        index
-                    ],
-                    SIMILARITY_SCORE: float(
-                        scores[index]
-                    ),
+                    DOCUMENT: documents[index],
+                    METADATA: metadata[index],
+                    SIMILARITY_SCORE: float(scores[index]),
                 }
             )
 

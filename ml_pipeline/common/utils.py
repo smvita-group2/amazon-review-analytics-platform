@@ -17,6 +17,7 @@ logger = get_logger(__name__)
 # Ensure Directory Exists
 # ==========================================================
 
+
 def ensure_directory(path: str | Path) -> Path:
     """
     Create a directory if it does not already exist.
@@ -36,6 +37,7 @@ def ensure_directory(path: str | Path) -> Path:
 # Chunk Iterable
 # ==========================================================
 
+
 def chunk_iterable(
     iterable: Iterable,
     chunk_size: int,
@@ -52,14 +54,13 @@ def chunk_iterable(
         chunk_size,
     ):
 
-        yield iterable[
-            index:index + chunk_size
-        ]
+        yield iterable[index : index + chunk_size]
 
 
 # ==========================================================
 # Safe String
 # ==========================================================
+
 
 def safe_string(value) -> str:
     """
@@ -77,6 +78,7 @@ def safe_string(value) -> str:
 # Format Rating
 # ==========================================================
 
+
 def format_rating(value) -> str:
     """
     Format product rating.
@@ -92,6 +94,7 @@ def format_rating(value) -> str:
 # ==========================================================
 # Format Integer
 # ==========================================================
+
 
 def format_number(value) -> str:
     """

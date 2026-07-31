@@ -6,7 +6,7 @@ Enterprise Streamlit Dashboard
 
 import streamlit as st
 
-#from pipeline import Pipeline
+# from pipeline import Pipeline
 
 
 # ---------------------------------------------------
@@ -241,17 +241,11 @@ st.sidebar.markdown("---")
 st.sidebar.subheader("💡 Example Questions")
 
 example_questions = [
-
     "Recommend a dishwasher under $500",
-
     "Which gaming headset has the best sound quality?",
-
     "Best beginner acoustic guitar",
-
     "Compare two similar products",
-
     "Which product has the highest ratings?",
-
 ]
 
 for question in example_questions:
@@ -276,8 +270,7 @@ st.sidebar.markdown("---")
 
 st.sidebar.subheader("🛠 Technology Stack")
 
-st.sidebar.markdown(
-    """
+st.sidebar.markdown("""
 - Python
 
 - PySpark
@@ -293,8 +286,7 @@ st.sidebar.markdown(
 - Google Gemini
 
 - Streamlit
-"""
-)
+""")
 
 st.sidebar.markdown("---")
 
@@ -318,14 +310,12 @@ with col2:
 
 st.sidebar.markdown("---")
 
-st.sidebar.info(
-    """
+st.sidebar.info("""
 Hybrid RAG combines semantic retrieval,
 keyword search, Reciprocal Rank Fusion,
 and CrossEncoder reranking to improve
 product search quality.
-"""
-)
+""")
 
 # ---------------------------------------------------
 # Hero Section
@@ -460,9 +450,7 @@ left, right = st.columns([4, 1])
 
 with left:
 
-    st.caption(
-        "Ask natural language questions about Amazon products."
-    )
+    st.caption("Ask natural language questions about Amazon products.")
 
 with right:
 
@@ -495,9 +483,7 @@ if search_clicked:
 
     if not query.strip():
 
-        st.warning(
-            "Please enter a question before searching."
-        )
+        st.warning("Please enter a question before searching.")
 
         st.stop()
 
@@ -505,9 +491,7 @@ if search_clicked:
 
         start_time = time.perf_counter()
 
-        with st.spinner(
-            "Searching products and generating response..."
-        ):
+        with st.spinner("Searching products and generating response..."):
 
             pipeline = Pipeline(
                 category=category,
@@ -521,9 +505,7 @@ if search_clicked:
 
         st.session_state.result = result
 
-        st.session_state.execution_time = (
-            end_time - start_time
-        )
+        st.session_state.execution_time = end_time - start_time
 
         st.toast(
             "Search completed successfully!",
@@ -534,9 +516,7 @@ if search_clicked:
 
         st.session_state.result = None
 
-        st.error(
-            f"Application Error\n\n{error}"
-        )
+        st.error(f"Application Error\n\n{error}")
 
 # ---------------------------------------------------
 # Search Statistics
@@ -544,13 +524,9 @@ if search_clicked:
 
 if st.session_state.result:
 
-    execution_time = (
-        st.session_state.execution_time
-    )
+    execution_time = st.session_state.execution_time
 
-    document_count = len(
-        st.session_state.result["documents"]
-    )
+    document_count = len(st.session_state.result["documents"])
 
     st.subheader("📈 Search Statistics")
 
@@ -701,9 +677,7 @@ if st.session_state.result:
             "View Product Information",
         ):
 
-            st.write(
-                description
-            )
+            st.write(description)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -719,8 +693,7 @@ col1, col2 = st.columns(2)
 
 with col1:
 
-    st.info(
-        """
+    st.info("""
 ### Retrieval Pipeline
 
 User Query
@@ -744,13 +717,11 @@ CrossEncoder Reranker
 ⬇
 
 Top Relevant Documents
-"""
-    )
+""")
 
 with col2:
 
-    st.success(
-        """
+    st.success("""
 ### Generation Pipeline
 
 Retrieved Documents
@@ -766,8 +737,7 @@ Google Gemini 2.5 Flash
 ⬇
 
 AI Generated Response
-"""
-    )
+""")
 
 # ---------------------------------------------------
 # Technology Stack
@@ -781,52 +751,44 @@ tech1, tech2, tech3, tech4 = st.columns(4)
 
 with tech1:
 
-    st.markdown(
-        """
+    st.markdown("""
 ### Data Engineering
 
 - PySpark
 - Python
 - ChromaDB
 - BM25
-"""
-    )
+""")
 
 with tech2:
 
-    st.markdown(
-        """
+    st.markdown("""
 ### Machine Learning
 
 - Sentence Transformers
 - MiniLM-L6-v2
 - CrossEncoder
-"""
-    )
+""")
 
 with tech3:
 
-    st.markdown(
-        """
+    st.markdown("""
 ### AI
 
 - Google Gemini
 - Hybrid RAG
 - Prompt Engineering
-"""
-    )
+""")
 
 with tech4:
 
-    st.markdown(
-        """
+    st.markdown("""
 ### Frontend
 
 - Streamlit
 - Custom CSS
 - Interactive Dashboard
-"""
-    )
+""")
 
 # ---------------------------------------------------
 # Footer
@@ -850,4 +812,3 @@ Semantic Search • BM25 • Reciprocal Rank Fusion • CrossEncoder • Gemini 
 """,
     unsafe_allow_html=True,
 )
-

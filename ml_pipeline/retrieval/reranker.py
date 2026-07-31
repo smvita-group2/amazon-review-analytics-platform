@@ -45,9 +45,7 @@ class Reranker:
             "show_progress_bar",
         )
 
-        self.model = (
-            CrossEncoderModel.get_model()
-        )
+        self.model = CrossEncoderModel.get_model()
 
     def rerank(
         self,
@@ -58,9 +56,7 @@ class Reranker:
 
         if not results:
 
-            logger.warning(
-                "No documents available for reranking."
-            )
+            logger.warning("No documents available for reranking.")
 
             return []
 
@@ -82,19 +78,14 @@ class Reranker:
             show_progress_bar=self.show_progress_bar,
         )
 
-        reranked_results = [
-            result.copy()
-            for result in results
-        ]
+        reranked_results = [result.copy() for result in results]
 
         for result, score in zip(
             reranked_results,
             scores,
         ):
 
-            result[
-                RERANK_SCORE
-            ] = float(
+            result[RERANK_SCORE] = float(
                 score,
             )
 
@@ -105,9 +96,7 @@ class Reranker:
             reverse=True,
         )
 
-        final_results = reranked_results[
-            :top_k
-        ]
+        final_results = reranked_results[:top_k]
 
         for result in final_results:
 

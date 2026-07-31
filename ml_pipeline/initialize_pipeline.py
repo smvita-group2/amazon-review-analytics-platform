@@ -58,6 +58,7 @@ logger = get_logger(__name__)
 # Initialization Pipeline
 # ==========================================================
 
+
 class InitializePipeline:
     """
     Orchestrates the offline initialization pipeline
@@ -151,10 +152,7 @@ class InitializePipeline:
             category,
         )
 
-        s3_key = (
-            f"{get_setting('paths', 'cleaned')}"
-            f"/{category}/"
-        )
+        s3_key = f"{get_setting('paths', 'cleaned')}" f"/{category}/"
 
         dataframe = read_parquet_from_s3(
             s3_key,
@@ -179,14 +177,10 @@ class InitializePipeline:
         Build product documents from the cleaned dataset.
         """
 
-        logger.info(
-            "Building product documents..."
-        )
+        logger.info("Building product documents...")
 
-        product_documents = (
-            self.document_builder.build_documents(
-                dataframe,
-            )
+        product_documents = self.document_builder.build_documents(
+            dataframe,
         )
 
         logger.info(
@@ -195,7 +189,6 @@ class InitializePipeline:
         )
 
         return product_documents
-
 
     # ==========================================================
     # Save Product Documents
@@ -215,19 +208,14 @@ class InitializePipeline:
             category,
         )
 
-        s3_key = (
-            f"{get_setting('paths', 'product_documents')}"
-            f"/{category}/"
-        )
+        s3_key = f"{get_setting('paths', 'product_documents')}" f"/{category}/"
 
         write_parquet_to_s3(
             dataframe=product_documents,
             s3_key=s3_key,
         )
 
-        logger.info(
-            "Product documents saved successfully."
-        )
+        logger.info("Product documents saved successfully.")
 
     # ==========================================================
     # Generate Embeddings
@@ -241,14 +229,10 @@ class InitializePipeline:
         Generate embeddings for product documents.
         """
 
-        logger.info(
-            "Generating embeddings..."
-        )
+        logger.info("Generating embeddings...")
 
-        embeddings = (
-            self.embedding_generator.generate_embeddings(
-                product_documents,
-            )
+        embeddings = self.embedding_generator.generate_embeddings(
+            product_documents,
         )
 
         logger.info(
@@ -276,19 +260,14 @@ class InitializePipeline:
             category,
         )
 
-        s3_key = (
-            f"{get_setting('paths', 'embeddings')}"
-            f"/{category}/"
-        )
+        s3_key = f"{get_setting('paths', 'embeddings')}" f"/{category}/"
 
         write_parquet_to_s3(
             dataframe=embeddings,
             s3_key=s3_key,
         )
 
-        logger.info(
-            "Embeddings saved successfully."
-        )
+        logger.info("Embeddings saved successfully.")
 
     # ==========================================================
     # Persist ChromaDB
@@ -317,9 +296,7 @@ class InitializePipeline:
             reset_collection=True,
         )
 
-        logger.info(
-            "ChromaDB persistence completed."
-        )
+        logger.info("ChromaDB persistence completed.")
 
     # ==========================================================
     # Build BM25
@@ -347,8 +324,4 @@ class InitializePipeline:
             product_documents,
         )
 
-        logger.info(
-            "BM25 index created successfully."
-        )
-
-        
+        logger.info("BM25 index created successfully.")

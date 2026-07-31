@@ -16,8 +16,6 @@ def get_secret(
 
     if not value:
 
-        raise ValueError(
-            f"Missing environment variable: {key}"
-        )
+        raise ValueError(f"Missing environment variable: {key}")
 
     return value

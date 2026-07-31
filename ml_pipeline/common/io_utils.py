@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 # Read Parquet
 # ==========================================================
 
+
 def read_parquet(path: str | Path) -> pd.DataFrame:
     """
     Read a parquet dataset.
@@ -31,6 +32,7 @@ def read_parquet(path: str | Path) -> pd.DataFrame:
 # ==========================================================
 # Write Parquet
 # ==========================================================
+
 
 def write_parquet(
     dataframe: pd.DataFrame,
@@ -57,6 +59,7 @@ def write_parquet(
 # Read CSV
 # ==========================================================
 
+
 def read_csv(path: str | Path) -> pd.DataFrame:
     """
     Read a CSV file.
@@ -70,6 +73,7 @@ def read_csv(path: str | Path) -> pd.DataFrame:
 # ==========================================================
 # Write CSV
 # ==========================================================
+
 
 def write_csv(
     dataframe: pd.DataFrame,

@@ -37,10 +37,7 @@ class ReviewSelector:
             "recent_reviews",
         )
 
-        self.total_required_reviews = (
-            self.helpful_reviews +
-            self.recent_reviews
-        )
+        self.total_required_reviews = self.helpful_reviews + self.recent_reviews
 
     def select_reviews(
         self,
@@ -65,9 +62,7 @@ class ReviewSelector:
 
         if reviews_df.empty:
 
-            logger.warning(
-                "No reviews found for product."
-            )
+            logger.warning("No reviews found for product.")
 
             return reviews_df
 
@@ -82,48 +77,36 @@ class ReviewSelector:
                 len(reviews_df),
             )
 
-            return (
-                reviews_df
-                .sort_values(
-                    by=REVIEW_TIMESTAMP,
-                    ascending=False,
-                )
-                .reset_index(drop=True)
-            )
+            return reviews_df.sort_values(
+                by=REVIEW_TIMESTAMP,
+                ascending=False,
+            ).reset_index(drop=True)
 
         # --------------------------------------------------
         # Most Helpful Reviews
         # --------------------------------------------------
 
-        helpful_reviews = (
-            reviews_df
-            .sort_values(
-                by=[
-                    HELPFUL_VOTE,
-                    REVIEW_RATING,
-                    REVIEW_TIMESTAMP,
-                ],
-                ascending=[
-                    False,
-                    False,
-                    False,
-                ],
-            )
-            .head(self.helpful_reviews)
-        )
+        helpful_reviews = reviews_df.sort_values(
+            by=[
+                HELPFUL_VOTE,
+                REVIEW_RATING,
+                REVIEW_TIMESTAMP,
+            ],
+            ascending=[
+                False,
+                False,
+                False,
+            ],
+        ).head(self.helpful_reviews)
 
         # --------------------------------------------------
         # Most Recent Reviews
         # --------------------------------------------------
 
-        recent_reviews = (
-            reviews_df
-            .sort_values(
-                by=REVIEW_TIMESTAMP,
-                ascending=False,
-            )
-            .head(self.recent_reviews)
-        )
+        recent_reviews = reviews_df.sort_values(
+            by=REVIEW_TIMESTAMP,
+            ascending=False,
+        ).head(self.recent_reviews)
 
         # --------------------------------------------------
         # Combine Reviews

@@ -57,14 +57,9 @@ class ReciprocalRankFusion:
             RRF score.
         """
 
-        if (
-            not semantic_results
-            and not bm25_results
-        ):
+        if not semantic_results and not bm25_results:
 
-            logger.warning(
-                "No retrieval results available."
-            )
+            logger.warning("No retrieval results available.")
 
             return []
 
@@ -131,30 +126,14 @@ class ReciprocalRankFusion:
 
                 continue
 
-            rrf_score = (
-                1.0
-                / (
-                    ReciprocalRankFusion.RRF_K
-                    + rank
-                )
-            )
+            rrf_score = 1.0 / (ReciprocalRankFusion.RRF_K + rank)
 
             if parent_asin not in fused_results:
 
-                fused_results[
-                    parent_asin
-                ] = result.copy()
+                fused_results[parent_asin] = result.copy()
 
-                fused_results[
-                    parent_asin
-                ][
-                    RRF_SCORE
-                ] = rrf_score
+                fused_results[parent_asin][RRF_SCORE] = rrf_score
 
             else:
 
-                fused_results[
-                    parent_asin
-                ][
-                    RRF_SCORE
-                ] += rrf_score
+                fused_results[parent_asin][RRF_SCORE] += rrf_score

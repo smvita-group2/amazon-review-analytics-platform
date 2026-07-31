@@ -55,11 +55,7 @@ class ProductDocumentFormatter:
             self._format_reviews(reviews),
         ]
 
-        return "\n\n".join(
-            section
-            for section in sections
-            if section.strip()
-        )
+        return "\n\n".join(section for section in sections if section.strip())
 
     # ======================================================
     # Product Information
@@ -91,9 +87,7 @@ class ProductDocumentFormatter:
         product: pd.Series,
     ) -> str:
 
-        description = safe_string(
-            product.get(DESCRIPTION_TEXT)
-        )
+        description = safe_string(product.get(DESCRIPTION_TEXT))
 
         if not description:
 
@@ -115,9 +109,7 @@ class ProductDocumentFormatter:
         product: pd.Series,
     ) -> str:
 
-        features = safe_string(
-            product.get(FEATURES_TEXT)
-        )
+        features = safe_string(product.get(FEATURES_TEXT))
 
         if not features:
 

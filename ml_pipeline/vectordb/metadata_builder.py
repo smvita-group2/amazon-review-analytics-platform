@@ -37,9 +37,7 @@ class MetadataBuilder:
 
         if dataframe.empty:
 
-            logger.warning(
-                "Input dataframe is empty."
-            )
+            logger.warning("Input dataframe is empty.")
 
             return []
 
@@ -52,8 +50,7 @@ class MetadataBuilder:
         if missing_columns:
 
             raise ValueError(
-                "Missing metadata columns: "
-                f"{', '.join(missing_columns)}"
+                "Missing metadata columns: " f"{', '.join(missing_columns)}"
             )
 
         logger.info(

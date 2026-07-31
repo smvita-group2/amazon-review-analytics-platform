@@ -105,9 +105,7 @@ def upload_directory(
 
     if not local_directory.exists():
 
-        raise FileNotFoundError(
-            f"Directory not found: {local_directory}"
-        )
+        raise FileNotFoundError(f"Directory not found: {local_directory}")
 
     logger.info(
         "Uploading directory '%s' to s3://%s/%s",
@@ -126,9 +124,7 @@ def upload_directory(
             local_directory,
         )
 
-        s3_key = (
-            f"{s3_prefix}/{relative_path.as_posix()}"
-        )
+        s3_key = f"{s3_prefix}/{relative_path.as_posix()}"
 
         s3_client.upload_file(
             str(file_path),
@@ -136,9 +132,7 @@ def upload_directory(
             s3_key,
         )
 
-    logger.info(
-        "Directory upload completed."
-    )
+    logger.info("Directory upload completed.")
 
 
 # ==========================================================
@@ -212,16 +206,9 @@ def download_directory(
 
         key = obj["Key"]
 
-        relative_path = Path(
-            key.removeprefix(
-                f"{s3_prefix}/"
-            )
-        )
+        relative_path = Path(key.removeprefix(f"{s3_prefix}/"))
 
-        destination = (
-            local_directory
-            / relative_path
-        )
+        destination = local_directory / relative_path
 
         destination.parent.mkdir(
             parents=True,
@@ -234,9 +221,7 @@ def download_directory(
             str(destination),
         )
 
-    logger.info(
-        "Directory download completed."
-    )
+    logger.info("Directory download completed.")
 
 
 # ==========================================================
@@ -287,7 +272,4 @@ def list_objects(
         [],
     )
 
-    return [
-        obj["Key"]
-        for obj in contents
-    ]
+    return [obj["Key"] for obj in contents]
