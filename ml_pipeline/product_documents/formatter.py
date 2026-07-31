@@ -8,8 +8,6 @@ be embedded into the vector database.
 import pandas as pd
 
 from common.constants import (
-    DESCRIPTION_TEXT,
-    FEATURES_TEXT,
     HELPFUL_VOTE,
     MAIN_CATEGORY,
     PRODUCT_AVERAGE_RATING,
@@ -38,10 +36,14 @@ class ProductDocumentFormatter:
     into a single text document.
     """
 
+    MAX_REVIEW_LENGTH = 500
+
     def build_document(
         self,
         product: pd.Series,
         reviews: pd.DataFrame,
+        description: str,
+        features: str,
     ) -> str:
         """
         Build the complete product document.
@@ -49,12 +51,16 @@ class ProductDocumentFormatter:
 
         sections = [
             self._format_product_information(product),
-            self._format_description(product),
-            self._format_features(product),
+            self._format_description(description),
+            self._format_features(features),
             self._format_reviews(reviews),
         ]
 
-        return "\n\n".join(section for section in sections if section.strip())
+        return "\n\n".join(
+            section
+            for section in sections
+            if section.strip()
+        )
 
     # ======================================================
     # Product Information
@@ -83,10 +89,10 @@ class ProductDocumentFormatter:
 
     def _format_description(
         self,
-        product: pd.Series,
+        description: str,
     ) -> str:
 
-        description = safe_string(product.get(DESCRIPTION_TEXT))
+        description = safe_string(description)
 
         if not description:
 
@@ -105,10 +111,10 @@ class ProductDocumentFormatter:
 
     def _format_features(
         self,
-        product: pd.Series,
+        features: str,
     ) -> str:
 
-        features = safe_string(product.get(FEATURES_TEXT))
+        features = safe_string(features)
 
         if not features:
 
@@ -146,6 +152,15 @@ class ProductDocumentFormatter:
             start=1,
         ):
 
+            review_text = safe_string(review.review_text)
+
+            if len(review_text) > self.MAX_REVIEW_LENGTH:
+
+                review_text = (
+                    review_text[: self.MAX_REVIEW_LENGTH].rstrip()
+                    + "..."
+                )
+
             lines.extend(
                 [
                     f"Review {index}",
@@ -156,7 +171,7 @@ class ProductDocumentFormatter:
                     f"Title: {safe_string(review.review_title)}",
                     "",
                     "Review:",
-                    safe_string(review.review_text),
+                    review_text,
                     "",
                     "-" * 60,
                     "",

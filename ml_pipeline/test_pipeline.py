@@ -2,19 +2,15 @@ from pipeline import Pipeline
 
 
 def format_score(score):
+    """
+    Format reranker relevance score.
+    """
 
     if score is None:
         return "N/A"
 
     try:
-        score = float(score)
-
-        # Semantic scores are already between 0 and 1
-        if 0.0 <= score <= 1.0:
-            return f"{score * 100:.1f}%"
-
-        # BM25 / CrossEncoder raw scores
-        return f"{score:.3f}"
+        return f"{float(score):.1f}%"
 
     except Exception:
         return str(score)
@@ -32,7 +28,9 @@ def main():
 
     while True:
 
-        query = input("\nEnter Query (type 'exit' to quit): ").strip()
+        query = input(
+            "\nEnter Query (type 'exit' to quit): "
+        ).strip()
 
         if query.lower() == "exit":
             break
@@ -50,42 +48,73 @@ def main():
             print("TOP RETRIEVED DOCUMENTS")
             print("=" * 100)
 
-            for i, document in enumerate(result["documents"], start=1):
+            for i, document in enumerate(
+                result["documents"],
+                start=1,
+            ):
 
-                metadata = document.get("metadata", {})
+                metadata = document.get(
+                    "metadata",
+                    {},
+                )
 
                 print(f"\n{'=' * 100}")
                 print(f"RESULT #{i}")
                 print(f"{'=' * 100}")
 
-                print(f"Product          : {metadata.get('product_title', 'N/A')}")
-                print(f"Store            : {metadata.get('store', 'N/A')}")
-                print(f"Category         : {metadata.get('main_category', 'N/A')}")
-                print(f"Sub Category     : {metadata.get('sub_category', 'N/A')}")
-
-                print(f"Average Rating   : {metadata.get('product_average_rating', 'N/A')}")
-                print(f"Rating Count     : {metadata.get('product_rating_count', 'N/A')}")
-                print(f"Review Count     : {metadata.get('product_review_count', 'N/A')}")
-
-                print(f"Parent ASIN      : {metadata.get('parent_asin', 'N/A')}")
-
-                print(f"Image URL        : {metadata.get('product_image_url', 'N/A')}")
-
-                score = (
-                    document.get("rerank_score")
-                    or document.get("similarity_score")
+                print(
+                    f"Product          : {metadata.get('product_title', 'N/A')}"
+                )
+                print(
+                    f"Store            : {metadata.get('store', 'N/A')}"
+                )
+                print(
+                    f"Category         : {metadata.get('main_category', 'N/A')}"
+                )
+                print(
+                    f"Sub Category     : {metadata.get('sub_category', 'N/A')}"
                 )
 
-                print(f"Score            : {format_score(score)}")
+                print(
+                    f"Average Rating   : {metadata.get('product_average_rating', 'N/A')}"
+                )
+                print(
+                    f"Rating Count     : {metadata.get('product_rating_count', 'N/A')}"
+                )
+                print(
+                    f"Review Count     : {metadata.get('product_review_count', 'N/A')}"
+                )
 
-                preview = document.get("document", "")
+                print(
+                    f"Parent ASIN      : {metadata.get('parent_asin', 'N/A')}"
+                )
+
+                print(
+                    f"Image URL        : {metadata.get('product_image_url', 'N/A')}"
+                )
+
+                print(
+                    f"Relevance        : {format_score(document.get('rerank_score'))}"
+                )
+
+                preview = document.get(
+                    "document",
+                    "",
+                )
 
                 if preview:
 
-                    preview = preview.replace("\n", " ")
+                    preview = preview.replace(
+                        "\n",
+                        " ",
+                    )
 
-                    if len(preview) > 350:
-                        preview = preview[:350] + "..."
+                    if len(preview) > 400:
+
+                        preview = (
+                            preview[:400]
+                            + "..."
+                        )
 
                 else:
 
@@ -97,7 +126,11 @@ def main():
 
                 print("\nMetadata Keys")
                 print("-" * 100)
-                print(sorted(metadata.keys()))
+                print(
+                    sorted(
+                        metadata.keys(),
+                    )
+                )
 
         except Exception as e:
 

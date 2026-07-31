@@ -7,13 +7,6 @@ retrieved product documents.
 
 from common.constants import (
     DOCUMENT,
-    MAIN_CATEGORY,
-    METADATA,
-    PRODUCT_AVERAGE_RATING,
-    PRODUCT_REVIEW_COUNT,
-    PRODUCT_TITLE,
-    STORE,
-    SUB_CATEGORY,
 )
 
 
@@ -29,19 +22,6 @@ class PromptBuilder:
     ) -> str:
         """
         Build the final prompt.
-
-        Parameters
-        ----------
-        query : str
-            User question.
-
-        documents : list[dict]
-            Retrieved product documents.
-
-        Returns
-        -------
-        str
-            Prompt sent to Gemini.
         """
 
         context = PromptBuilder._build_context(
@@ -49,33 +29,43 @@ class PromptBuilder:
         )
 
         return f"""
-You are an intelligent shopping assistant.
+You are an expert Amazon shopping assistant.
 
-Answer the user's question ONLY using the provided product information.
+Answer the user's question ONLY using the retrieved product documents.
 
-Instructions:
-- Do not make up facts.
-- If the answer cannot be found in the provided context, reply:
-  "The requested information is not available in the retrieved products."
-- Keep answers concise and factual.
-- Compare products when appropriate.
-- Mention product names whenever possible.
+Rules:
 
-=========================
-Retrieved Product Context
-=========================
+- Use ONLY the provided product documents.
+- Never invent, assume or infer facts that are not present.
+- Use information from:
+  • Product Information
+  • Description
+  • Features
+  • Representative Reviews
+- Compare products whenever appropriate.
+- Mention product names in comparisons.
+- If multiple products satisfy the request, mention all relevant products.
+- If the answer cannot be determined from the retrieved products, reply EXACTLY with:
+
+The requested information is not available in the retrieved products.
+
+Keep the answer concise, factual, well-structured and easy to read.
+
+========================================
+RETRIEVED PRODUCT DOCUMENTS
+========================================
 
 {context}
 
-=========================
-User Question
-=========================
+========================================
+USER QUESTION
+========================================
 
 {query}
 
-=========================
-Answer
-=========================
+========================================
+ANSWER
+========================================
 """.strip()
 
     @staticmethod
@@ -98,33 +88,11 @@ Answer
             start=1,
         ):
 
-            metadata = result.get(
-                METADATA,
-                {},
-            )
-
             section = f"""
-Product {index}
+========================================
+PRODUCT {index}
+========================================
 
-Name:
-{metadata.get(PRODUCT_TITLE, "Unknown")}
-
-Category:
-{metadata.get(MAIN_CATEGORY, "Unknown")}
-
-Sub Category:
-{metadata.get(SUB_CATEGORY, "Unknown")}
-
-Store:
-{metadata.get(STORE, "Unknown")}
-
-Average Rating:
-{metadata.get(PRODUCT_AVERAGE_RATING, "Unknown")}
-
-Review Count:
-{metadata.get(PRODUCT_REVIEW_COUNT, "Unknown")}
-
-Information:
 {result.get(DOCUMENT, "")}
 """.strip()
 

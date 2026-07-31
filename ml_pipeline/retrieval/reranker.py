@@ -28,7 +28,6 @@ class Reranker:
         self,
     ) -> None:
 
-        # Number of documents to keep after reranking
         self.top_k = get_setting(
             "retrieval",
             "final_top_k",
@@ -104,12 +103,41 @@ class Reranker:
 
         final_results = reranked_results[:top_k]
 
-        for result in final_results:
+        # ======================================================
+        # Normalize reranker scores to 0-100
+        # ======================================================
 
-            result.pop(
-                RERANK_SCORE,
-                None,
-            )
+        if final_results:
+
+            raw_scores = [
+                result[RERANK_SCORE]
+                for result in final_results
+            ]
+
+            min_score = min(raw_scores)
+            max_score = max(raw_scores)
+
+            for result in final_results:
+
+                if max_score == min_score:
+
+                    result[RERANK_SCORE] = 100.0
+
+                else:
+
+                    normalized = (
+                        (
+                            result[RERANK_SCORE] - min_score
+                        )
+                        / (
+                            max_score - min_score
+                        )
+                    ) * 100
+
+                    result[RERANK_SCORE] = round(
+                        normalized,
+                        1,
+                    )
 
         logger.info(
             "Returned %d reranked documents.",
