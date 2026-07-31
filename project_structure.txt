@@ -1,0 +1,54 @@
+Folder PATH listing for volume Vishal
+Volume serial number is 000000F6 709F:5E8F
+A:.
+¦   .gitignore
+¦   LICENSE
+¦   project_structure.txt
+¦   README.md
+¦   requirements.txt
+¦   VideoGame_EDA.py
+¦   
++---config
+¦   +---datasets
+¦           paths.py
+¦           schema.py
+¦           __init__.py
+¦           
++---docs
+¦       Project_Overview_Report.docx
+¦       
++---local-jupyter-notebook-analysis
+¦       analysis.ipynb
+¦       Combined_note.ipynb
+¦       spark_analysis.ipynb
+¦       Spark_analysis_2.ipynb
+¦       
++---notebooks
+¦   ¦   00_data_ingestion.ipynb
+¦   ¦   01_data_understanding.ipynb
+¦   ¦   
+¦   +---BronzeToSilver
+¦   ¦       02_Bronze_To_Silver_ETL.ipynb
+¦   ¦       
+¦   +---Musical-Instrments
+¦   ¦       Review_EDA_Akshta_005_22-07.ipynb
+¦   ¦       
+¦   +---Sports&Outdoor_EDA
+¦   ¦       01_Data_Understanding_and_EDA.ipynb.ipynb
+¦   ¦       
+¦   +---Video_Games_Data_EDA
+¦           EDA_Abhijeet.ipynb
+¦           EDA_Report_Abhijeet.docx
+¦           VideoGame_EDA.ipynb
+¦           
++---src
+    +---common
+    ¦       spark_session.py
+    ¦       
+    +---ingestion
+            pipeline.py
+            reader.py
+            sampler.py
+            writer.py
+            __init__.py
+            
