@@ -7,14 +7,13 @@ a CrossEncoder model.
 
 from operator import itemgetter
 
-from ml_pipeline.retrieval.cross_encoder_model import CrossEncoderModel
-
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.constants import (
     DOCUMENT,
     RERANK_SCORE,
 )
 from ml_pipeline.common.logger import get_logger
+from ml_pipeline.retrieval.cross_encoder_model import CrossEncoderModel
 
 logger = get_logger(__name__)
 

@@ -6,13 +6,12 @@ Reciprocal Rank Fusion (RRF), and
 CrossEncoder reranking.
 """
 
+from ml_pipeline.common.config import get_setting
+from ml_pipeline.common.logger import get_logger
 from ml_pipeline.retrieval.bm25_search import BM25Search
 from ml_pipeline.retrieval.reranker import Reranker
 from ml_pipeline.retrieval.rrf import ReciprocalRankFusion
 from ml_pipeline.retrieval.semantic_search import SemanticSearch
-
-from ml_pipeline.common.config import get_setting
-from ml_pipeline.common.logger import get_logger
 
 logger = get_logger(__name__)
 
