@@ -15,6 +15,7 @@ paths:
   embeddings: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/embeddings"
   bm25: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/bm25"
   chromadb_backup: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/chromadb"
+  review_analytics: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/review_analytics"
 
 # ==========================================================
 # Embedding Configuration

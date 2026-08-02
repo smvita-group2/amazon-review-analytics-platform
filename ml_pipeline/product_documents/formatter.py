@@ -1,8 +1,8 @@
 """
 Product Document Formatter
 
-Builds a structured text document for a product that will
-be embedded into the vector database.
+Builds an enriched product document for embedding into
+the Hybrid RAG vector database.
 """
 
 import pandas as pd
@@ -27,8 +27,8 @@ logger = get_logger(__name__)
 
 class ProductDocumentFormatter:
     """
-    Formats product information and representative reviews
-    into a single text document.
+    Formats a product into a structured document
+    for semantic retrieval.
     """
 
     MAX_REVIEW_LENGTH = 500
@@ -37,6 +37,7 @@ class ProductDocumentFormatter:
         self,
         product: pd.Series,
         reviews: pd.DataFrame,
+        analytics: dict,
         description: str,
         features: str,
     ) -> str:
@@ -46,12 +47,17 @@ class ProductDocumentFormatter:
 
         sections = [
             self._format_product_information(product),
+            self._format_customer_insights(analytics),
             self._format_description(description),
             self._format_features(features),
             self._format_reviews(reviews),
         ]
 
-        return "\n\n".join(section for section in sections if section.strip())
+        return "\n\n".join(
+            section
+            for section in sections
+            if section.strip()
+        )
 
     # ======================================================
     # Product Information
@@ -72,6 +78,34 @@ class ProductDocumentFormatter:
             f"Sub Category: {safe_string(product.get(SUB_CATEGORY))}\n"
             f"Average Rating: {format_rating(product.get(PRODUCT_AVERAGE_RATING))}\n"
             f"Total Ratings: {format_number(product.get(PRODUCT_RATING_COUNT))}"
+        )
+
+    # ======================================================
+    # Customer Insights
+    # ======================================================
+
+    def _format_customer_insights(
+        self,
+        analytics: dict,
+    ) -> str:
+
+        if not analytics:
+
+            return ""
+
+        return (
+            "==============================\n"
+            "CUSTOMER INSIGHTS\n"
+            "==============================\n\n"
+            f"Overall Sentiment: {analytics.get('overall_sentiment', 'Unknown')}\n"
+            f"Sentiment Score: {analytics.get('sentiment_score', 'N/A')} / 100\n"
+            f"Confidence Level: {analytics.get('confidence_level', 'Unknown')}\n"
+            f"Review Count: {analytics.get('review_count', 0)}\n"
+            f"Positive Reviews: {analytics.get('positive_percentage', 0)}%\n"
+            f"Neutral Reviews: {analytics.get('neutral_percentage', 0)}%\n"
+            f"Negative Reviews: {analytics.get('negative_percentage', 0)}%\n"
+            f"Verified Purchases: {analytics.get('verified_purchase_percentage', 0)}%\n"
+            f"Average Helpful Votes: {analytics.get('average_helpful_vote', 0)}"
         )
 
     # ======================================================
@@ -119,7 +153,7 @@ class ProductDocumentFormatter:
         )
 
     # ======================================================
-    # Reviews
+    # Representative Reviews
     # ======================================================
 
     def _format_reviews(
@@ -143,11 +177,18 @@ class ProductDocumentFormatter:
             start=1,
         ):
 
-            review_text = safe_string(review.review_text)
+            review_text = safe_string(
+                review.review_text,
+            )
 
             if len(review_text) > self.MAX_REVIEW_LENGTH:
 
-                review_text = review_text[: self.MAX_REVIEW_LENGTH].rstrip() + "..."
+                review_text = (
+                    review_text[
+                        : self.MAX_REVIEW_LENGTH
+                    ].rstrip()
+                    + "..."
+                )
 
             lines.extend(
                 [

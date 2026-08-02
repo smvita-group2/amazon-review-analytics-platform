@@ -8,6 +8,7 @@ CrossEncoder reranking.
 
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.logger import get_logger
+from ml_pipeline.retrieval.intent_parser import IntentParser
 from ml_pipeline.retrieval.bm25_search import BM25Search
 from ml_pipeline.retrieval.reranker import Reranker
 from ml_pipeline.retrieval.rrf import ReciprocalRankFusion
@@ -60,6 +61,8 @@ class HybridSearch:
 
         self.reranker = Reranker()
 
+        self.intent_parser = IntentParser()
+
     def search(
         self,
         query: str,
@@ -92,12 +95,21 @@ class HybridSearch:
             self.category,
         )
 
+        intent = self.intent_parser.parse(
+            query,
+        )
+
+        logger.info(
+               "Detected intent: %s", intent,
+        )
+
+       
         semantic_results = self.semantic_search.search(
-            query=query,
+            query=intent.original_query,
         )
 
         bm25_results = self.bm25_search.search(
-            query=query,
+            query=intent.original_query,
         )
 
         logger.info(

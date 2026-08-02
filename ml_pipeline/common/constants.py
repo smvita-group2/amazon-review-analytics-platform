@@ -41,6 +41,32 @@ FEATURES_TEXT = "features_text"
 PRODUCT_IMAGE_URL = "product_image_url"
 
 # ==========================================================
+# Review Analytics Columns
+# ==========================================================
+
+REVIEW_COUNT = "review_count"
+
+POSITIVE_REVIEW_COUNT = "positive_review_count"
+NEUTRAL_REVIEW_COUNT = "neutral_review_count"
+NEGATIVE_REVIEW_COUNT = "negative_review_count"
+
+POSITIVE_PERCENTAGE = "positive_percentage"
+NEUTRAL_PERCENTAGE = "neutral_percentage"
+NEGATIVE_PERCENTAGE = "negative_percentage"
+
+AVERAGE_HELPFUL_VOTE = "average_helpful_vote"
+
+VERIFIED_PURCHASE_PERCENTAGE = (
+    "verified_purchase_percentage"
+)
+
+CONFIDENCE_LEVEL = "confidence_level"
+
+SENTIMENT_SCORE = "sentiment_score"
+
+OVERALL_SENTIMENT = "overall_sentiment"
+
+# ==========================================================
 # Generated Columns
 # ==========================================================
 
@@ -83,6 +109,8 @@ CHROMA_METADATA_FIELDS = (
     PRODUCT_RATING_COUNT,
     PRODUCT_REVIEW_COUNT,
     PRODUCT_IMAGE_URL,
+    OVERALL_SENTIMENT,
+    CONFIDENCE_LEVEL,
 )
 
 CHROMA_REQUIRED_COLUMNS = (

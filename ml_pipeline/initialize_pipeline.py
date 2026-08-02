@@ -6,8 +6,6 @@ Hybrid RAG system.
 """
 
 import pandas as pd
-from ml_pipeline.product_documents.document_builder import ProductDocumentBuilder
-from ml_pipeline.vectordb.persistence import Persistence
 
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.local_io import (
@@ -16,7 +14,9 @@ from ml_pipeline.common.local_io import (
 )
 from ml_pipeline.common.logger import get_logger
 from ml_pipeline.embeddings.embedding_generator import EmbeddingGenerator
+from ml_pipeline.product_documents.document_builder import ProductDocumentBuilder
 from ml_pipeline.retrieval.bm25_builder import BM25Builder
+from ml_pipeline.vectordb.persistence import Persistence
 
 # ==========================================================
 # Logger
@@ -36,7 +36,9 @@ class InitializePipeline:
     for the Hybrid RAG system.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+    ) -> None:
 
         self.document_builder = ProductDocumentBuilder()
 
@@ -56,10 +58,17 @@ class InitializePipeline:
             category,
         )
 
-        dataframe = self._load_cleaned_data(category)
+        cleaned_df = self._load_cleaned_data(
+            category,
+        )
+
+        review_analytics_df = self._load_review_analytics(
+            category,
+        )
 
         product_documents = self._build_product_documents(
-            dataframe,
+            cleaned_df,
+            review_analytics_df,
         )
 
         self._save_product_documents(
@@ -114,7 +123,36 @@ class InitializePipeline:
         )
 
         logger.info(
-            "Loaded %d records.",
+            "Loaded %d cleaned records.",
+            len(dataframe),
+        )
+
+        return dataframe
+
+    # ==========================================================
+    # Load Review Analytics
+    # ==========================================================
+
+    def _load_review_analytics(
+        self,
+        category: str,
+    ) -> pd.DataFrame:
+
+        logger.info(
+            "Loading review analytics for category: %s",
+            category,
+        )
+
+        dataframe = read_parquet_local(
+            base_path=get_setting(
+                "paths",
+                "review_analytics",
+            ),
+            category=category,
+        )
+
+        logger.info(
+            "Loaded %d review analytics records.",
             len(dataframe),
         )
 
@@ -126,13 +164,19 @@ class InitializePipeline:
 
     def _build_product_documents(
         self,
-        dataframe: pd.DataFrame,
+        cleaned_df: pd.DataFrame,
+        review_analytics_df: pd.DataFrame,
     ) -> pd.DataFrame:
 
-        logger.info("Building product documents...")
+        logger.info(
+            "Building product documents..."
+        )
 
-        product_documents = self.document_builder.build_documents(
-            dataframe,
+        product_documents = (
+            self.document_builder.build_documents(
+                cleaned_df,
+                review_analytics_df,
+            )
         )
 
         logger.info(
@@ -180,10 +224,14 @@ class InitializePipeline:
         product_documents: pd.DataFrame,
     ) -> pd.DataFrame:
 
-        logger.info("Generating embeddings...")
+        logger.info(
+            "Generating embeddings..."
+        )
 
-        embeddings = self.embedding_generator.generate_embeddings(
-            product_documents,
+        embeddings = (
+            self.embedding_generator.generate_embeddings(
+                product_documents,
+            )
         )
 
         logger.info(
