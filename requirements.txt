@@ -36,3 +36,4 @@ bandit
 
 mypy
 
+google-genai
