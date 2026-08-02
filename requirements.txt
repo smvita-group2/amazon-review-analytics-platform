@@ -39,3 +39,5 @@ mypy
 google-genai
 
 numpy
+
+sentence-transformers
