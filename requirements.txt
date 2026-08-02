@@ -37,3 +37,5 @@ bandit
 mypy
 
 google-genai
+
+numpy
