@@ -5,8 +5,8 @@ Persists product documents into ChromaDB.
 """
 
 import pandas as pd
-from vectordb.chromadb_manager import ChromaDBManager
-from vectordb.metadata_builder import MetadataBuilder
+from ml_pipeline.vectordb.chromadb_manager import ChromaDBManager
+from ml_pipeline.vectordb.metadata_builder import MetadataBuilder
 
 from ml_pipeline.common.constants import (
     CHROMA_REQUIRED_COLUMNS,

@@ -6,8 +6,8 @@ Hybrid RAG system.
 """
 
 import pandas as pd
-from product_documents.document_builder import ProductDocumentBuilder
-from vectordb.persistence import Persistence
+from ml_pipeline.product_documents.document_builder import ProductDocumentBuilder
+from ml_pipeline.vectordb.persistence import Persistence
 
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.local_io import (

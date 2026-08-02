@@ -5,8 +5,8 @@ Builds one product document per unique product.
 """
 
 import pandas as pd
-from product_documents.formatter import ProductDocumentFormatter
-from product_documents.review_selector import ReviewSelector
+from ml_pipeline.product_documents.formatter import ProductDocumentFormatter
+from ml_pipeline.product_documents.review_selector import ReviewSelector
 
 from ml_pipeline.common.constants import (
     DESCRIPTION_TEXT,

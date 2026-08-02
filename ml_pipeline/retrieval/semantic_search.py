@@ -6,7 +6,7 @@ Performs semantic retrieval using ChromaDB.
 
 from typing import Any
 
-from vectordb.chromadb_manager import ChromaDBManager
+from ml_pipeline.vectordb.chromadb_manager import ChromaDBManager
 
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.constants import (
