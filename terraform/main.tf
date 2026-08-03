@@ -47,7 +47,8 @@ module "glue" {
   project_name = var.project_name
   environment  = var.environment
 
-  bucket_name = module.s3.bucket_name
+  bucket_name  = module.s3.bucket_name
+  lab_role_arn = "arn:aws:iam::471112764802:role/LabRole"
 }
 
 module "monitoring" {
