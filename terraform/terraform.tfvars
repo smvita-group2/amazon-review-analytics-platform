@@ -4,11 +4,11 @@ project_name = "amazon-review-analytics"
 environment  = "dev"
 
 # Existing bucket
-create_bucket = false
-bucket_name   = "amazon-review-analytics-group-2"
+create_bucket = true
+bucket_name   = "amazon-review-analytics-shreyash-471112764802"
 
 # Deployment artifacts
-artifact_bucket = "amazon-review-analytics-group-2"
+artifact_bucket = "amazon-review-analytics-shreyash-471112764802"
 artifact_prefix = "artifacts"
 
 # Network
