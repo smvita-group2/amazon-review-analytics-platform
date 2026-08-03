@@ -96,7 +96,8 @@ data/gold/
 # Models & Embeddings
 # ==================================================
 models/
-embeddings/
+/embeddings/
+data/embeddings/
 faiss_index/
 *.faiss
 
