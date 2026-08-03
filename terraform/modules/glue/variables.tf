@@ -36,3 +36,27 @@ variable "lab_role_arn" {
   type        = string
   default     = "arn:aws:iam::471112764802:role/LabRole"
 }
+
+variable "glue_version" {
+  description = "AWS Glue Version"
+  type        = string
+  default     = "4.0"
+}
+
+variable "worker_type" {
+  description = "Glue Worker Type"
+  type        = string
+  default     = "G.1X"
+}
+
+variable "number_of_workers" {
+  description = "Number of Glue Workers"
+  type        = number
+  default     = 2
+}
+
+variable "timeout" {
+  description = "Glue job timeout in minutes"
+  type        = number
+  default     = 60
+}
