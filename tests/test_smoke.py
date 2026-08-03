@@ -1,5 +1,6 @@
 """
-Smoke tests verifying core package imports, configuration loading, and pipeline readiness.
+Smoke tests verifying core package imports, configuration loading,
+and pipeline readiness.
 """
 
 from ml_pipeline.common.config import get_setting
@@ -12,7 +13,9 @@ from ml_pipeline.product_documents.review_selector import ReviewSelector
 from ml_pipeline.retrieval.rrf import ReciprocalRankFusion
 from src.bronze_to_silver.metadata_transformer import MetadataTransformer
 from src.bronze_to_silver.reviews_transformer import ReviewsTransformer
-from src.silver_to_gold.gold_visualization_transformer import GoldVisualizationTransformer
+from src.silver_to_gold.gold_visualization_transformer import (
+    GoldVisualizationTransformer,
+)
 from src.silver_to_gold.silver_master_transformer import SilverMasterTransformer
 from src.validation.metadata_validator import MetadataValidator
 from src.validation.reviews_validator import ReviewsValidator

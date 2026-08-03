@@ -48,7 +48,8 @@ def test_reciprocal_rank_fusion():
     )
 
     assert len(fused) == 3
-    # ASIN_2 appears in both lists (rank 2 in semantic, rank 1 in BM25), so it should rank first overall
+    # ASIN_2 appears in both lists (rank 2 in semantic, rank 1 in BM25),
+    # so it should rank first overall
     assert fused[0][PARENT_ASIN_KEY] == "ASIN_2"
 
 
@@ -76,13 +77,15 @@ def test_review_selector():
     """
     data = {
         HELPFUL_VOTE: [10, 2, 50, 0, 1],
-        REVIEW_TIMESTAMP: pd.to_datetime([
-            "2023-01-01",
-            "2023-05-01",
-            "2023-02-01",
-            "2023-06-01",
-            "2023-04-01",
-        ]),
+        REVIEW_TIMESTAMP: pd.to_datetime(
+            [
+                "2023-01-01",
+                "2023-05-01",
+                "2023-02-01",
+                "2023-06-01",
+                "2023-04-01",
+            ]
+        ),
     }
     df = pd.DataFrame(data)
 
@@ -96,21 +99,25 @@ def test_product_document_formatter():
     """
     Test ProductDocumentFormatter formatting output.
     """
-    product = pd.Series({
-        PRODUCT_TITLE: "Wireless Mouse",
-        STORE: "Logitech",
-        PRODUCT_AVERAGE_RATING: 4.8,
-        PRODUCT_RATING_COUNT: 1500,
-        "main_category": "Electronics",
-        "sub_category": "Accessories",
-    })
-    reviews = pd.DataFrame({
-        REVIEW_TITLE: ["Great"],
-        REVIEW_TEXT: ["Smooth sensor"],
-        REVIEW_RATING: [5],
-        VERIFIED_PURCHASE: [True],
-        HELPFUL_VOTE: [10],
-    })
+    product = pd.Series(
+        {
+            PRODUCT_TITLE: "Wireless Mouse",
+            STORE: "Logitech",
+            PRODUCT_AVERAGE_RATING: 4.8,
+            PRODUCT_RATING_COUNT: 1500,
+            "main_category": "Electronics",
+            "sub_category": "Accessories",
+        }
+    )
+    reviews = pd.DataFrame(
+        {
+            REVIEW_TITLE: ["Great"],
+            REVIEW_TEXT: ["Smooth sensor"],
+            REVIEW_RATING: [5],
+            VERIFIED_PURCHASE: [True],
+            HELPFUL_VOTE: [10],
+        }
+    )
 
     formatter = ProductDocumentFormatter()
     doc = formatter.build_document(
@@ -129,24 +136,26 @@ def test_product_document_builder():
     """
     Test ProductDocumentBuilder document dataframe output.
     """
-    df = pd.DataFrame({
-        PARENT_ASIN: ["ASIN100", "ASIN100"],
-        PRODUCT_TITLE: ["Smart Speaker", "Smart Speaker"],
-        STORE: ["Amazon", "Amazon"],
-        "main_category": ["Electronics", "Electronics"],
-        "sub_category": ["Speakers", "Speakers"],
-        PRODUCT_AVERAGE_RATING: [4.6, 4.6],
-        PRODUCT_RATING_COUNT: [500, 500],
-        PRODUCT_IMAGE_URL: ["http://img.url", "http://img.url"],
-        "description_text": ["Voice controlled", "Voice controlled"],
-        "features_text": ["Alexa built-in", "Alexa built-in"],
-        REVIEW_RATING: [5, 4],
-        REVIEW_TITLE: ["Awesome", "Good"],
-        REVIEW_TEXT: ["Love it", "Decent sound"],
-        VERIFIED_PURCHASE: [True, True],
-        HELPFUL_VOTE: [10, 2],
-        REVIEW_TIMESTAMP: pd.to_datetime(["2023-01-01", "2023-02-01"]),
-    })
+    df = pd.DataFrame(
+        {
+            PARENT_ASIN: ["ASIN100", "ASIN100"],
+            PRODUCT_TITLE: ["Smart Speaker", "Smart Speaker"],
+            STORE: ["Amazon", "Amazon"],
+            "main_category": ["Electronics", "Electronics"],
+            "sub_category": ["Speakers", "Speakers"],
+            PRODUCT_AVERAGE_RATING: [4.6, 4.6],
+            PRODUCT_RATING_COUNT: [500, 500],
+            PRODUCT_IMAGE_URL: ["http://img.url", "http://img.url"],
+            "description_text": ["Voice controlled", "Voice controlled"],
+            "features_text": ["Alexa built-in", "Alexa built-in"],
+            REVIEW_RATING: [5, 4],
+            REVIEW_TITLE: ["Awesome", "Good"],
+            REVIEW_TEXT: ["Love it", "Decent sound"],
+            VERIFIED_PURCHASE: [True, True],
+            HELPFUL_VOTE: [10, 2],
+            REVIEW_TIMESTAMP: pd.to_datetime(["2023-01-01", "2023-02-01"]),
+        }
+    )
 
     builder = ProductDocumentBuilder()
     doc_df = builder.build_documents(df)

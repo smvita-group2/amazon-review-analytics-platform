@@ -21,16 +21,18 @@ def test_reviews_transformer(spark):
     Test ReviewsTransformer schema transformation, column renaming,
     and helpful vote cleaning.
     """
-    schema = StructType([
-        StructField("parent_asin", StringType(), True),
-        StructField("user_id", StringType(), True),
-        StructField("rating", DoubleType(), True),
-        StructField("title", StringType(), True),
-        StructField("text", StringType(), True),
-        StructField("helpful_vote", IntegerType(), True),
-        StructField("verified_purchase", StringType(), True),
-        StructField("timestamp", LongType(), True),
-    ])
+    schema = StructType(
+        [
+            StructField("parent_asin", StringType(), True),
+            StructField("user_id", StringType(), True),
+            StructField("rating", DoubleType(), True),
+            StructField("title", StringType(), True),
+            StructField("text", StringType(), True),
+            StructField("helpful_vote", IntegerType(), True),
+            StructField("verified_purchase", StringType(), True),
+            StructField("timestamp", LongType(), True),
+        ]
+    )
 
     data = [
         (
@@ -92,24 +94,28 @@ def test_metadata_transformer(spark):
     Test MetadataTransformer category parsing, store trimming,
     and price extraction.
     """
-    image_struct = StructType([
-        StructField("hi_res", StringType(), True),
-        StructField("large", StringType(), True),
-    ])
+    image_struct = StructType(
+        [
+            StructField("hi_res", StringType(), True),
+            StructField("large", StringType(), True),
+        ]
+    )
 
-    schema = StructType([
-        StructField("parent_asin", StringType(), True),
-        StructField("title", StringType(), True),
-        StructField("store", StringType(), True),
-        StructField("categories", ArrayType(StringType()), True),
-        StructField("price", StringType(), True),
-        StructField("average_rating", DoubleType(), True),
-        StructField("rating_number", IntegerType(), True),
-        StructField("description", ArrayType(StringType()), True),
-        StructField("features", ArrayType(StringType()), True),
-        StructField("images", ArrayType(image_struct), True),
-        StructField("main_category", StringType(), True),
-    ])
+    schema = StructType(
+        [
+            StructField("parent_asin", StringType(), True),
+            StructField("title", StringType(), True),
+            StructField("store", StringType(), True),
+            StructField("categories", ArrayType(StringType()), True),
+            StructField("price", StringType(), True),
+            StructField("average_rating", DoubleType(), True),
+            StructField("rating_number", IntegerType(), True),
+            StructField("description", ArrayType(StringType()), True),
+            StructField("features", ArrayType(StringType()), True),
+            StructField("images", ArrayType(image_struct), True),
+            StructField("main_category", StringType(), True),
+        ]
+    )
 
     data = [
         (

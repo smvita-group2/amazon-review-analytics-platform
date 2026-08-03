@@ -118,8 +118,9 @@ class ReviewsValidator:
             )
 
         if metrics["invalid_helpful_votes"] > 0:
+            count_val = metrics["invalid_helpful_votes"]
             raise ValueError(
-                f"Found {metrics['invalid_helpful_votes']} review(s) with negative helpful votes."
+                f"Found {count_val} review(s) with negative helpful votes."
             )
 
         return self
