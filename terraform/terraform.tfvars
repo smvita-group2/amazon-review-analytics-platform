@@ -12,8 +12,8 @@ artifact_bucket = "amazon-review-analytics-shreyash-471112764802"
 artifact_prefix = "artifacts"
 
 # Network
-vpc_id    = "vpc-023ac2f6325567736"
-subnet_id = "subnet-00e3d0807c2aa3752"
+vpc_id    = "vpc-01e9a6c45d239e514"
+subnet_id = "subnet-0050635527648b3ae"
 
 # EMR
 master_instance_type  = "m4.xlarge"

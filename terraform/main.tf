@@ -28,7 +28,7 @@ module "emr" {
   subnet_id = var.subnet_id
 
   service_role     = "amazon-review-analytics-dev-emr-service-role"
-  instance_profile = "amazon-review-analytics-dev-emr-ec2-role"
+  instance_profile = "amazon-review-analytics-dev-instance-profile"
 
   log_uri = "s3://${module.s3.bucket_name}/logs/"
 
