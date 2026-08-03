@@ -30,3 +30,9 @@ variable "crawler_schedule" {
   type        = string
   default     = "cron(0 2 * * ? *)"
 }
+
+variable "lab_role_arn" {
+  description = "Pre-built IAM LabRole ARN for federated accounts"
+  type        = string
+  default     = "arn:aws:iam::471112764802:role/LabRole"
+}

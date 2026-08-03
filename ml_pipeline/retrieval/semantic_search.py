@@ -6,8 +6,6 @@ Performs semantic retrieval using ChromaDB.
 
 from typing import Any
 
-from ml_pipeline.vectordb.chromadb_manager import ChromaDBManager
-
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.constants import (
     DOCUMENT,
@@ -17,6 +15,7 @@ from ml_pipeline.common.constants import (
 )
 from ml_pipeline.common.logger import get_logger
 from ml_pipeline.embeddings.embedding_model import EmbeddingModel
+from ml_pipeline.vectordb.chromadb_manager import ChromaDBManager
 
 logger = get_logger(__name__)
 

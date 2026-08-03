@@ -5,8 +5,6 @@ Builds one product document per unique product.
 """
 
 import pandas as pd
-from ml_pipeline.product_documents.formatter import ProductDocumentFormatter
-from ml_pipeline.product_documents.review_selector import ReviewSelector
 
 from ml_pipeline.common.constants import (
     DESCRIPTION_TEXT,
@@ -23,6 +21,8 @@ from ml_pipeline.common.constants import (
     SUB_CATEGORY,
 )
 from ml_pipeline.common.logger import get_logger
+from ml_pipeline.product_documents.formatter import ProductDocumentFormatter
+from ml_pipeline.product_documents.review_selector import ReviewSelector
 
 logger = get_logger(__name__)
 
