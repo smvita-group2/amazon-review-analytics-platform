@@ -169,7 +169,7 @@ class GoldVisualizationTransformer:
         self.df = self.df.withColumn(
             "purchase_type",
             when(
-                col("verified_purchase"),
+                col("verified_purchase").cast("boolean"),
                 "Verified Purchase",
             ).otherwise(
                 "Non-Verified Purchase",

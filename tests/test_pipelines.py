@@ -4,6 +4,7 @@ Unit tests for data processing pipelines.
 
 from pyspark.sql.types import (
     ArrayType,
+    BooleanType,
     DoubleType,
     IntegerType,
     LongType,
@@ -123,7 +124,7 @@ def test_silver_master_and_gold_pipeline_flow(spark):
             StructField("review_title", StringType(), True),
             StructField("review_text", StringType(), True),
             StructField("helpful_vote", IntegerType(), True),
-            StructField("verified_purchase", StringType(), True),
+            StructField("verified_purchase", BooleanType(), True),
             StructField("review_timestamp", StringType(), True),
             StructField("review_date", StringType(), True),
             StructField("review_year", IntegerType(), True),
@@ -138,7 +139,7 @@ def test_silver_master_and_gold_pipeline_flow(spark):
             "Great",
             "Love it",
             1,
-            "True",
+            True,
             "2023-01-01 00:00:00",
             "2023-01-01",
             2023,
