@@ -42,10 +42,7 @@ class EmbeddingGenerator:
         """
         logger.info("Generating embeddings for %d documents...", len(product_documents))
 
-        if (
-            product_documents.empty
-            or PRODUCT_DOCUMENT not in product_documents.columns
-        ):
+        if product_documents.empty or PRODUCT_DOCUMENT not in product_documents.columns:
             logger.warning(
                 "Empty product documents DataFrame or missing '%s' column.",
                 PRODUCT_DOCUMENT,

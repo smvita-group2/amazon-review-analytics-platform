@@ -13,6 +13,10 @@ on:
       - develop
       - dev-test
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   python-ci:
     runs-on: ubuntu-latest
@@ -28,6 +32,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install Dependencies
         run: |
