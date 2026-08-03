@@ -20,6 +20,7 @@ module "s3" {
 ########################################
 
 module "emr" {
+  count  = var.enable_emr ? 1 : 0
   source = "./modules/emr"
 
   project_name = var.project_name
@@ -56,5 +57,5 @@ module "monitoring" {
   project_name = var.project_name
   environment  = var.environment
 
-  emr_cluster_id = module.emr.cluster_id
+  emr_cluster_id = var.enable_emr ? module.emr[0].cluster_id : "serverless-glue"
 }

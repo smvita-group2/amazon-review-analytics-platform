@@ -16,6 +16,7 @@ vpc_id    = "vpc-01e9a6c45d239e514"
 subnet_id = "subnet-0050635527648b3ae"
 
 # EMR
+enable_emr            = false
 master_instance_type  = "m4.xlarge"
 master_instance_count = 1
 

@@ -35,10 +35,10 @@ output "log_group" {
 
 output "emr_cluster_id" {
   description = "EMR Cluster ID"
-  value       = module.emr.cluster_id
+  value       = var.enable_emr ? module.emr[0].cluster_id : null
 }
 
 output "emr_cluster_name" {
   description = "EMR Cluster Name"
-  value       = module.emr.cluster_name
+  value       = var.enable_emr ? module.emr[0].cluster_name : null
 }

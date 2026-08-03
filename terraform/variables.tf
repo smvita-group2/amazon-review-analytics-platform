@@ -69,3 +69,9 @@ variable "core_instance_count" {
   type        = number
   default     = 1
 }
+
+variable "enable_emr" {
+  description = "Enable EMR cluster provisioning (false for Glue-only serverless processing)"
+  type        = bool
+  default     = false
+}
