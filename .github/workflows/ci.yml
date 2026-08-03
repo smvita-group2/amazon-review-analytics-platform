@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - develop
+      - dev-test
       - workflows/automate
       - feat/terrafrom
 
   pull_request:
     branches:
       - develop
+      - dev-test
 
 jobs:
   python-ci:

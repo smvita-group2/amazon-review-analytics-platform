@@ -129,7 +129,7 @@ class GoldVisualizationTransformer:
             size(
                 split(
                     review_text,
-                    r"\s+",
+                    " ",
                 )
             ),
         )

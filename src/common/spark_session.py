@@ -25,6 +25,9 @@ def create_spark_session(
     spark = (
         builder.config("spark.sql.caseSensitive", "true")
         .config("spark.sql.shuffle.partitions", "8")
+        .config("spark.sql.adaptive.enabled", "true")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .getOrCreate()
     )
 

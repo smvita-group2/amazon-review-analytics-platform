@@ -22,8 +22,9 @@ paths:
 
 embedding:
   model_name: "sentence-transformers/all-MiniLM-L6-v2"
-  dimension: 384
-  batch_size: 32
+  dimension: 256
+  batch_size: 128
+  max_seq_length: 256
   normalize_embeddings: true
   show_progress_bar: true
 
