@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - dev-test
       - feature/terraform
   workflow_dispatch:
 
