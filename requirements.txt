@@ -2,6 +2,8 @@
 # Data Processing
 # ==========================
 pyspark
+pandas
+rank-bm25
 
 # ==========================
 # AWS

@@ -17,6 +17,9 @@ jobs:
   python-ci:
     runs-on: ubuntu-latest
 
+    env:
+      PYTHONPATH: .
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
