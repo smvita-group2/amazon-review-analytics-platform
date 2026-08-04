@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - dev-test
   workflow_dispatch:
 
 concurrency:
@@ -93,6 +94,6 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
-      - name: Terraform Apply (Main Branch Only)
-        if: github.ref == 'refs/heads/main'
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-test'
         run: terraform apply -auto-approve tfplan
