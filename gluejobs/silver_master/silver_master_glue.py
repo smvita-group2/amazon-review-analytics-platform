@@ -77,7 +77,12 @@ if category_param:
 elif datasets_param:
     DATASETS = [d.strip() for d in datasets_param.split(",") if d.strip()]
 else:
-    DATASETS = ["Appliances", "Video_Games", "Musical_Instruments"]
+    DATASETS = [
+        "Appliances",
+        "Video_Games",
+        "Musical_Instruments",
+        "Sports_and_Outdoors",
+    ]
 
 logger.info(f"Datasets to process: {DATASETS}")
 

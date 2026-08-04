@@ -25,7 +25,7 @@ variable "category" {
 variable "datasets" {
   description = "Comma-separated list of default datasets"
   type        = string
-  default     = "Appliances,Video_Games,Musical_Instruments"
+  default     = "Appliances,Video_Games,Musical_Instruments,Sports_and_Outdoors"
 }
 
 variable "bucket_name" {
