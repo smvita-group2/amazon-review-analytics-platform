@@ -406,12 +406,14 @@ resource "aws_glue_trigger" "stage_4_crawler" {
 # Glue Catalog Crawler (Created or Reused)
 # ==========================================================
 
+# Synchronizes Parquet datasets from S3 Silver and Gold layers into the Glue Data Catalog Database (amazon_reviews_db)
 resource "aws_glue_crawler" "this" {
   count         = var.create_crawler ? 1 : 0
   name          = var.crawler_name
   role          = local.lab_role_arn
   database_name = local.database_name
 
+  # Target S3 paths where PySpark ETL jobs write output
   s3_target {
     path = "s3://${var.bucket_name}/silver/"
   }
@@ -422,6 +424,7 @@ resource "aws_glue_crawler" "this" {
 
   schedule = var.crawler_schedule
 
+  # Automatically update schemas and log deletions
   schema_change_policy {
     delete_behavior = "LOG"
     update_behavior = "UPDATE_IN_DATABASE"
@@ -434,6 +437,9 @@ resource "aws_glue_crawler" "this" {
       TableGroupingPolicy = "CombineCompatibleSchemas"
     }
   })
+
+  # Explicit dependency on Glue catalog database
+  depends_on = [aws_glue_catalog_database.this]
 
   tags = {
     Project     = var.project_name

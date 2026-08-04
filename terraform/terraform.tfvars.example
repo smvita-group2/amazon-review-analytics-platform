@@ -14,5 +14,5 @@ artifact_prefix = "artifacts"
 # Reuse existing resources
 create_database  = false
 create_workflow  = false
-create_crawler   = false
+create_crawler   = true # Enable AWS Glue Crawler to synchronize S3 silver/gold tables into Glue Data Catalog
 create_log_group = false
