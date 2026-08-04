@@ -11,7 +11,7 @@ def create_spark_session(
     Args:
         app_name: Name of the Spark application.
         local: Run Spark in local mode if True.
-               Set to False when running on EMR.
+               Set to False when running on AWS Glue or Spark Cluster.
 
     Returns:
         Configured SparkSession.

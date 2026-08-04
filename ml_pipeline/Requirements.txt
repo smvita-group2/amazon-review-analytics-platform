@@ -29,10 +29,10 @@ transformers==4.56.1
 # CPU:
 # pip install torch torchvision torchaudio
 #
-# EMR GPU:
+# AWS Glue / Cloud GPU:
 # Install the matching CUDA wheel.
 #
-# EMR CPU:
+# Cloud CPU:
 # pip install torch torchvision torchaudio
 
 # ----------------------------------------------------------

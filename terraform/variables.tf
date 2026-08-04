@@ -27,26 +27,6 @@ variable "create_bucket" {
   default     = true
 }
 
-variable "vpc_id" {
-  description = "VPC ID"
-  type        = string
-}
-
-variable "subnet_id" {
-  description = "Subnet ID for EMR"
-  type        = string
-}
-
-variable "master_instance_type" {
-  type    = string
-  default = "m4.xlarge"
-}
-
-variable "core_instance_type" {
-  type    = string
-  default = "m4.xlarge"
-}
-
 variable "artifact_bucket" {
   description = "S3 bucket containing deployment artifacts"
   type        = string
@@ -56,22 +36,4 @@ variable "artifact_prefix" {
   description = "Artifact folder"
   type        = string
   default     = "artifacts/develop"
-}
-
-variable "master_instance_count" {
-  description = "Master node count"
-  type        = number
-  default     = 1
-}
-
-variable "core_instance_count" {
-  description = "Core node count"
-  type        = number
-  default     = 1
-}
-
-variable "enable_emr" {
-  description = "Enable EMR cluster provisioning (false for Glue-only serverless processing)"
-  type        = bool
-  default     = false
 }

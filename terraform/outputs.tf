@@ -32,13 +32,3 @@ output "log_group" {
   description = "CloudWatch Log Group"
   value       = module.monitoring.log_group_name
 }
-
-output "emr_cluster_id" {
-  description = "EMR Cluster ID"
-  value       = var.enable_emr ? module.emr[0].cluster_id : null
-}
-
-output "emr_cluster_name" {
-  description = "EMR Cluster Name"
-  value       = var.enable_emr ? module.emr[0].cluster_name : null
-}

@@ -45,6 +45,13 @@ resource "aws_s3_object" "gold_aggregates_script" {
   etag   = filemd5("${path.module}/../../../gluejobs/gold/gold_aggergates/gold_aggregates.py")
 }
 
+resource "aws_s3_object" "gold_ml_script" {
+  bucket = var.bucket_name
+  key    = "scripts/gluejobs/gold/gold_ml/gold_ml_hybrid_cleaned.py"
+  source = "${path.module}/../../../gluejobs/gold/gold_ml/gold_ml_hybrid_cleaned.py"
+  etag   = filemd5("${path.module}/../../../gluejobs/gold/gold_ml/gold_ml_hybrid_cleaned.py")
+}
+
 # ==========================================================
 # Glue PySpark Jobs
 # ==========================================================
@@ -69,6 +76,8 @@ resource "aws_glue_job" "bronze_to_silver_reviews" {
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-spark-ui"                  = "true"
     "--spark-event-logs-path"            = "s3://${var.bucket_name}/logs/spark/"
+    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--s3_bucket"                        = var.bucket_name
   }
 
   tags = {
@@ -96,6 +105,8 @@ resource "aws_glue_job" "bronze_to_silver_metadata" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
+    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--s3_bucket"                        = var.bucket_name
   }
 
   tags = {
@@ -123,6 +134,8 @@ resource "aws_glue_job" "silver_master" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
+    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--s3_bucket"                        = var.bucket_name
   }
 
   tags = {
@@ -150,6 +163,8 @@ resource "aws_glue_job" "gold_visualization" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
+    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--s3_bucket"                        = var.bucket_name
   }
 
   tags = {
@@ -177,6 +192,37 @@ resource "aws_glue_job" "gold_aggregates" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
+    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--s3_bucket"                        = var.bucket_name
+  }
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_glue_job" "gold_ml" {
+  name              = "${var.project_name}-${var.environment}-gold-ml"
+  role_arn          = var.lab_role_arn
+  glue_version      = var.glue_version
+  worker_type       = var.worker_type
+  number_of_workers = var.number_of_workers
+  timeout           = var.timeout
+
+  command {
+    name            = "glueetl"
+    script_location = "s3://${var.bucket_name}/${aws_s3_object.gold_ml_script.key}"
+    python_version  = "3"
+  }
+
+  default_arguments = {
+    "--job-language"                     = "python"
+    "--enable-metrics"                   = "true"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--s3_bucket"                        = var.bucket_name
   }
 
   tags = {
@@ -263,6 +309,10 @@ resource "aws_glue_trigger" "stage_3_gold" {
   actions {
     job_name = aws_glue_job.gold_aggregates.name
   }
+
+  actions {
+    job_name = aws_glue_job.gold_ml.name
+  }
 }
 
 # Trigger 4: Start Crawler upon Gold Jobs Completion
@@ -281,6 +331,11 @@ resource "aws_glue_trigger" "stage_4_crawler" {
 
     conditions {
       job_name = aws_glue_job.gold_aggregates.name
+      state    = "SUCCEEDED"
+    }
+
+    conditions {
+      job_name = aws_glue_job.gold_ml.name
       state    = "SUCCEEDED"
     }
   }

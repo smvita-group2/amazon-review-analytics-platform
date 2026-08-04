@@ -21,5 +21,6 @@ output "job_names" {
     silver_master             = aws_glue_job.silver_master.name
     gold_visualization        = aws_glue_job.gold_visualization.name
     gold_aggregates           = aws_glue_job.gold_aggregates.name
+    gold_ml                   = aws_glue_job.gold_ml.name
   }
 }
