@@ -13,6 +13,12 @@ variable "bucket_name" {
   type        = string
 }
 
+variable "create_database" {
+  description = "Create a new Glue Database or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
 variable "database_name" {
   description = "Glue Catalog Database"
   type        = string

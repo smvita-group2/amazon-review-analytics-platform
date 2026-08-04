@@ -14,7 +14,7 @@ concurrency:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION || vars.AWS_REGION || 'us-east-1' }}
-  S3_BUCKET: ${{ vars.S3_BUCKET || 'amazon-review-analytics-shreyash-471112764802' }}
+  S3_BUCKET: ${{ vars.S3_BUCKET || 'amazon-review-analytics-group-2' }}
   S3_ARTIFACT_PREFIX: ${{ vars.S3_ARTIFACT_PREFIX || 'artifacts' }}
 
 jobs:

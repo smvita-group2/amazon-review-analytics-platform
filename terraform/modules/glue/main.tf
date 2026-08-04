@@ -1,9 +1,14 @@
 # ==========================================================
-# Glue Catalog Database
+# Glue Catalog Database (Created or Reused)
 # ==========================================================
 
 resource "aws_glue_catalog_database" "this" {
-  name = var.database_name
+  count = var.create_database ? 1 : 0
+  name  = var.database_name
+}
+
+locals {
+  database_name = var.create_database ? aws_glue_catalog_database.this[0].name : var.database_name
 }
 
 # ==========================================================
@@ -352,7 +357,7 @@ resource "aws_glue_trigger" "stage_4_crawler" {
 resource "aws_glue_crawler" "this" {
   name          = var.crawler_name
   role          = var.lab_role_arn
-  database_name = aws_glue_catalog_database.this.name
+  database_name = local.database_name
 
   s3_target {
     path = "s3://${var.bucket_name}/silver/"

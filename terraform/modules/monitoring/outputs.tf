@@ -1,3 +1,3 @@
 output "log_group_name" {
-  value = aws_cloudwatch_log_group.app.name
+  value = local.log_group_name
 }

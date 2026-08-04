@@ -1,6 +1,6 @@
 output "database_name" {
   description = "Glue catalog database name"
-  value       = aws_glue_catalog_database.this.name
+  value       = local.database_name
 }
 
 output "crawler_name" {
