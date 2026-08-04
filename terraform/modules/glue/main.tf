@@ -132,7 +132,8 @@ resource "aws_glue_job" "bronze_to_silver_reviews" {
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-spark-ui"                  = "true"
     "--spark-event-logs-path"            = "s3://${var.bucket_name}/logs/spark/"
-    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--category"                         = var.category
+    "--datasets"                         = var.datasets
     "--s3_bucket"                        = var.bucket_name
   }
 
@@ -161,7 +162,8 @@ resource "aws_glue_job" "bronze_to_silver_metadata" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--category"                         = var.category
+    "--datasets"                         = var.datasets
     "--s3_bucket"                        = var.bucket_name
   }
 
@@ -190,7 +192,8 @@ resource "aws_glue_job" "silver_master" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--category"                         = var.category
+    "--datasets"                         = var.datasets
     "--s3_bucket"                        = var.bucket_name
   }
 
@@ -219,7 +222,8 @@ resource "aws_glue_job" "gold_visualization" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--category"                         = var.category
+    "--datasets"                         = var.datasets
     "--s3_bucket"                        = var.bucket_name
   }
 
@@ -248,7 +252,8 @@ resource "aws_glue_job" "gold_aggregates" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--category"                         = var.category
+    "--datasets"                         = var.datasets
     "--s3_bucket"                        = var.bucket_name
   }
 
@@ -277,7 +282,8 @@ resource "aws_glue_job" "gold_ml" {
     "--job-language"                     = "python"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--datasets"                         = "Appliances,Video_Games,Musical_Instruments"
+    "--category"                         = var.category
+    "--datasets"                         = var.datasets
     "--s3_bucket"                        = var.bucket_name
   }
 

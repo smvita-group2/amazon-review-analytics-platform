@@ -16,6 +16,18 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "category" {
+  description = "Single category filter to process (e.g. Appliances). If empty, processes all datasets."
+  type        = string
+  default     = "Appliances"
+}
+
+variable "datasets" {
+  description = "Comma-separated list of default datasets"
+  type        = string
+  default     = "Appliances,Video_Games,Musical_Instruments"
+}
+
 variable "bucket_name" {
   description = "Project S3 Bucket"
   type        = string

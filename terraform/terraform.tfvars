@@ -3,6 +3,10 @@ aws_region = "us-east-1"
 project_name = "amazon-review-analytics"
 environment  = "dev"
 
+# Category Filter (Set to "Appliances" for testing, or "" to process all datasets)
+category = "Appliances"
+datasets = "Appliances,Video_Games,Musical_Instruments"
+
 # Existing S3 Bucket (Reuse existing bucket)
 create_bucket = false
 bucket_name   = "amazon-review-analytics-group-2"
@@ -14,5 +18,5 @@ artifact_prefix = "artifacts"
 # Reuse existing resources
 create_database  = false
 create_workflow  = false
-create_crawler   = true # Enable AWS Glue Crawler to synchronize S3 silver/gold tables into Glue Data Catalog
+create_crawler   = true
 create_log_group = false

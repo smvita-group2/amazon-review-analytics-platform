@@ -22,6 +22,8 @@ module "glue" {
 
   project_name    = var.project_name
   environment     = var.environment
+  category        = var.category
+  datasets        = var.datasets
   create_database = var.create_database
   create_workflow = var.create_workflow
   create_crawler  = var.create_crawler

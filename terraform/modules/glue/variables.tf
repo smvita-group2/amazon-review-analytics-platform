@@ -13,6 +13,18 @@ variable "bucket_name" {
   type        = string
 }
 
+variable "category" {
+  description = "Category filter (e.g. Appliances). If empty, processes all datasets."
+  type        = string
+  default     = "Appliances"
+}
+
+variable "datasets" {
+  description = "Comma-separated list of default datasets"
+  type        = string
+  default     = "Appliances,Video_Games,Musical_Instruments"
+}
+
 variable "create_database" {
   description = "Create a new Glue Database or reuse an existing one"
   type        = bool
