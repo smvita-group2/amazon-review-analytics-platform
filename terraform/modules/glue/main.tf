@@ -1,14 +1,23 @@
 # ==========================================================
+# Caller Identity & Local Dynamic Definitions
+# ==========================================================
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  database_name = var.create_database ? aws_glue_catalog_database.this[0].name : var.database_name
+  workflow_name = var.create_workflow ? aws_glue_workflow.pipeline_workflow[0].name : var.workflow_name
+  crawler_name  = var.create_crawler ? aws_glue_crawler.this[0].name : var.crawler_name
+  lab_role_arn  = var.lab_role_arn != null && var.lab_role_arn != "" ? var.lab_role_arn : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+}
+
+# ==========================================================
 # Glue Catalog Database (Created or Reused)
 # ==========================================================
 
 resource "aws_glue_catalog_database" "this" {
   count = var.create_database ? 1 : 0
   name  = var.database_name
-}
-
-locals {
-  database_name = var.create_database ? aws_glue_catalog_database.this[0].name : var.database_name
 }
 
 # ==========================================================
@@ -105,7 +114,7 @@ resource "aws_s3_object" "gold_ml_script" {
 
 resource "aws_glue_job" "bronze_to_silver_reviews" {
   name              = "${var.project_name}-${var.environment}-bronze-to-silver-reviews"
-  role_arn          = var.lab_role_arn
+  role_arn          = local.lab_role_arn
   glue_version      = var.glue_version
   worker_type       = var.worker_type
   number_of_workers = var.number_of_workers
@@ -136,7 +145,7 @@ resource "aws_glue_job" "bronze_to_silver_reviews" {
 
 resource "aws_glue_job" "bronze_to_silver_metadata" {
   name              = "${var.project_name}-${var.environment}-bronze-to-silver-metadata"
-  role_arn          = var.lab_role_arn
+  role_arn          = local.lab_role_arn
   glue_version      = var.glue_version
   worker_type       = var.worker_type
   number_of_workers = var.number_of_workers
@@ -165,7 +174,7 @@ resource "aws_glue_job" "bronze_to_silver_metadata" {
 
 resource "aws_glue_job" "silver_master" {
   name              = "${var.project_name}-${var.environment}-silver-master"
-  role_arn          = var.lab_role_arn
+  role_arn          = local.lab_role_arn
   glue_version      = var.glue_version
   worker_type       = var.worker_type
   number_of_workers = var.number_of_workers
@@ -194,7 +203,7 @@ resource "aws_glue_job" "silver_master" {
 
 resource "aws_glue_job" "gold_visualization" {
   name              = "${var.project_name}-${var.environment}-gold-visualization"
-  role_arn          = var.lab_role_arn
+  role_arn          = local.lab_role_arn
   glue_version      = var.glue_version
   worker_type       = var.worker_type
   number_of_workers = var.number_of_workers
@@ -223,7 +232,7 @@ resource "aws_glue_job" "gold_visualization" {
 
 resource "aws_glue_job" "gold_aggregates" {
   name              = "${var.project_name}-${var.environment}-gold-aggregates"
-  role_arn          = var.lab_role_arn
+  role_arn          = local.lab_role_arn
   glue_version      = var.glue_version
   worker_type       = var.worker_type
   number_of_workers = var.number_of_workers
@@ -252,7 +261,7 @@ resource "aws_glue_job" "gold_aggregates" {
 
 resource "aws_glue_job" "gold_ml" {
   name              = "${var.project_name}-${var.environment}-gold-ml"
-  role_arn          = var.lab_role_arn
+  role_arn          = local.lab_role_arn
   glue_version      = var.glue_version
   worker_type       = var.worker_type
   number_of_workers = var.number_of_workers
@@ -293,10 +302,6 @@ resource "aws_glue_workflow" "pipeline_workflow" {
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
-}
-
-locals {
-  workflow_name = var.create_workflow ? aws_glue_workflow.pipeline_workflow[0].name : var.workflow_name
 }
 
 # Trigger 1: Start Stage 1 (Bronze to Silver Jobs)
@@ -404,7 +409,7 @@ resource "aws_glue_trigger" "stage_4_crawler" {
 resource "aws_glue_crawler" "this" {
   count         = var.create_crawler ? 1 : 0
   name          = var.crawler_name
-  role          = var.lab_role_arn
+  role          = local.lab_role_arn
   database_name = local.database_name
 
   s3_target {
@@ -435,8 +440,4 @@ resource "aws_glue_crawler" "this" {
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
-}
-
-locals {
-  crawler_name = var.create_crawler ? aws_glue_crawler.this[0].name : var.crawler_name
 }

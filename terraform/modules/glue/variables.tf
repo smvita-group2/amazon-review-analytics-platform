@@ -56,9 +56,9 @@ variable "crawler_schedule" {
 }
 
 variable "lab_role_arn" {
-  description = "Pre-built IAM LabRole ARN for federated accounts"
+  description = "IAM Role ARN for AWS Glue jobs and crawler execution"
   type        = string
-  default     = "arn:aws:iam::478582114103:role/amazon-review-analytics-dev-glue-role"
+  default     = null
 }
 
 variable "glue_version" {

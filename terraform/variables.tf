@@ -52,6 +52,12 @@ variable "create_log_group" {
   default     = false
 }
 
+variable "lab_role_arn" {
+  description = "IAM Role ARN for AWS Glue jobs and crawler execution"
+  type        = string
+  default     = null
+}
+
 variable "artifact_bucket" {
   description = "S3 bucket containing deployment artifacts"
   type        = string

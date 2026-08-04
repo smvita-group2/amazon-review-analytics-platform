@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 locals {
   common_tags = {
     Project     = var.project_name
@@ -25,7 +27,7 @@ module "glue" {
   create_crawler  = var.create_crawler
 
   bucket_name  = module.s3.bucket_name
-  lab_role_arn = "arn:aws:iam::478582114103:role/amazon-review-analytics-dev-glue-role"
+  lab_role_arn = var.lab_role_arn != null && var.lab_role_arn != "" ? var.lab_role_arn : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
 }
 
 module "monitoring" {
