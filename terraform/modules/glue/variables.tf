@@ -25,6 +25,24 @@ variable "database_name" {
   default     = "amazon_reviews_db"
 }
 
+variable "create_workflow" {
+  description = "Create a new Glue Workflow or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "workflow_name" {
+  description = "Glue Workflow Name"
+  type        = string
+  default     = "amazon-review-analytics-dev-pipeline-workflow"
+}
+
+variable "create_crawler" {
+  description = "Create a new Glue Crawler or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
 variable "crawler_name" {
   description = "Glue crawler name"
   type        = string

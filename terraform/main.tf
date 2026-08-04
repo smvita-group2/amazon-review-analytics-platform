@@ -21,6 +21,8 @@ module "glue" {
   project_name    = var.project_name
   environment     = var.environment
   create_database = var.create_database
+  create_workflow = var.create_workflow
+  create_crawler  = var.create_crawler
 
   bucket_name  = module.s3.bucket_name
   lab_role_arn = "arn:aws:iam::478582114103:role/amazon-review-analytics-dev-glue-role"

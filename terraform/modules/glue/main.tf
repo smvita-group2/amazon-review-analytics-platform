@@ -20,6 +20,13 @@ resource "aws_s3_object" "bronze_to_silver_reviews_script" {
   key    = "scripts/gluejobs/bronze_to_silver/bronze_to_silver_reviews_glue.py"
   source = "${path.module}/../../../gluejobs/bronze_to_silver/bronze_to_silver_reviews_glue.py"
   etag   = filemd5("${path.module}/../../../gluejobs/bronze_to_silver/bronze_to_silver_reviews_glue.py")
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 }
 
 resource "aws_s3_object" "bronze_to_silver_metadata_script" {
@@ -27,6 +34,13 @@ resource "aws_s3_object" "bronze_to_silver_metadata_script" {
   key    = "scripts/gluejobs/bronze_to_silver/bronze_to_silver_metadata_glue.py"
   source = "${path.module}/../../../gluejobs/bronze_to_silver/bronze_to_silver_metadata_glue.py"
   etag   = filemd5("${path.module}/../../../gluejobs/bronze_to_silver/bronze_to_silver_metadata_glue.py")
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 }
 
 resource "aws_s3_object" "silver_master_script" {
@@ -34,6 +48,13 @@ resource "aws_s3_object" "silver_master_script" {
   key    = "scripts/gluejobs/silver_master/silver_master_glue.py"
   source = "${path.module}/../../../gluejobs/silver_master/silver_master_glue.py"
   etag   = filemd5("${path.module}/../../../gluejobs/silver_master/silver_master_glue.py")
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 }
 
 resource "aws_s3_object" "gold_visualization_script" {
@@ -41,6 +62,13 @@ resource "aws_s3_object" "gold_visualization_script" {
   key    = "scripts/gluejobs/gold/gold_visualization/gold_visualization_glue.py"
   source = "${path.module}/../../../gluejobs/gold/gold_visualization/gold_visualization_glue.py"
   etag   = filemd5("${path.module}/../../../gluejobs/gold/gold_visualization/gold_visualization_glue.py")
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 }
 
 resource "aws_s3_object" "gold_aggregates_script" {
@@ -48,6 +76,13 @@ resource "aws_s3_object" "gold_aggregates_script" {
   key    = "scripts/gluejobs/gold/gold_aggergates/gold_aggregates.py"
   source = "${path.module}/../../../gluejobs/gold/gold_aggergates/gold_aggregates.py"
   etag   = filemd5("${path.module}/../../../gluejobs/gold/gold_aggergates/gold_aggregates.py")
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 }
 
 resource "aws_s3_object" "gold_ml_script" {
@@ -55,6 +90,13 @@ resource "aws_s3_object" "gold_ml_script" {
   key    = "scripts/gluejobs/gold/gold_ml/gold_ml_hybrid_cleaned.py"
   source = "${path.module}/../../../gluejobs/gold/gold_ml/gold_ml_hybrid_cleaned.py"
   etag   = filemd5("${path.module}/../../../gluejobs/gold/gold_ml/gold_ml_hybrid_cleaned.py")
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 }
 
 # ==========================================================
@@ -242,7 +284,8 @@ resource "aws_glue_job" "gold_ml" {
 # ==========================================================
 
 resource "aws_glue_workflow" "pipeline_workflow" {
-  name        = "${var.project_name}-${var.environment}-pipeline-workflow"
+  count       = var.create_workflow ? 1 : 0
+  name        = var.workflow_name
   description = "Automated end-to-end Medallion Data Pipeline workflow"
 
   tags = {
@@ -252,11 +295,15 @@ resource "aws_glue_workflow" "pipeline_workflow" {
   }
 }
 
+locals {
+  workflow_name = var.create_workflow ? aws_glue_workflow.pipeline_workflow[0].name : var.workflow_name
+}
+
 # Trigger 1: Start Stage 1 (Bronze to Silver Jobs)
 resource "aws_glue_trigger" "start_stage_1" {
   name          = "${var.project_name}-${var.environment}-trigger-stage-1"
   type          = "ON_DEMAND"
-  workflow_name = aws_glue_workflow.pipeline_workflow.name
+  workflow_name = local.workflow_name
 
   actions {
     job_name = aws_glue_job.bronze_to_silver_reviews.name
@@ -271,7 +318,7 @@ resource "aws_glue_trigger" "start_stage_1" {
 resource "aws_glue_trigger" "stage_2_silver_master" {
   name          = "${var.project_name}-${var.environment}-trigger-stage-2"
   type          = "CONDITIONAL"
-  workflow_name = aws_glue_workflow.pipeline_workflow.name
+  workflow_name = local.workflow_name
 
   predicate {
     logical = "AND"
@@ -296,7 +343,7 @@ resource "aws_glue_trigger" "stage_2_silver_master" {
 resource "aws_glue_trigger" "stage_3_gold" {
   name          = "${var.project_name}-${var.environment}-trigger-stage-3"
   type          = "CONDITIONAL"
-  workflow_name = aws_glue_workflow.pipeline_workflow.name
+  workflow_name = local.workflow_name
 
   predicate {
     logical = "AND"
@@ -324,7 +371,7 @@ resource "aws_glue_trigger" "stage_3_gold" {
 resource "aws_glue_trigger" "stage_4_crawler" {
   name          = "${var.project_name}-${var.environment}-trigger-stage-4"
   type          = "CONDITIONAL"
-  workflow_name = aws_glue_workflow.pipeline_workflow.name
+  workflow_name = local.workflow_name
 
   predicate {
     logical = "AND"
@@ -346,15 +393,16 @@ resource "aws_glue_trigger" "stage_4_crawler" {
   }
 
   actions {
-    crawler_name = aws_glue_crawler.this.name
+    crawler_name = local.crawler_name
   }
 }
 
 # ==========================================================
-# Glue Catalog Crawler
+# Glue Catalog Crawler (Created or Reused)
 # ==========================================================
 
 resource "aws_glue_crawler" "this" {
+  count         = var.create_crawler ? 1 : 0
   name          = var.crawler_name
   role          = var.lab_role_arn
   database_name = local.database_name
@@ -387,4 +435,8 @@ resource "aws_glue_crawler" "this" {
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
+}
+
+locals {
+  crawler_name = var.create_crawler ? aws_glue_crawler.this[0].name : var.crawler_name
 }

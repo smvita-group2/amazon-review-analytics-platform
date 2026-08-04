@@ -13,4 +13,6 @@ artifact_prefix = "artifacts"
 
 # Reuse existing resources
 create_database  = false
+create_workflow  = false
+create_crawler   = false
 create_log_group = false

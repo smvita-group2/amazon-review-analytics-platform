@@ -34,6 +34,18 @@ variable "create_database" {
   default     = false
 }
 
+variable "create_workflow" {
+  description = "Create a new Glue Workflow or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "create_crawler" {
+  description = "Create a new Glue Crawler or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
 variable "create_log_group" {
   description = "Create a new CloudWatch Log Group or reuse an existing one"
   type        = bool

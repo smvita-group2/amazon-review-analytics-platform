@@ -5,12 +5,12 @@ output "database_name" {
 
 output "crawler_name" {
   description = "Glue catalog crawler name"
-  value       = aws_glue_crawler.this.name
+  value       = local.crawler_name
 }
 
 output "workflow_name" {
   description = "Automated pipeline workflow name"
-  value       = aws_glue_workflow.pipeline_workflow.name
+  value       = local.workflow_name
 }
 
 output "job_names" {
