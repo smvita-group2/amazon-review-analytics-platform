@@ -15,8 +15,11 @@ class PromptBuilder:
     Utility class for constructing RAG prompts.
     """
 
-    MAX_PRODUCTS = 3
-    MAX_DOCUMENT_LENGTH = 1800
+    # Send only the top 2 reranked products
+    MAX_PRODUCTS = 2
+
+    # Reduce prompt size sent to Gemini
+    MAX_DOCUMENT_LENGTH = 1000
 
     @staticmethod
     def build(
@@ -34,64 +37,34 @@ class PromptBuilder:
         return f"""
 You are an Amazon shopping assistant.
 
-Use ONLY the retrieved product information below.
+Answer ONLY using the retrieved products.
 
 Rules:
-
-- Never invent or assume information.
-- Never use outside knowledge.
-- Answer ONLY using the retrieved products.
+- Do not invent information.
+- Do not use outside knowledge.
+- If the exact answer is unavailable, answer using the closest retrieved products.
 - Mention product names whenever relevant.
-- Base the review summary and sentiment ONLY on the
-  representative reviews.
-- If the exact product or information is not found,
-  briefly state that and continue by describing the
-  retrieved products.
-- ALWAYS complete every section below.
 
-Always respond using this format:
+Respond using exactly these sections:
 
-Recommendation:
-- Answer the user's question.
-- If the exact answer is unavailable, briefly explain
-  that the retrieved products do not contain the
-  requested information and continue with the closest
-  retrieved products.
+Recommendation
 
-Retrieved Products Summary:
-- Summarize the retrieved products in 2-3 concise
-  sentences.
-- Mention the main product types that were retrieved.
+Retrieved Products Summary
 
-Review Summary:
-- Summarize the representative customer reviews in
-  1-2 concise sentences.
-- Mention the most common strengths and weaknesses
-  if available.
+Review Summary
 
-Overall Sentiment:
-- Choose ONLY one:
-  Positive
-  Mostly Positive
-  Mixed
-  Mostly Negative
-  Negative
+Overall Sentiment
+(Choose one: Positive, Mostly Positive, Mixed, Mostly Negative, Negative)
 
-==============================
 RETRIEVED PRODUCTS
-==============================
 
 {context}
 
-==============================
 USER QUESTION
-==============================
 
 {query}
 
-==============================
 ANSWER
-==============================
 """.strip()
 
     @staticmethod
@@ -129,9 +102,7 @@ ANSWER
                 )
 
             sections.append(f"""
-==============================
 PRODUCT {index}
-==============================
 
 {document}
 """.strip())

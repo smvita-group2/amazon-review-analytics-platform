@@ -84,6 +84,8 @@ class GeminiClient:
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=cls._temperature,
+                    max_output_tokens=300,
+                    candidate_count=1,
                 ),
             )
 
@@ -91,6 +93,8 @@ class GeminiClient:
 
         except Exception:
 
-            logger.exception("Gemini generation failed.")
+            logger.exception(
+                "Gemini generation failed.",
+            )
 
             raise

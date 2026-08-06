@@ -29,11 +29,32 @@ st.set_page_config(
 
 
 @st.cache_resource(show_spinner=False)
-def load_pipeline(category: str):
+def load_pipeline(
+    category: str,
+) -> Pipeline:
     """
     Cache one Pipeline instance per category.
     """
-    return Pipeline(category=category)
+
+    return Pipeline(
+        category=category,
+    )
+
+
+@st.cache_resource(show_spinner=False)
+def warmup() -> None:
+    """
+    Warm up the default category so the first search
+    avoids most of the cold-start initialization.
+    """
+
+    load_pipeline(
+        CATEGORIES[0],
+    )
+
+
+# Execute once when the application starts
+warmup()
 
 
 # ==========================================================
@@ -456,7 +477,7 @@ if search_clicked:
 
             progress.progress(
                 10,
-                text="Loading Pipeline...",
+                text="Preparing Search...",
             )
 
             pipeline = load_pipeline(
