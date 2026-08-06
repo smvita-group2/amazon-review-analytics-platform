@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- ================= HEADER ================= -->
+    
+        <header>
+    
+            <a href="{{ url_for('home') }}">
+    
+                <img
+                    src="{{ url_for('static', filename='images/Official logo amazon (1).jpg') }}"
+                    class="logo">
+    
+            </a>
+            <div class="nav-buttons">
+
+                <a href="/product-search" class="btn orange">
+            
+                    🔍 Product Search
+            
+                </a>
+            
+                <a href="/dashboard" class="btn white">
+            
+                    📊 Dashboard
+            
+                </a>
+            
+            </div>
+           
+    
+        </header>
+         <!-- ================= SEARCH SECTION ================= -->
+         <section
+         class="search-hero"
+     
+         {% if bg_image %}
+         style="background-image:url('{{ url_for('static', filename='images/' + bg_image) }}');"
+         {% endif %}
+     >
+     
+         <div class="overlay">
+     
+             <h1>Search Amazon Products</h1>
+     
+             <p>
+                 Find any Amazon product and analyze reviews using AI.
+             </p>
+     
+             <h3 class="selected-category">
+     
+                 Selected Category :
+                 {{ category.replace('_',' ').title() if category else "All Products" }}
+     
+             </h3>
+     
+             <form class="search-box" method="GET">
+     
+                 <div class="search-input">
+     
+                     <i class="fa-solid fa-magnifying-glass"></i>
+     
+                     <input
+                         type="text"
+                         name="query"
+                         placeholder="Enter Product Name...">
+     
+                 </div>
+     
+                 <button type="submit">
+     
+                     Search
+     
+                     <i class="fa-solid fa-arrow-right"></i>
+     
+                 </button>
+     
+             </form>
+     
+         </div>
+     
+     </section> 
+
+        <!-- ================= SEARCH RESULTS ================= -->
+
+        <section class="search-results">
+
+            <h2 class="results-title">
+        
+                Search Results
+        
+            </h2>
+        
+            <div id="results-container">
+        
+                <!-- Products will appear here -->
+        
+            </div>
+        
+        </section>
+        
+        </div>
+        
+        </body>
+        </html>

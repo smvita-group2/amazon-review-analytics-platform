@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Amazon Review Analytics Platform</title>
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ================= HEADER ================= -->
+
+        <header class="header">
+
+            <img
+                src="{{ url_for('static', filename='images/Official logo amazon (1).jpg') }}"
+                class="logo">
+
+                <div class="nav-buttons">
+
+                    <a href="/product-search" class="btn orange">
+                
+                        🔍 Product Search
+                
+                    </a>
+                
+                    <a href="/dashboard" class="btn white">
+                
+                        📊 Dashboard
+                
+                    </a>
+                
+                </div>
+
+        </header>
+
+        <!-- ================= HERO ================= -->
+
+        <section class="hero">
+
+            <h1>
+
+                Amazon
+                <span>Review</span>
+
+                <br>
+
+                Analytics Platform
+
+            </h1>
+            
+
+            <h3>
+
+                AI Powered Product Review Intelligence
+
+            </h3>
+
+            <div class="line"></div>
+
+            <p>
+
+                Discover customer insights from millions of Amazon reviews.
+
+                <br><br>
+
+                Search products, visualize analytics dashboards,
+
+                <br><br>
+
+                and explore AI-powered recommendations using Hybrid RAG.
+
+            </p>
+
+        </section>
+        <!-- ================= SEARCH ================= -->
+
+<section class="search-section">
+
+    <div class="search-box">
+
+        <div class="search-input">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                placeholder="Search Amazon Products...">
+
+        </div>
+
+        <button>
+
+            Search
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </button>
+
+    </div>
+
+</section>
+<!-- ================= CATEGORIES ================= -->
+
+<section class="categories">
+
+    <h2 class="section-title">
+
+        <span>Explore Categories</span>
+
+    </h2>
+
+    <div class="cards">
+
+        <!-- ================= VIDEO GAMES ================= -->
+
+        <a href="{{ url_for('product_search', category='video_games') }}" class="card">
+
+            <img src="{{ url_for('static', filename='images/Video game p1.png') }}">
+
+            <div class="card-content">
+
+                <div>
+
+                    <h3>🎮 Video Games</h3>
+
+                    <p>Explore Reviews & Insights</p>
+
+                </div>
+
+                <span class="arrow">→</span>
+
+            </div>
+
+        </a>
+
+        <!-- ================= SPORTS ================= -->
+
+        <a href="{{ url_for('product_search', category='sports') }}" class="card">
+
+            <img src="{{ url_for('static', filename='images/Sport_product.jpg') }}">
+
+            <div class="card-content">
+
+                <div>
+
+                    <h3>🏀 Sports</h3>
+
+                    <p>Explore Reviews & Insights</p>
+
+                </div>
+
+                <span class="arrow">→</span>
+
+            </div>
+
+        </a>
+
+        <!-- ================= APPLIANCES ================= -->
+
+        <a href="{{ url_for('product_search', category='appliances') }}" class="card">
+
+            <img src="{{ url_for('static', filename='images/appliences.jpg') }}">
+
+            <div class="card-content">
+
+                <div>
+
+                    <h3>🧺 Appliances</h3>
+
+                    <p>Explore Reviews & Insights</p>
+
+                </div>
+
+                <span class="arrow">→</span>
+
+            </div>
+
+        </a>
+
+        <!-- ================= MUSICAL ================= -->
+
+        <a href="{{ url_for('product_search', category='musical_instruments') }}" class="card">
+
+            <img src="{{ url_for('static', filename='images/Musical products.jpg') }}">
+
+            <div class="card-content">
+
+                <div>
+
+                    <h3>🎸 Musical Instruments</h3>
+
+                    <p>Explore Reviews & Insights</p>
+
+                </div>
+
+                <span class="arrow">→</span>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</section>

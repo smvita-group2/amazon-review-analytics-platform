@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+    <a href="{{ url_for('home') }}">
+
+        <img
+        src="{{ url_for('static', filename='images/Official logo amazon (1).jpg') }}"
+        class="logo">
+
+    </a>
+
+    <div class="nav-buttons">
+
+        <a href="/product-search" class="btn orange">
+
+            🔍 Product Search
+
+        </a>
+
+        <a href="/dashboard" class="btn white">
+
+            📊 Dashboard
+
+        </a>
+
+    </div>
+
+</header>
+
+<iframe
+title="AmazonReview"
+width="100%"
+height="850"
+src="https://app.powerbi.com/reportEmbed?reportId=c8911bd6-0b82-41e3-9be1-187224fa9a94&autoAuth=true&ctid=56c1d497-700b-49cf-8f8d-3dd6b20d522f"
+frameborder="0"
+allowfullscreen>
+
+</iframe>
+
+</div>
+
+</body>
+
+</html>
