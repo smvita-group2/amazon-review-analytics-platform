@@ -97,9 +97,7 @@ ANSWER
             if len(document) > PromptBuilder.MAX_DOCUMENT_LENGTH:
 
                 document = (
-                    document[
-                        : PromptBuilder.MAX_DOCUMENT_LENGTH
-                    ].rstrip()
+                    document[: PromptBuilder.MAX_DOCUMENT_LENGTH].rstrip()
                     + "\n\n[Document Truncated]"
                 )
 

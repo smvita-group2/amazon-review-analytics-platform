@@ -7,8 +7,6 @@ Performs semantic retrieval using ChromaDB.
 from time import perf_counter
 from typing import Any
 
-from ml_pipeline.vectordb.chromadb_manager import ChromaDBManager
-
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.constants import (
     DOCUMENT,
@@ -18,6 +16,7 @@ from ml_pipeline.common.constants import (
 )
 from ml_pipeline.common.logger import get_logger
 from ml_pipeline.embeddings.embedding_model import EmbeddingModel
+from ml_pipeline.vectordb.chromadb_manager import ChromaDBManager
 
 logger = get_logger(__name__)
 
@@ -67,9 +66,7 @@ class SemanticSearch:
 
         if not query:
 
-            logger.warning(
-                "Received empty semantic query."
-            )
+            logger.warning("Received empty semantic query.")
 
             return []
 
@@ -157,15 +154,11 @@ class SemanticSearch:
             )
 
         semantic_results.sort(
-            key=lambda result: result[
-                SIMILARITY_SCORE
-            ],
+            key=lambda result: result[SIMILARITY_SCORE],
             reverse=True,
         )
 
-        elapsed = (
-            perf_counter() - start_time
-        ) * 1000
+        elapsed = (perf_counter() - start_time) * 1000
 
         logger.info(
             "Semantic Search completed in %.2f ms | Returned %d documents.",

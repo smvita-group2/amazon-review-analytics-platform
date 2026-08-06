@@ -50,10 +50,7 @@ class BM25Builder:
             exist_ok=True,
         )
 
-        self.output_file = (
-            self.output_directory
-            / f"{category}.pkl"
-        )
+        self.output_file = self.output_directory / f"{category}.pkl"
 
     # ======================================================
     # Tokenizer
@@ -86,47 +83,29 @@ class BM25Builder:
 
         if dataframe.empty:
 
-            logger.warning(
-                "Input dataframe is empty."
-            )
+            logger.warning("Input dataframe is empty.")
 
             return
 
         if PRODUCT_DOCUMENT not in dataframe.columns:
 
-            raise ValueError(
-                f"Missing required column: {PRODUCT_DOCUMENT}"
-            )
+            raise ValueError(f"Missing required column: {PRODUCT_DOCUMENT}")
 
         logger.info(
             "Building BM25 index for '%s'.",
             self.category,
         )
 
-        documents = (
-            dataframe[PRODUCT_DOCUMENT]
-            .fillna("")
-            .astype(str)
-            .tolist()
-        )
+        documents = dataframe[PRODUCT_DOCUMENT].fillna("").astype(str).tolist()
 
-        tokenized_corpus = [
-            self._tokenize(document)
-            for document in documents
-        ]
+        tokenized_corpus = [self._tokenize(document) for document in documents]
 
         bm25 = BM25Okapi(
             tokenized_corpus,
         )
 
         metadata = (
-            dataframe[
-                list(CHROMA_METADATA_FIELDS)
-            ]
-            .fillna("")
-            .to_dict(
-                orient="records"
-            )
+            dataframe[list(CHROMA_METADATA_FIELDS)].fillna("").to_dict(orient="records")
         )
 
         bundle = {

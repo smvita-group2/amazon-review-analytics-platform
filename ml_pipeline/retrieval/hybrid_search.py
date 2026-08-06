@@ -48,7 +48,7 @@ class HybridSearch:
     def __init__(
         self,
         category: str,
-    ) ->None:
+    ) -> None:
 
         self.category = category
 
@@ -85,16 +85,11 @@ class HybridSearch:
 
         if not query:
 
-            logger.warning(
-                "Received empty search query."
-            )
+            logger.warning("Received empty search query.")
 
             return []
 
-        final_top_k = (
-            final_top_k
-            or self.final_top_k
-        )
+        final_top_k = final_top_k or self.final_top_k
 
         logger.info(
             "Running Hybrid Search | Category=%s",
@@ -109,9 +104,7 @@ class HybridSearch:
             # Semantic + BM25 (Parallel)
             # ------------------------------------------
 
-            with ThreadPoolExecutor(
-                max_workers=2
-            ) as executor:
+            with ThreadPoolExecutor(max_workers=2) as executor:
 
                 semantic_future = executor.submit(
                     self.semantic_search.search,
@@ -132,14 +125,9 @@ class HybridSearch:
                 len(bm25_results),
             )
 
-            if (
-                not semantic_results
-                and not bm25_results
-            ):
+            if not semantic_results and not bm25_results:
 
-                logger.warning(
-                    "No retrieval results found."
-                )
+                logger.warning("No retrieval results found.")
 
                 return []
 
@@ -147,11 +135,9 @@ class HybridSearch:
             # Reciprocal Rank Fusion
             # ------------------------------------------
 
-            fused_results = (
-                ReciprocalRankFusion.fuse(
-                    semantic_results=semantic_results,
-                    bm25_results=bm25_results,
-                )
+            fused_results = ReciprocalRankFusion.fuse(
+                semantic_results=semantic_results,
+                bm25_results=bm25_results,
             )
 
             logger.info(
@@ -167,9 +153,7 @@ class HybridSearch:
             # Limit candidates before reranking
             # ------------------------------------------
 
-            candidates = fused_results[
-                : self.rerank_top_k
-            ]
+            candidates = fused_results[: self.rerank_top_k]
 
             logger.info(
                 "Sending %d candidates to CrossEncoder.",
@@ -180,23 +164,16 @@ class HybridSearch:
             # CrossEncoder Reranking
             # ------------------------------------------
 
-            reranked_results = (
-                self.reranker.rerank(
-                    query=query,
-                    results=candidates,
-                    top_k=final_top_k,
-                )
+            reranked_results = self.reranker.rerank(
+                query=query,
+                results=candidates,
+                top_k=final_top_k,
             )
 
-            elapsed = (
-                perf_counter() - start_time
-            ) * 1000
+            elapsed = (perf_counter() - start_time) * 1000
 
             logger.info(
-                (
-                    "Hybrid Search completed "
-                    "in %.2f ms | Returned %d documents."
-                ),
+                ("Hybrid Search completed " "in %.2f ms | Returned %d documents."),
                 elapsed,
                 len(reranked_results),
             )
@@ -205,8 +182,6 @@ class HybridSearch:
 
         except Exception:
 
-            logger.exception(
-                "Hybrid Search failed."
-            )
+            logger.exception("Hybrid Search failed.")
 
             return []

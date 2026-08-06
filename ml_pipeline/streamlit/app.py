@@ -684,21 +684,13 @@ if st.session_state.result:
 
                     with right:
 
-                        st.markdown(
-                            f"### {index}. {title}"
-                        )
+                        st.markdown(f"### {index}. {title}")
 
-                        st.caption(
-                            f"🏪 {store}"
-                        )
+                        st.caption(f"🏪 {store}")
 
-                        st.caption(
-                            f"📂 {category_name}"
-                        )
+                        st.caption(f"📂 {category_name}")
 
-                        st.caption(
-                            f"📁 {sub_category}"
-                        )
+                        st.caption(f"📁 {sub_category}")
 
                         m1, m2 = st.columns(2)
 

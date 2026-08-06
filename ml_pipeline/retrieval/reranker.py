@@ -12,8 +12,8 @@ from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.constants import (
     DOCUMENT,
     METADATA,
-    RERANK_SCORE,
     RECOMMENDATION_SCORE,
+    RERANK_SCORE,
 )
 from ml_pipeline.common.logger import get_logger
 from ml_pipeline.retrieval.cross_encoder_model import CrossEncoderModel
@@ -61,9 +61,7 @@ class Reranker:
 
         if not results:
 
-            logger.warning(
-                "No documents available for reranking."
-            )
+            logger.warning("No documents available for reranking.")
 
             return []
 
@@ -102,10 +100,7 @@ class Reranker:
         # Normalize CrossEncoder Scores
         # --------------------------------------------------
 
-        raw_scores = [
-            item[RERANK_SCORE]
-            for item in reranked_results
-        ]
+        raw_scores = [item[RERANK_SCORE] for item in reranked_results]
 
         min_score = min(raw_scores)
         max_score = max(raw_scores)
@@ -133,11 +128,7 @@ class Reranker:
 
             else:
 
-                relevance = (
-                    item[RERANK_SCORE] - min_score
-                ) / (
-                    max_score - min_score
-                )
+                relevance = (item[RERANK_SCORE] - min_score) / (max_score - min_score)
 
             # -----------------------------
             # Rating
@@ -163,19 +154,14 @@ class Reranker:
                 )
             )
 
-            normalized_reviews = (
-                math.log1p(review_count)
-                / math.log1p(max_reviews)
-            )
+            normalized_reviews = math.log1p(review_count) / math.log1p(max_reviews)
 
             # -----------------------------
             # Final Recommendation Score
             # -----------------------------
 
             recommendation = (
-                0.55 * relevance
-                + 0.30 * normalized_rating
-                + 0.15 * normalized_reviews
+                0.55 * relevance + 0.30 * normalized_rating + 0.15 * normalized_reviews
             )
 
             item[RERANK_SCORE] = round(
@@ -193,15 +179,11 @@ class Reranker:
         # --------------------------------------------------
 
         reranked_results.sort(
-            key=lambda x: x[
-                RECOMMENDATION_SCORE
-            ],
+            key=lambda x: x[RECOMMENDATION_SCORE],
             reverse=True,
         )
 
-        final_results = reranked_results[
-            :top_k
-        ]
+        final_results = reranked_results[:top_k]
 
         logger.info(
             "Returned %d reranked documents.",

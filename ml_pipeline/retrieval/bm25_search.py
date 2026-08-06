@@ -52,9 +52,7 @@ class BM25Search:
             )
         )
 
-        self.input_file = (
-            self.input_directory / f"{category}.pkl"
-        )
+        self.input_file = self.input_directory / f"{category}.pkl"
 
         self._load_index()
 
@@ -68,9 +66,7 @@ class BM25Search:
 
         if not self.input_file.exists():
 
-            raise FileNotFoundError(
-                f"BM25 index not found: {self.input_file}"
-            )
+            raise FileNotFoundError(f"BM25 index not found: {self.input_file}")
 
         logger.info(
             "Loading BM25 index for '%s'.",
@@ -129,9 +125,7 @@ class BM25Search:
 
         if not query or not query.strip():
 
-            logger.warning(
-                "Received empty BM25 query."
-            )
+            logger.warning("Received empty BM25 query.")
 
             return []
 
@@ -173,19 +167,13 @@ class BM25Search:
             -top_k,
         )[-top_k:]
 
-        top_indices = top_indices[
-            np.argsort(
-                scores[top_indices]
-            )[::-1]
-        ]
+        top_indices = top_indices[np.argsort(scores[top_indices])[::-1]]
 
         results = []
 
         for index in top_indices:
 
-            score = float(
-                scores[index]
-            )
+            score = float(scores[index])
 
             # Skip useless matches
             if score <= 0:
@@ -203,9 +191,7 @@ class BM25Search:
                 }
             )
 
-        elapsed = (
-            perf_counter() - start_time
-        ) * 1000
+        elapsed = (perf_counter() - start_time) * 1000
 
         logger.info(
             "BM25 Search completed in %.2f ms | Returned %d documents.",
