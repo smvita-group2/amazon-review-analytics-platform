@@ -2,15 +2,18 @@
 CrossEncoder Reranker
 
 Re-ranks hybrid retrieval results using
-a CrossEncoder model.
+a CrossEncoder model and computes a
+Recommendation Score.
 """
 
-from operator import itemgetter
+import math
 
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.constants import (
     DOCUMENT,
+    METADATA,
     RERANK_SCORE,
+    RECOMMENDATION_SCORE,
 )
 from ml_pipeline.common.logger import get_logger
 from ml_pipeline.retrieval.cross_encoder_model import CrossEncoderModel
@@ -51,12 +54,16 @@ class Reranker:
         top_k: int | None = None,
     ) -> list[dict]:
         """
-        Re-rank retrieved documents using the CrossEncoder.
+        Re-rank retrieved documents using the
+        CrossEncoder and compute a recommendation
+        score.
         """
 
         if not results:
 
-            logger.warning("No documents available for reranking.")
+            logger.warning(
+                "No documents available for reranking."
+            )
 
             return []
 
@@ -91,42 +98,110 @@ class Reranker:
 
             reranked_results.append(item)
 
-        reranked_results.sort(
-            key=itemgetter(
-                RERANK_SCORE,
+        # --------------------------------------------------
+        # Normalize CrossEncoder Scores
+        # --------------------------------------------------
+
+        raw_scores = [
+            item[RERANK_SCORE]
+            for item in reranked_results
+        ]
+
+        min_score = min(raw_scores)
+        max_score = max(raw_scores)
+
+        max_reviews = max(
+            (
+                item[METADATA].get(
+                    "product_review_count",
+                    1,
+                )
+                for item in reranked_results
             ),
+            default=1,
+        )
+
+        for item in reranked_results:
+
+            # -----------------------------
+            # Normalized Relevance
+            # -----------------------------
+
+            if max_score == min_score:
+
+                relevance = 1.0
+
+            else:
+
+                relevance = (
+                    item[RERANK_SCORE] - min_score
+                ) / (
+                    max_score - min_score
+                )
+
+            # -----------------------------
+            # Rating
+            # -----------------------------
+
+            rating = float(
+                item[METADATA].get(
+                    "product_average_rating",
+                    0,
+                )
+            )
+
+            normalized_rating = rating / 5.0
+
+            # -----------------------------
+            # Review Confidence
+            # -----------------------------
+
+            review_count = float(
+                item[METADATA].get(
+                    "product_review_count",
+                    0,
+                )
+            )
+
+            normalized_reviews = (
+                math.log1p(review_count)
+                / math.log1p(max_reviews)
+            )
+
+            # -----------------------------
+            # Final Recommendation Score
+            # -----------------------------
+
+            recommendation = (
+                0.55 * relevance
+                + 0.30 * normalized_rating
+                + 0.15 * normalized_reviews
+            )
+
+            item[RERANK_SCORE] = round(
+                relevance * 100,
+                1,
+            )
+
+            item[RECOMMENDATION_SCORE] = round(
+                recommendation * 100,
+                1,
+            )
+
+        # --------------------------------------------------
+        # Sort by Recommendation Score
+        # --------------------------------------------------
+
+        reranked_results.sort(
+            key=lambda x: x[
+                RECOMMENDATION_SCORE
+            ],
             reverse=True,
         )
 
-        final_results = reranked_results[:top_k]
-
-        # ======================================================
-        # Normalize reranker scores to 0-100
-        # ======================================================
-
-        if final_results:
-
-            raw_scores = [result[RERANK_SCORE] for result in final_results]
-
-            min_score = min(raw_scores)
-            max_score = max(raw_scores)
-
-            for result in final_results:
-
-                if max_score == min_score:
-
-                    result[RERANK_SCORE] = 100.0
-
-                else:
-
-                    normalized = (
-                        (result[RERANK_SCORE] - min_score) / (max_score - min_score)
-                    ) * 100
-
-                    result[RERANK_SCORE] = round(
-                        normalized,
-                        1,
-                    )
+        final_results = reranked_results[
+            :top_k
+        ]
 
         logger.info(
             "Returned %d reranked documents.",

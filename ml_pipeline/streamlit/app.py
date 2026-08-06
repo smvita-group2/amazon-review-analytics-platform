@@ -417,43 +417,48 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.subheader("🔎 Intelligent Product Search")
 
 query = st.text_input(
-    label="",
-    placeholder="Ask anything about products... (e.g. black dishwasher under $500)",
+    label="Product Search",
+    label_visibility="collapsed",
+    placeholder=(
+        "Ask anything about products... "
+        "(e.g. black dishwasher under $500, "
+        "quiet blender for smoothies, "
+        "coffee maker with grinder)"
+    ),
 )
 
 left, middle, right = st.columns([6, 1, 1])
 
 with left:
 
-    st.caption("Natural language product search powered by Hybrid RAG.")
+    st.caption(
+        "Search products using Hybrid RAG "
+        "(Semantic Search + BM25 + RRF + CrossEncoder)."
+    )
 
 with middle:
 
     search_clicked = st.button(
         "🔍 Search",
+        type="primary",
         use_container_width=True,
     )
 
 with right:
 
     clear_clicked = st.button(
-        "🗑 Clear",
+        "🗑️ Clear",
         use_container_width=True,
     )
-
 
 if clear_clicked:
 
     st.session_state.result = None
-
     st.session_state.execution_time = None
 
     st.rerun()
 
-
 st.markdown("---")
-
-
 # ==========================================================
 # Pipeline Execution
 # ==========================================================
@@ -652,11 +657,6 @@ if st.session_state.result:
                     "",
                 )
 
-                relevance = product.get(
-                    "rerank_score",
-                    0,
-                )
-
                 document = product.get(
                     "document",
                     "",
@@ -684,15 +684,23 @@ if st.session_state.result:
 
                     with right:
 
-                        st.markdown(f"### {index}. {title}")
+                        st.markdown(
+                            f"### {index}. {title}"
+                        )
 
-                        st.caption(f"🏪 {store}")
+                        st.caption(
+                            f"🏪 {store}"
+                        )
 
-                        st.caption(f"📂 {category_name}")
+                        st.caption(
+                            f"📂 {category_name}"
+                        )
 
-                        st.caption(f"📁 {sub_category}")
+                        st.caption(
+                            f"📁 {sub_category}"
+                        )
 
-                        m1, m2, m3 = st.columns(3)
+                        m1, m2 = st.columns(2)
 
                         with m1:
 
@@ -706,13 +714,6 @@ if st.session_state.result:
                             st.metric(
                                 "📝 Reviews",
                                 f"{int(review_count):,}",
-                            )
-
-                        with m3:
-
-                            st.metric(
-                                "🎯 Match",
-                                f"{float(relevance):.1f}%",
                             )
 
                     with st.expander(

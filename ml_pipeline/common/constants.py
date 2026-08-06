@@ -108,3 +108,5 @@ PARENT_ASIN_KEY = "parent_asin"
 RRF_SCORE = "rrf_score"
 
 RERANK_SCORE = "rerank_score"
+
+RECOMMENDATION_SCORE = "recommendation_score"

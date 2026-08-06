@@ -47,10 +47,17 @@ chromadb:
 # ==========================================================
 
 retrieval:
-  top_k_semantic: 10
-  top_k_bm25: 10
+  top_k_semantic: 20
+  top_k_bm25: 20
+
+  # Number of fused documents passed to the CrossEncoder
+  rerank_top_k: 25
+
+  # Final documents passed to Gemini
   final_top_k: 5
+
   normalize_query_embeddings: true
+  min_similarity: 0.35
 
 # ==========================================================
 # BM25
