@@ -128,15 +128,13 @@ ANSWER
                     + "\n\n[Document Truncated]"
                 )
 
-            sections.append(
-                f"""
+            sections.append(f"""
 ==============================
 PRODUCT {index}
 ==============================
 
 {document}
-""".strip()
-            )
+""".strip())
 
         return "\n\n".join(
             sections,
