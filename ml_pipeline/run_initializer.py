@@ -21,10 +21,9 @@ BM25
 Backup ChromaDB
 """
 
-from initialize_pipeline import InitializePipeline
-
 from ml_pipeline.common.constants import CATEGORIES
 from ml_pipeline.common.logger import get_logger
+from ml_pipeline.initialize_pipeline import InitializePipeline
 
 # from ml_pipeline.common.config import get_setting
 # from ml_pipeline.common.s3_utils import upload_directory

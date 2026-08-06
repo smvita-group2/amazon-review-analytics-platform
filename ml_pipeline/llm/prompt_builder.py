@@ -32,21 +32,50 @@ class PromptBuilder:
         )
 
         return f"""
-You are an expert Amazon shopping assistant.
+You are an Amazon shopping assistant.
 
-Answer the user's question ONLY using the retrieved product information.
+Use ONLY the retrieved product information below.
 
 Rules:
 
-- Use ONLY the retrieved products.
-- Never invent facts.
-- If the answer is unavailable, reply exactly:
+- Never invent or assume information.
+- Never use outside knowledge.
+- Answer ONLY using the retrieved products.
+- Mention product names whenever relevant.
+- Base the review summary and sentiment ONLY on the
+  representative reviews.
+- If the exact product or information is not found,
+  briefly state that and continue by describing the
+  retrieved products.
+- ALWAYS complete every section below.
 
-The requested information is not available in the retrieved products.
+Always respond using this format:
 
-- Compare products when appropriate.
-- Mention product names.
-- Keep the answer concise, factual and well structured.
+Recommendation:
+- Answer the user's question.
+- If the exact answer is unavailable, briefly explain
+  that the retrieved products do not contain the
+  requested information and continue with the closest
+  retrieved products.
+
+Retrieved Products Summary:
+- Summarize the retrieved products in 2-3 concise
+  sentences.
+- Mention the main product types that were retrieved.
+
+Review Summary:
+- Summarize the representative customer reviews in
+  1-2 concise sentences.
+- Mention the most common strengths and weaknesses
+  if available.
+
+Overall Sentiment:
+- Choose ONLY one:
+  Positive
+  Mostly Positive
+  Mixed
+  Mostly Negative
+  Negative
 
 ==============================
 RETRIEVED PRODUCTS
@@ -80,7 +109,6 @@ ANSWER
 
         sections = []
 
-        # Only send the best reranked products
         documents = documents[: PromptBuilder.MAX_PRODUCTS]
 
         for index, result in enumerate(
@@ -93,7 +121,6 @@ ANSWER
                 "",
             )
 
-            # Reduce Gemini input size
             if len(document) > PromptBuilder.MAX_DOCUMENT_LENGTH:
 
                 document = (
@@ -101,17 +128,13 @@ ANSWER
                     + "\n\n[Document Truncated]"
                 )
 
-            section = f"""
+            sections.append(f"""
 ==============================
 PRODUCT {index}
 ==============================
 
 {document}
-""".strip()
-
-            sections.append(
-                section,
-            )
+""".strip())
 
         return "\n\n".join(
             sections,
