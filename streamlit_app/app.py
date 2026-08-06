@@ -1,120 +1,151 @@
 import streamlit as st
+from pathlib import Path
+
 from components.styles import load_css
 
-# ---------------------------------
-# Page Configuration
-# ---------------------------------
+# ==========================================================
+# PAGE CONFIG
+# ==========================================================
+
 st.set_page_config(
     page_title="Amazon Review Analytics Platform",
-    page_icon="📊",
+    page_icon="🛒",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Load Custom CSS
+# ==========================================================
+# LOAD CSS
+# ==========================================================
+
 st.markdown(load_css(), unsafe_allow_html=True)
 
-# ---------------------------------
-# Hero Section
-# ---------------------------------
+# ==========================================================
+# ASSETS
+# ==========================================================
+
+BASE_DIR = Path(__file__).parent
+ASSETS = BASE_DIR / "assets"
+
+LOGO = ASSETS / "Official logo amazon (1).jpg"
+
+VIDEO_GAME = ASSETS / "Video game p1.png"
+SPORT = ASSETS / "Sport.png"
+APPLIANCE = ASSETS / "appliences.jpg"
+MUSICAL = ASSETS / "Musical products.jpg"
+
+# ==========================================================
+# SESSION STATE
+# ==========================================================
+
+if "category" not in st.session_state:
+    st.session_state.category = None
+
+# ==========================================================
+# HERO
+# ==========================================================
+
+# ---------- Header (Logo Top Left) ----------
+
+col_logo, col_space = st.columns([1, 8])
+
+with col_logo:
+    st.image(str(LOGO), width=110)
+
+st.markdown("<hr>", unsafe_allow_html=True)
+
+# ---------- Hero Title ----------
 
 st.markdown(
-    "<h1 class='hero-title'>Amazon Review Analytics Platform</h1>",
-    unsafe_allow_html=True
+"""
+<h1 class="hero-title">
+Amazon <span style="color:#FF9900;">Review</span><br>
+Analytics Platform
+</h1>
+""",
+unsafe_allow_html=True
 )
+
+# ---------- Subtitle ----------
 
 st.markdown(
-    "<p class='hero-subtitle'>AI Powered Product Review Intelligence</p>",
-    unsafe_allow_html=True
+"""
+<div class="hero-subtitle">
+AI Powered Product Review Intelligence
+</div>
+""",
+unsafe_allow_html=True
 )
+
+# ---------- Orange Line ----------
 
 st.markdown(
-    """
-    <p class='hero-description'>
-    Analyze millions of Amazon customer reviews using
-    Big Data Analytics, Interactive Dashboards,
-    and Hybrid RAG powered Product Search.
-    </p>
-    """,
-    unsafe_allow_html=True
+"""
+<div style="
+width:140px;
+height:4px;
+margin:18px auto 30px auto;
+background:linear-gradient(90deg,#7C3AED,#FF9900);
+border-radius:20px;
+">
+</div>
+""",
+unsafe_allow_html=True
 )
 
-# ---------------------------------
-# Action Buttons
-# ---------------------------------
-
-st.markdown("<br><br>", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2, gap="large")
-
-with col1:
-    if st.button("📊 Open Dashboard", use_container_width=True):
-        st.switch_page("pages/1_Dashboard.py")
-
-with col2:
-    if st.button("🔍 Product Search", use_container_width=True):
-        st.switch_page("pages/2_Product_Search.py")
-        
-# ---------------------------------
-# Supported Categories
-# ---------------------------------
-
-st.markdown("<br>", unsafe_allow_html=True)
+# ---------- Description ----------
 
 st.markdown(
-    """
-    <h2 class='category-title'>
-        Supported Categories
-    </h2>
-    """,
-    unsafe_allow_html=True
+"""
+<div class="hero-description">
+Discover customer insights from millions of Amazon reviews.<br><br>
+
+Search products, visualize analytics dashboards,<br><br>
+
+and explore AI-powered recommendations using Hybrid RAG.
+</div>
+""",
+unsafe_allow_html=True
 )
-col1, col2 = st.columns(2, gap="large")
 
-with col1:
-    st.markdown("""
-    <div class="category-card">
-        <div class="category-icon">🏠</div>
-        <div class="category-name">Appliances</div>
-        <div class="category-text">
-            Explore customer reviews and insights.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+# ==========================================================
+# NAVIGATION
+# ==========================================================
 
-with col2:
-    st.markdown("""
-    <div class="category-card">
-        <div class="category-icon">🏀</div>
-        <div class="category-name">Sports</div>
-        <div class="category-text">
-            Analyze sports product reviews.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown(
+"""
+<div style="
+text-align:center;
+font-size:20px;
+font-weight:700;
+margin-top:30px;
+margin-bottom:15px;">
+Navigation
+</div>
+""",
+unsafe_allow_html=True
+)
 
-st.markdown("<br>", unsafe_allow_html=True)
+page = st.segmented_control(
+    "Navigation",
+    [
+        "🔍 Product Search",
+        "📊 Dashboard"
+    ],
+    default="🔍 Product Search"
+)
 
-col3, col4 = st.columns(2, gap="large")
+if page == "📊 Dashboard":
+    st.switch_page("pages/1_Dashboard.py")
 
-with col3:
-    st.markdown("""
-    <div class="category-card">
-        <div class="category-icon">🎧</div>
-        <div class="category-name">Music & Audio</div>
-        <div class="category-text">
-            Discover audio product insights.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+# ==========================================================
+# SEARCH
+# ==========================================================
 
-with col4:
-    st.markdown("""
-    <div class="category-card">
-        <div class="category-icon">🎮</div>
-        <div class="category-name">Video Games</div>
-        <div class="category-text">
-            Explore gaming product reviews.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+search = st.text_input(
+
+    "",
+
+    placeholder="Search Amazon Products..."
+
+)
