@@ -1,8 +1,8 @@
 """
 Prompt Builder
 
-Builds prompts for the Gemini model using
-retrieved product documents.
+Builds prompts for Gemini using retrieved
+Hybrid RAG product documents.
 """
 
 from ml_pipeline.common.constants import (
@@ -15,13 +15,16 @@ class PromptBuilder:
     Utility class for constructing RAG prompts.
     """
 
+    MAX_PRODUCTS = 3
+    MAX_DOCUMENT_LENGTH = 1800
+
     @staticmethod
     def build(
         query: str,
         documents: list[dict],
     ) -> str:
         """
-        Build the final prompt.
+        Build the final Gemini prompt.
         """
 
         context = PromptBuilder._build_context(
@@ -31,41 +34,35 @@ class PromptBuilder:
         return f"""
 You are an expert Amazon shopping assistant.
 
-Answer the user's question ONLY using the retrieved product documents.
+Answer the user's question ONLY using the retrieved product information.
 
 Rules:
 
-- Use ONLY the provided product documents.
-- Never invent, assume or infer facts that are not present.
-- Use information from:
-  • Product Information
-  • Description
-  • Features
-  • Representative Reviews
-- Compare products whenever appropriate.
-- Mention product names in comparisons.
-- If multiple products satisfy the request, mention all relevant products.
-- If the answer cannot be determined from the retrieved products, reply EXACTLY with:
+- Use ONLY the retrieved products.
+- Never invent facts.
+- If the answer is unavailable, reply exactly:
 
 The requested information is not available in the retrieved products.
 
-Keep the answer concise, factual, well-structured and easy to read.
+- Compare products when appropriate.
+- Mention product names.
+- Keep the answer concise, factual and well structured.
 
-========================================
-RETRIEVED PRODUCT DOCUMENTS
-========================================
+==============================
+RETRIEVED PRODUCTS
+==============================
 
 {context}
 
-========================================
+==============================
 USER QUESTION
-========================================
+==============================
 
 {query}
 
-========================================
+==============================
 ANSWER
-========================================
+==============================
 """.strip()
 
     @staticmethod
@@ -74,7 +71,7 @@ ANSWER
     ) -> str:
         """
         Convert retrieved documents into
-        formatted prompt context.
+        prompt context.
         """
 
         if not documents:
@@ -83,17 +80,33 @@ ANSWER
 
         sections = []
 
+        # Only send the best reranked products
+        documents = documents[: PromptBuilder.MAX_PRODUCTS]
+
         for index, result in enumerate(
             documents,
             start=1,
         ):
 
-            section = f"""
-========================================
-PRODUCT {index}
-========================================
+            document = result.get(
+                DOCUMENT,
+                "",
+            )
 
-{result.get(DOCUMENT, "")}
+            # Reduce Gemini input size
+            if len(document) > PromptBuilder.MAX_DOCUMENT_LENGTH:
+
+                document = (
+                    document[: PromptBuilder.MAX_DOCUMENT_LENGTH].rstrip()
+                    + "\n\n[Document Truncated]"
+                )
+
+            section = f"""
+==============================
+PRODUCT {index}
+==============================
+
+{document}
 """.strip()
 
             sections.append(

@@ -5,7 +5,9 @@ Performs lexical retrieval using a persisted BM25 index.
 """
 
 import pickle
+import re
 from pathlib import Path
+from time import perf_counter
 
 import numpy as np
 
@@ -23,7 +25,7 @@ logger = get_logger(__name__)
 
 class BM25Search:
     """
-    Performs BM25 keyword search using a persisted index.
+    Performs BM25 keyword retrieval.
     """
 
     def __init__(
@@ -43,7 +45,6 @@ class BM25Search:
             "lowercase",
         )
 
-        # Load BM25 directory from settings.yaml -> paths -> bm25
         self.input_directory = Path(
             get_setting(
                 "paths",
@@ -55,12 +56,13 @@ class BM25Search:
 
         self._load_index()
 
+    # ======================================================
+    # Load Index
+    # ======================================================
+
     def _load_index(
         self,
     ) -> None:
-        """
-        Load the persisted BM25 bundle.
-        """
 
         if not self.input_file.exists():
 
@@ -87,30 +89,63 @@ class BM25Search:
             len(self.documents),
         )
 
-    def search(
+    # ======================================================
+    # Query Preprocessing
+    # ======================================================
+
+    def _preprocess_query(
         self,
         query: str,
-        top_k: int | None = None,
-    ) -> list[dict]:
-        """
-        Perform BM25 keyword search.
-        """
+    ) -> list[str]:
 
         query = query.strip()
-
-        if not query:
-
-            logger.warning("Received an empty query.")
-
-            return []
-
-        top_k = top_k or self.top_k
 
         if self.lowercase:
 
             query = query.lower()
 
-        tokenized_query = query.split()
+        # collapse multiple spaces
+        query = " ".join(query.split())
+
+        # tokenize
+        return re.findall(
+            r"\b[a-zA-Z0-9]+\b",
+            query,
+        )
+
+    # ======================================================
+    # Search
+    # ======================================================
+
+    def search(
+        self,
+        query: str,
+        top_k: int | None = None,
+    ) -> list[dict]:
+
+        if not query or not query.strip():
+
+            logger.warning("Received empty BM25 query.")
+
+            return []
+
+        top_k = top_k or self.top_k
+
+        logger.info(
+            "Running BM25 Search | Category=%s | TopK=%d",
+            self.category,
+            top_k,
+        )
+
+        start_time = perf_counter()
+
+        tokenized_query = self._preprocess_query(
+            query,
+        )
+
+        if not tokenized_query:
+
+            return []
 
         scores = np.asarray(
             self.bm25.get_scores(
@@ -138,6 +173,13 @@ class BM25Search:
 
         for index in top_indices:
 
+            score = float(scores[index])
+
+            # Skip useless matches
+            if score <= 0:
+
+                continue
+
             results.append(
                 {
                     PARENT_ASIN_KEY: self.metadata[index].get(
@@ -145,14 +187,16 @@ class BM25Search:
                     ),
                     DOCUMENT: self.documents[index],
                     METADATA: self.metadata[index],
-                    SIMILARITY_SCORE: float(scores[index]),
+                    SIMILARITY_SCORE: score,
                 }
             )
 
+        elapsed = (perf_counter() - start_time) * 1000
+
         logger.info(
-            "Retrieved %d BM25 results from '%s'.",
+            "BM25 Search completed in %.2f ms | Returned %d documents.",
+            elapsed,
             len(results),
-            self.category,
         )
 
         return results

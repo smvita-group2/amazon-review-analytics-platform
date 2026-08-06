@@ -4,6 +4,7 @@ Semantic Search
 Performs semantic retrieval using ChromaDB.
 """
 
+from time import perf_counter
 from typing import Any
 
 from ml_pipeline.common.config import get_setting
@@ -42,6 +43,11 @@ class SemanticSearch:
             "normalize_query_embeddings",
         )
 
+        self.min_similarity = get_setting(
+            "retrieval",
+            "min_similarity",
+        )
+
         self.chroma = ChromaDBManager(
             category=category,
         )
@@ -54,45 +60,39 @@ class SemanticSearch:
     ) -> list[dict]:
         """
         Perform semantic search.
-
-        Parameters
-        ----------
-        query : str
-            User query.
-
-        top_k : int | None
-            Number of documents to retrieve.
-
-        where : dict | None
-            Optional metadata filters.
-
-        Returns
-        -------
-        list[dict]
-            Semantic search results.
         """
 
         query = query.strip()
 
         if not query:
 
-            logger.warning("Received an empty query.")
+            logger.warning("Received empty semantic query.")
 
             return []
 
         top_k = top_k or self.top_k
 
         logger.info(
-            "Performing semantic search on '%s' (top_k=%d).",
+            "Running Semantic Search | Category=%s | TopK=%d",
             self.category,
             top_k,
         )
 
+        start_time = perf_counter()
+
+        # --------------------------------------------------
+        # Encode Query
+        # --------------------------------------------------
+
         query_embedding = EmbeddingModel.encode(
-            query,
+            [query],
             convert_to_numpy=True,
             normalize_embeddings=self.normalize_query_embeddings,
-        ).tolist()
+        )[0].tolist()
+
+        # --------------------------------------------------
+        # Chroma Search
+        # --------------------------------------------------
 
         response = self.chroma.query(
             query_embedding=query_embedding,
@@ -100,13 +100,20 @@ class SemanticSearch:
             where=where,
         )
 
-        documents = response.get("documents") or [[]]
-        metadatas = response.get("metadatas") or [[]]
-        distances = response.get("distances") or [[]]
+        documents = response.get(
+            "documents",
+            [[]],
+        )[0]
 
-        documents = documents[0] if documents else []
-        metadatas = metadatas[0] if metadatas else []
-        distances = distances[0] if distances else []
+        metadatas = response.get(
+            "metadatas",
+            [[]],
+        )[0]
+
+        distances = response.get(
+            "distances",
+            [[]],
+        )[0]
 
         semantic_results = []
 
@@ -116,10 +123,17 @@ class SemanticSearch:
             distances,
         ):
 
-            similarity_score = max(
+            distance = float(distance)
+
+            similarity = max(
                 0.0,
-                1.0 - float(distance),
+                1.0 - distance,
             )
+
+            # Skip weak matches
+            if similarity < self.min_similarity:
+
+                continue
 
             semantic_results.append(
                 {
@@ -128,7 +142,14 @@ class SemanticSearch:
                     ),
                     DOCUMENT: document,
                     METADATA: metadata,
-                    SIMILARITY_SCORE: similarity_score,
+                    SIMILARITY_SCORE: round(
+                        similarity,
+                        4,
+                    ),
+                    "distance": round(
+                        distance,
+                        4,
+                    ),
                 }
             )
 
@@ -137,10 +158,12 @@ class SemanticSearch:
             reverse=True,
         )
 
+        elapsed = (perf_counter() - start_time) * 1000
+
         logger.info(
-            "Retrieved %d semantic results from '%s'.",
+            "Semantic Search completed in %.2f ms | Returned %d documents.",
+            elapsed,
             len(semantic_results),
-            self.category,
         )
 
         return semantic_results

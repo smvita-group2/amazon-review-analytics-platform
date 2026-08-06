@@ -1,10 +1,13 @@
 """
 Hybrid Search
 
-Combines semantic search, BM25 search,
-Reciprocal Rank Fusion (RRF), and
-CrossEncoder reranking.
+Combines Semantic Search, BM25 Search,
+Reciprocal Rank Fusion (RRF),
+and CrossEncoder reranking.
 """
+
+from concurrent.futures import ThreadPoolExecutor
+from time import perf_counter
 
 from ml_pipeline.common.config import get_setting
 from ml_pipeline.common.logger import get_logger
@@ -18,36 +21,45 @@ logger = get_logger(__name__)
 
 class HybridSearch:
     """
-    Hybrid retrieval pipeline.
+    Hybrid Retrieval Pipeline
 
-    Workflow
-    --------
-    User Query
-        ↓
-    Semantic Search
-        ↓
-    BM25 Search
-        ↓
+          User Query
+               │
+               ▼
+     ┌──────────────────┐
+     │ Semantic Search  │
+     └──────────────────┘
+               │
+               │
+     ┌──────────────────┐
+     │   BM25 Search    │
+     └──────────────────┘
+               │
+               ▼
     Reciprocal Rank Fusion
-        ↓
-    CrossEncoder Reranker
-        ↓
-    Final Documents
+               │
+               ▼
+       CrossEncoder Reranker
+               │
+               ▼
+         Final Top Documents
     """
 
     def __init__(
         self,
         category: str,
     ) -> None:
-        """
-        Initialize the hybrid retrieval pipeline.
-        """
 
         self.category = category
 
         self.final_top_k = get_setting(
             "retrieval",
             "final_top_k",
+        )
+
+        self.rerank_top_k = get_setting(
+            "retrieval",
+            "rerank_top_k",
         )
 
         self.semantic_search = SemanticSearch(
@@ -66,65 +78,110 @@ class HybridSearch:
         final_top_k: int | None = None,
     ) -> list[dict]:
         """
-        Perform hybrid retrieval.
-
-        Parameters
-        ----------
-        query : str
-            User search query.
-
-        final_top_k : int | None
-            Number of documents to return after
-            reranking.
-
-        Returns
-        -------
-        list[dict]
-            Final reranked retrieval results.
+        Execute Hybrid Retrieval.
         """
 
-        if final_top_k is None:
+        query = query.strip()
 
-            final_top_k = self.final_top_k
+        if not query:
+
+            logger.warning("Received empty search query.")
+
+            return []
+
+        final_top_k = final_top_k or self.final_top_k
 
         logger.info(
-            "Running hybrid search for category '%s'.",
+            "Running Hybrid Search | Category=%s",
             self.category,
         )
 
-        semantic_results = self.semantic_search.search(
-            query=query,
-        )
+        start_time = perf_counter()
 
-        bm25_results = self.bm25_search.search(
-            query=query,
-        )
+        try:
 
-        logger.info(
-            "Retrieved %d semantic and %d BM25 results.",
-            len(semantic_results),
-            len(bm25_results),
-        )
+            # ------------------------------------------
+            # Semantic + BM25 (Parallel)
+            # ------------------------------------------
 
-        fused_results = ReciprocalRankFusion.fuse(
-            semantic_results=semantic_results,
-            bm25_results=bm25_results,
-        )
+            with ThreadPoolExecutor(max_workers=2) as executor:
 
-        logger.info(
-            "Fused %d unique retrieval results.",
-            len(fused_results),
-        )
+                semantic_future = executor.submit(
+                    self.semantic_search.search,
+                    query=query,
+                )
 
-        reranked_results = self.reranker.rerank(
-            query=query,
-            results=fused_results,
-            top_k=final_top_k,
-        )
+                bm25_future = executor.submit(
+                    self.bm25_search.search,
+                    query=query,
+                )
 
-        logger.info(
-            "Returning %d reranked documents.",
-            len(reranked_results),
-        )
+                semantic_results = semantic_future.result()
+                bm25_results = bm25_future.result()
 
-        return reranked_results
+            logger.info(
+                "Semantic Results : %d | BM25 Results : %d",
+                len(semantic_results),
+                len(bm25_results),
+            )
+
+            if not semantic_results and not bm25_results:
+
+                logger.warning("No retrieval results found.")
+
+                return []
+
+            # ------------------------------------------
+            # Reciprocal Rank Fusion
+            # ------------------------------------------
+
+            fused_results = ReciprocalRankFusion.fuse(
+                semantic_results=semantic_results,
+                bm25_results=bm25_results,
+            )
+
+            logger.info(
+                "RRF produced %d unique documents.",
+                len(fused_results),
+            )
+
+            if not fused_results:
+
+                return []
+
+            # ------------------------------------------
+            # Limit candidates before reranking
+            # ------------------------------------------
+
+            candidates = fused_results[: self.rerank_top_k]
+
+            logger.info(
+                "Sending %d candidates to CrossEncoder.",
+                len(candidates),
+            )
+
+            # ------------------------------------------
+            # CrossEncoder Reranking
+            # ------------------------------------------
+
+            reranked_results = self.reranker.rerank(
+                query=query,
+                results=candidates,
+                top_k=final_top_k,
+            )
+
+            elapsed = (perf_counter() - start_time) * 1000
+
+            logger.info(
+                ("Hybrid Search completed " "in %.2f ms | Returned %d documents."),
+                elapsed,
+                len(reranked_results),
+            )
+
+            return reranked_results
+
+        except Exception:
+
+            logger.exception("Hybrid Search failed.")
+
+            return []

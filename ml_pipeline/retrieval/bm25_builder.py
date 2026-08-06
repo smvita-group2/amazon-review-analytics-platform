@@ -5,6 +5,7 @@ Builds and persists a BM25 index for a product category.
 """
 
 import pickle
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -22,7 +23,7 @@ logger = get_logger(__name__)
 
 class BM25Builder:
     """
-    Builds and persists a BM25 index for a category.
+    Builds and persists a BM25 index.
     """
 
     def __init__(
@@ -51,13 +52,34 @@ class BM25Builder:
 
         self.output_file = self.output_directory / f"{category}.pkl"
 
+    # ======================================================
+    # Tokenizer
+    # ======================================================
+
+    def _tokenize(
+        self,
+        text: str,
+    ) -> list[str]:
+
+        if self.lowercase:
+
+            text = text.lower()
+
+        text = " ".join(text.split())
+
+        return re.findall(
+            r"\b[a-zA-Z0-9]+\b",
+            text,
+        )
+
+    # ======================================================
+    # Build
+    # ======================================================
+
     def build(
         self,
         dataframe: pd.DataFrame,
     ) -> None:
-        """
-        Build and persist the BM25 index locally.
-        """
 
         if dataframe.empty:
 
@@ -76,19 +98,15 @@ class BM25Builder:
 
         documents = dataframe[PRODUCT_DOCUMENT].fillna("").astype(str).tolist()
 
-        corpus = documents
-
-        if self.lowercase:
-
-            corpus = [document.lower() for document in corpus]
-
-        tokenized_corpus = [document.split() for document in corpus]
+        tokenized_corpus = [self._tokenize(document) for document in documents]
 
         bm25 = BM25Okapi(
             tokenized_corpus,
         )
 
-        metadata = dataframe[list(CHROMA_METADATA_FIELDS)].to_dict(orient="records")
+        metadata = (
+            dataframe[list(CHROMA_METADATA_FIELDS)].fillna("").to_dict(orient="records")
+        )
 
         bundle = {
             "bm25": bm25,
