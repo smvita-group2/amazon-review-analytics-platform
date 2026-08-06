@@ -4,15 +4,12 @@ Hybrid RAG Platform for Intelligent Product Search
 Enterprise Streamlit Dashboard
 """
 
-import os
-import sys
 import time
 
 import streamlit as st
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from ml_pipeline.pipeline import Pipeline  # noqa: E402
+from ml_pipeline.common.constants import CATEGORIES
+from ml_pipeline.pipeline import Pipeline
 
 # ==========================================================
 # Page Configuration
@@ -75,26 +72,9 @@ header {visibility:hidden;}
 
     max-width:1450px;
 
-    padding-top:2rem;
+    padding-top:1rem;
 
-    padding-bottom:2rem;
-
-}
-
-
-/* ------------------------- */
-/* Sidebar */
-/* ------------------------- */
-
-section[data-testid="stSidebar"]{
-
-    background:#111827;
-
-}
-
-section[data-testid="stSidebar"] *{
-
-    color:white;
+    padding-bottom:1.5rem;
 
 }
 
@@ -113,11 +93,11 @@ section[data-testid="stSidebar"] *{
 
     border-radius:20px;
 
-    padding:40px;
+    padding:30px;
 
     color:white;
 
-    margin-bottom:30px;
+    margin-bottom:18px;
 
     box-shadow:0px 8px 25px rgba(0,0,0,.18);
 
@@ -125,15 +105,15 @@ section[data-testid="stSidebar"] *{
 
 .hero h1{
 
-    font-size:40px;
+    font-size:38px;
 
-    margin-bottom:10px;
+    margin-bottom:8px;
 
 }
 
 .hero p{
 
-    font-size:18px;
+    font-size:17px;
 
     opacity:.95;
 
@@ -150,7 +130,7 @@ section[data-testid="stSidebar"] *{
 
     border-radius:16px;
 
-    padding:22px;
+    padding:18px;
 
     border:1px solid #E5E7EB;
 
@@ -164,20 +144,21 @@ section[data-testid="stSidebar"] *{
 
     color:#6B7280;
 
-    font-size:14px;
+    font-size:13px;
+
+    margin-bottom:6px;
 
 }
 
 .metric-value{
 
-    font-size:30px;
+    font-size:28px;
 
     font-weight:bold;
 
     color:#2563EB;
 
 }
-
 
 
 /* ------------------------- */
@@ -192,9 +173,9 @@ section[data-testid="stSidebar"] *{
 
     border:1px solid #E5E7EB;
 
-    padding:22px;
+    padding:20px;
 
-    margin-bottom:20px;
+    margin-bottom:16px;
 
     box-shadow:0px 5px 14px rgba(0,0,0,.08);
 
@@ -229,7 +210,7 @@ section[data-testid="stSidebar"] *{
 
     margin-right:8px;
 
-    margin-top:10px;
+    margin-top:8px;
 
     font-size:12px;
 
@@ -246,7 +227,7 @@ section[data-testid="stSidebar"] *{
 
     color:#6B7280;
 
-    margin-top:60px;
+    margin-top:35px;
 
 }
 
@@ -259,9 +240,9 @@ div.stButton > button{
 
     width:100%;
 
-    height:52px;
+    height:48px;
 
-    font-size:18px;
+    font-size:17px;
 
     border-radius:12px;
 
@@ -284,66 +265,15 @@ div.stButton > button:hover{
     unsafe_allow_html=True,
 )
 
-
 # ==========================================================
-# Sidebar
+# Default Category
 # ==========================================================
 
-category = "Appliances"
+if "category" not in st.session_state:
 
-st.sidebar.title("🛒 Hybrid RAG")
+    st.session_state.category = CATEGORIES[0]
 
-st.sidebar.caption("Amazon Appliances Product Search Platform")
-
-st.sidebar.markdown("---")
-
-st.sidebar.success("📂 Category")
-
-st.sidebar.write("**Appliances**")
-
-st.sidebar.markdown("---")
-
-st.sidebar.subheader("💡 Example Queries")
-
-examples = [
-    "best black dishwasher",
-    "energy efficient refrigerator",
-    "front load washing machine",
-    "quiet microwave oven",
-    "stainless steel gas range",
-]
-
-for item in examples:
-
-    st.sidebar.caption(f"• {item}")
-
-st.sidebar.markdown("---")
-
-st.sidebar.subheader("⚙ Retrieval Pipeline")
-
-st.sidebar.success("Sentence Transformers Embeddings")
-
-st.sidebar.success("Semantic Search (ChromaDB)")
-
-st.sidebar.success("BM25 Keyword Search")
-
-st.sidebar.success("Reciprocal Rank Fusion (RRF)")
-
-st.sidebar.success("CrossEncoder Reranking")
-
-st.sidebar.success("Google Gemini 2.5 Flash")
-
-st.sidebar.markdown("---")
-
-st.sidebar.info("""
-Search Amazon appliance products using a Hybrid Retrieval-Augmented
-Generation (Hybrid RAG) pipeline.
-
-The system combines semantic retrieval with keyword search, fuses both
-result sets using Reciprocal Rank Fusion (RRF), reranks the candidates
-with a CrossEncoder model, and generates grounded responses using
-Google Gemini 2.5 Flash based only on the retrieved product information.
-""")
+category = st.session_state.category
 
 # ==========================================================
 # Hero
@@ -359,7 +289,7 @@ st.markdown(
 
 Intelligent product discovery powered by Semantic Search, BM25,
 Reciprocal Rank Fusion (RRF), CrossEncoder reranking and
-Google Gemini 2.5 Flash.
+Google Gemini 3.5 Flash.
 
 </p>
 
@@ -374,9 +304,9 @@ Google Gemini 2.5 Flash.
 m1, m2, m3, m4 = st.columns(4)
 
 cards = [
-    ("Category", "Appliances"),
-    ("Retrieval", "Hybrid"),
-    ("LLM", "Gemini 2.5"),
+    ("Category", category.replace("_", " ")),
+    ("Retrieval", "Hybrid RAG"),
+    ("LLM", "Gemini 3.5 Flash"),
     ("Status", "Online"),
 ]
 
@@ -416,15 +346,60 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 st.subheader("🔎 Intelligent Product Search")
 
+category = st.selectbox(
+    "📂 Product Category",
+    CATEGORIES,
+    key="category",
+)
+
+if category == "Appliances":
+
+    placeholder = (
+        "Ask anything about appliances... "
+        "(e.g. best refrigerator water filter, quiet dishwasher)"
+    )
+
+    examples = [
+        "Whirlpool refrigerator water filter",
+        "Dishwasher replacement basket",
+        "Products that improve water quality",
+    ]
+
+
+elif category == "Video_Games":
+
+    placeholder = (
+        "Ask anything about video games... "
+        "(e.g. highest rated PS5 game, Nintendo Switch racing game)"
+    )
+
+    examples = [
+        "Best PS5 controller",
+        "Highest rated PlayStation game",
+        "Nintendo Switch racing game",
+    ]
+
+
+elif category == "Musical_Instruments":
+
+    placeholder = (
+        "Ask anything about musical instruments... "
+        "(e.g. best acoustic guitar, beginner keyboard)"
+    )
+
+    examples = [
+        "Best acoustic guitar",
+        "Beginner keyboard",
+        "Studio microphone",
+    ]
+
+
+st.caption("💡 Example Searches: " + " • ".join(examples))
+
 query = st.text_input(
     label="Product Search",
     label_visibility="collapsed",
-    placeholder=(
-        "Ask anything about products... "
-        "(e.g. black dishwasher under $500, "
-        "quiet blender for smoothies, "
-        "coffee maker with grinder)"
-    ),
+    placeholder=placeholder,
 )
 
 left, middle, right = st.columns([6, 1, 1])
@@ -548,10 +523,10 @@ if st.session_state.result:
 
     documents = result.get("documents", [])
 
-    answer_tab, products_tab, architecture_tab = st.tabs(
+    products_tab, answer_tab, architecture_tab = st.tabs(
         [
-            "💬 AI Answer",
             "📦 Retrieved Products",
+            "💬 AI Generated Answer",
             "🏗 Architecture",
         ]
     )
@@ -588,7 +563,7 @@ if st.session_state.result:
 
             st.metric(
                 "Category",
-                "Appliances",
+                category.replace("_", " "),
             )
 
         with c3:
@@ -749,7 +724,7 @@ if st.session_state.result:
              Prompt Builder
                          │
                          ▼
-        Google Gemini 2.5 Flash
+        Google Gemini 3.5 Flash
                          │
                          ▼
               Generated Answer
