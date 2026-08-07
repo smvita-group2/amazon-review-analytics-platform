@@ -1,29 +1,27 @@
 from pathlib import Path
+import json
 
 import numpy as np
 import pandas as pd
 
-import pyarrow.dataset as ds
-
-import torch
-
-from tqdm import tqdm
-
 from sentence_transformers import SentenceTransformer
+
+
 # Embedding Processor
 class EmbeddingProcessor:
     """
     Generates semantic embeddings
-    for unique Amazon products.
+    with checkpoint support.
     """
 
     def __init__(
             self,
             input_file,
             output_dir,
-            batch_size=50000,
-            embedding_batch_size=512
+            model_name="all-MiniLM-L6-v2",
+            batch_size=256
     ):
+
         self.input_file = Path(input_file)
 
         self.output_dir = Path(output_dir)
@@ -33,431 +31,524 @@ class EmbeddingProcessor:
             exist_ok=True
         )
 
+        self.model_name = model_name
+
         self.batch_size = batch_size
-
-        self.embedding_batch_size = embedding_batch_size
-
-        self.dataset = None
-
-        self.scanner = None
-
-        self.products = None
 
         self.documents = None
 
         self.model = None
 
-        self.embeddings = None
-
-        self.device = None
-        self.start_index = 0
-    # Load Dataset
-    def load_dataset(self):
-        """
-        Loads cleaned_data.parquet
-        """
-
-        print("=" * 60)
-        print("LOADING DATASET")
-        print("=" * 60)
-
-        self.dataset = ds.dataset(
-            self.input_file,
-            format="parquet"
+        self.embedding_output = (
+            self.output_dir /
+            "product_embeddings.npy"
         )
 
-        self.scanner = self.dataset.scanner(
-            batch_size=self.batch_size
+        self.flag_file = (
+            self.output_dir /
+            "embedding_completed.flag"
         )
 
-        print("Dataset Loaded Successfully")
+        # Checkpoint Directory
 
-    # Prepare Products
-    def prepare_products(self):
+        self.checkpoint_dir = (
+            self.output_dir /
+            "embeddings_checkpoint"
+        )
+
+        self.checkpoint_dir.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        # Progress File
+
+        self.progress_file = (
+            self.checkpoint_dir /
+            "progress.json"
+        )
+    # Load Documents
+    def load_documents(self):
         """
-        Extracts one unique record
-        for every parent_asin.
+        Loads product documents
+        for embedding generation.
         """
 
         print("=" * 60)
-        print("PREPARING PRODUCTS")
+        print("LOADING PRODUCT DOCUMENTS")
         print("=" * 60)
 
-        product_batches = []
+        if not self.input_file.exists():
 
-        total_reviews = 0
+            raise FileNotFoundError(
+                f"\nInput file not found:\n"
+                f"{self.input_file}"
+            )
 
-        batch_number = 0
+        self.documents = pd.read_parquet(
+            self.input_file
+        )
 
-        for batch in self.scanner.to_batches():
-            batch_number += 1
+        if "combined_text" not in self.documents.columns:
 
-            print(f"Processing Batch : {batch_number}")
+            raise ValueError(
+                "'combined_text' column "
+                "not found."
+            )
 
-            batch_df = batch.to_pandas()
-            total_reviews += len(batch_df)
-            batch_df = batch_df[
-                [
-                    "parent_asin",
-                    "product_title",
-                    "store",
-                    "main_category",
-                    "sub_category",
-                    "description_text",
-                    "features_text"
-                ]
-
+        self.documents[
+            "combined_text"
+        ] = (
+            self.documents[
+                "combined_text"
             ]
-
-            batch_df = batch_df.drop_duplicates(
-                subset="parent_asin"
-            )
-
-            product_batches.append(batch_df)
-
-            del batch_df
-            del batch
-        self.products = pd.concat(
-            product_batches,
-            ignore_index=True
+            .fillna("")
+            .astype(str)
         )
-
-        self.products = self.products.drop_duplicates(
-            subset="parent_asin"
-        )
-        # Free memory
-        del product_batches
-
-        print(f"Total Reviews Processed : {total_reviews:,}")
-
-        print(f"Unique Products : {len(self.products):,}")
-
-    # Create Documents
-
-
-
-    def create_documents(self):
-        """
-        Creates one document
-        for every unique product.
-        """
-
-        print("=" * 60)
-        print("CREATING PRODUCT DOCUMENTS")
-        print("=" * 60)
-
-        self.products = self.products.fillna("")
-
-        self.documents = []
-
-        for row in tqdm(
-                self.products.itertuples(index=False),
-                total=len(self.products),
-                desc="Creating Documents"
-        ):
-            document = (
-                f"Title: {row.product_title}\n\n"
-                f"Brand: {row.store}\n\n"
-                f"Category: {row.main_category}\n\n"
-                f"Sub Category: {row.sub_category}\n\n"
-                f"Description:\n{row.description_text}\n\n"
-                f"Features:\n{row.features_text}"
-            )
-
-            self.documents.append(document)
 
         print(
-            f"Documents Created : {len(self.documents):,}"
+            "Documents Loaded Successfully"
         )
-    # Load Embedding Model
+
+        print(
+            f"Total Products : "
+            f"{len(self.documents):,}"
+        )
+
+        print(
+            f"Columns : "
+            f"{self.documents.columns.tolist()}"
+        )
+
+
+    # Load Model
     def load_model(self):
         """
-        Loads SentenceTransformer model.
+        Loads SentenceTransformer
+        model.
         """
 
         print("=" * 60)
         print("LOADING EMBEDDING MODEL")
         print("=" * 60)
 
-        self.device = (
-            "cuda"
-            if torch.cuda.is_available()
-            else "cpu"
-        )
-
-        MODEL_NAME = (
-            "sentence-transformers/all-MiniLM-L6-v2"
-        )
-
         self.model = SentenceTransformer(
-            MODEL_NAME,
-            device=self.device
+            self.model_name
         )
-
-        self.model.max_seq_length = 256
-
-        print(f"Running on : {self.device}")
-
-        print("Embedding Model Loaded Successfully")
-
-    # Initialize Checkpoint Files
-    def initialize_checkpoint_files(self):
-        """
-        Creates checkpoint file paths.
-        """
-
-        self.embedding_checkpoint = (
-                self.output_dir /
-                "embedding_checkpoint.npy"
-        )
-
-        self.last_embedding_file = (
-                self.output_dir /
-                "last_embedding.txt"
-        )
-
-        self.metadata_file = (
-                self.output_dir /
-                "product_metadata.parquet"
-        )
-
-        self.final_embedding_file = (
-                self.output_dir /
-                "product_embeddings.npy"
-        )
-
-        self.completed_flag = (
-                self.output_dir /
-                "embedding_completed.flag"
-        )
-
-    # Load Embedding Checkpoint
-    def load_checkpoint(self):
-        """
-        Loads embedding checkpoint if available.
-        """
-
-        print("=" * 60)
-        print("LOADING EMBEDDING CHECKPOINT")
-        print("=" * 60)
-
-        if (
-                self.embedding_checkpoint.exists()
-                and
-                self.last_embedding_file.exists()
-        ):
-
-            self.embeddings = list(
-                np.load(
-                    self.embedding_checkpoint,
-                    allow_pickle=True
-                )
-            )
-
-            with open(
-                    self.last_embedding_file,
-                    "r"
-            ) as file:
-
-                self.start_index = int(
-                    file.read()
-                )
-
-            print(
-                f"Checkpoint Found"
-            )
-
-            print(
-                f"Resume From : {self.start_index:,}"
-            )
-
-            print(
-                f"Embeddings Loaded : {len(self.embeddings):,}"
-            )
-
-        else:
-
-            self.embeddings = []
-
-            self.start_index = 0
-
-            print(
-                "No Checkpoint Found"
-            )
-
-        # Save Embedding Checkpoint
-
-    def save_checkpoint(
-            self,
-            current_index
-    ):
-        """
-        Saves embedding checkpoint.
-        """
-
-        print("=" * 60)
-        print("SAVING EMBEDDING CHECKPOINT")
-        print("=" * 60)
-
-        np.save(
-            self.embedding_checkpoint,
-            np.array(
-                self.embeddings,
-                dtype=np.float32
-            )
-        )
-
-        with open(
-                self.last_embedding_file,
-                "w"
-        ) as file:
-            file.write(
-                str(current_index)
-            )
 
         print(
-            f"Checkpoint Saved : {current_index:,}"
+            "Embedding Model Loaded Successfully"
         )
 
+        print(
+            f"Model Name : "
+            f"{self.model_name}"
+        )
+
+        print(
+            f"Embedding Dimension : "
+            f"{self.model.get_sentence_embedding_dimension()}"
+        )
+    # Load Progress
+    def load_progress(self):
+        """
+        Loads the last completed
+        batch number from the
+        progress file.
+        """
+
+        print("=" * 60)
+        print("CHECKING CHECKPOINT")
+        print("=" * 60)
+
+        if self.progress_file.exists():
+
+            try:
+
+                with open(
+                        self.progress_file,
+                        "r"
+                ) as file:
+
+                    progress = json.load(file)
+
+            except json.JSONDecodeError:
+
+                print(
+                    "Progress file corrupted."
+                )
+
+                print(
+                    "Starting from Batch : 1"
+                )
+
+                return 0
+            last_completed_batch = (
+                progress.get(
+                    "last_completed_batch",
+                    0
+                )
+            )
+
+            print(
+                f"Resuming from Batch : "
+                f"{last_completed_batch + 1}"
+            )
+
+            return last_completed_batch
+
+        print(
+            "No Checkpoint Found"
+        )
+
+        print(
+            "Starting From Batch : 1"
+        )
+
+        return 0
+
+
+    # Save Progress
+    def save_progress(
+            self,
+            batch_number
+    ):
+        """
+        Saves the last completed
+        batch number.
+        """
+
+        progress = {
+
+            "last_completed_batch":
+                batch_number
+
+        }
+
+        with open(
+                self.progress_file,
+                "w"
+        ) as file:
+
+            json.dump(
+                progress,
+                file,
+                indent=4
+            )
+    # Save Batch
+    def save_batch(
+            self,
+            batch_number,
+            batch_embeddings
+    ):
+        """
+        Saves one embedding batch
+        as a checkpoint file.
+        """
+
+        batch_file = (
+            self.checkpoint_dir /
+            f"batch_{batch_number:04d}.npy"
+        )
+
+        np.save(
+            batch_file,
+            batch_embeddings
+        )
+
+        print(
+            f"Checkpoint Saved : "
+            f"{batch_file.name}"
+        )
     # Generate Embeddings
     def generate_embeddings(self):
         """
-        Generates embeddings in batches
-        with automatic checkpointing.
+        Generates embeddings
+        with checkpoint support.
         """
 
         print("=" * 60)
         print("GENERATING EMBEDDINGS")
         print("=" * 60)
 
-        total_documents = len(self.documents)
+        total_documents = len(
+            self.documents
+        )
 
-        checkpoint_interval = 10
+        total_batches = (
+            total_documents +
+            self.batch_size - 1
+        ) // self.batch_size
 
-        batch_counter = 0
+        last_completed_batch = (
+            self.load_progress()
+        )
 
-        for start in tqdm(
-                range(
-                    self.start_index,
-                    total_documents,
-                    self.embedding_batch_size
-                )
+        for batch_number in range(
+                last_completed_batch + 1,
+                total_batches + 1
         ):
 
+            start = (
+                (batch_number - 1)
+                * self.batch_size
+            )
+
             end = min(
-                start + self.embedding_batch_size,
+                start + self.batch_size,
                 total_documents
             )
 
-            batch_documents = self.documents[
-                start:end
-            ]
+            print()
 
-            batch_embeddings = self.model.encode(
-                batch_documents,
-                batch_size=self.embedding_batch_size,
-                convert_to_numpy=True,
-                normalize_embeddings=True,
-                show_progress_bar=False
+            print(
+                f"Generating Batch : "
+                f"{batch_number}/{total_batches}"
             )
 
-            self.embeddings.extend(
-                batch_embeddings.astype(np.float32)
+            batch_documents = (
+
+                self.documents[
+                    "combined_text"
+                ]
+
+                .iloc[start:end]
+
+                .tolist()
+
             )
 
-            batch_counter += 1
+            batch_embeddings = (
+                self.model.encode(
 
-            # Save checkpoint every 10 batches
-            if batch_counter % checkpoint_interval == 0:
-                self.save_checkpoint(
-                    current_index=end
-                )
+                    batch_documents,
 
-                print(
-                    f"Checkpoint Saved "
-                    f"at Document {end:,}"
+                    batch_size=self.batch_size,
+
+                    show_progress_bar=False,
+
+                    convert_to_numpy=True,
+
+                    normalize_embeddings=True
+
                 )
+                .astype(np.float32)
+            )
+
+            self.save_batch(
+
+                batch_number,
+
+                batch_embeddings
+
+            )
+
+            self.save_progress(
+                batch_number
+            )
+
+            print(
+
+                f"Processed : "
+                f"{end:,}/{total_documents:,}"
+
+            )
 
             del batch_documents
             del batch_embeddings
 
-            if self.device == "cuda":
-                torch.cuda.empty_cache()
-        self.save_checkpoint(
-            current_index=total_documents
-        )
+        print()
 
         print(
-            f"Embeddings Generated : {len(self.embeddings):,}"
+            "All Embedding Batches Generated Successfully"
         )
-
-    # Save Final Embeddings
-    def save_embeddings(self):
+    # Merge Batches
+    def merge_batches(self):
         """
-        Saves final embeddings
-        and metadata.
+        Merges all checkpoint
+        embedding batches into
+        a single NumPy array.
         """
 
         print("=" * 60)
-        print("SAVING FINAL EMBEDDINGS")
+        print("MERGING EMBEDDING BATCHES")
         print("=" * 60)
 
-        embeddings_array = np.array(
-            self.embeddings,
-            dtype=np.float32
+        batch_files = sorted(
+            self.checkpoint_dir.glob(
+                "batch_*.npy"
+            )
         )
+
+        if not batch_files:
+
+            raise FileNotFoundError(
+                "No embedding checkpoint files found."
+            )
+
+        embedding_batches = []
+
+        for batch_file in batch_files:
+
+            print(
+                f"Loading : {batch_file.name}"
+            )
+
+            embedding_batches.append(
+                np.load(batch_file)
+            )
+
+        embeddings = np.vstack(
+            embedding_batches
+        )
+
+        del embedding_batches
+
+        expected_documents = len(
+            self.documents
+        )
+
+        if embeddings.shape[0] != expected_documents:
+
+            raise ValueError(
+                "Embedding count mismatch.\n"
+                f"Expected : {expected_documents}\n"
+                f"Found    : {embeddings.shape[0]}"
+            )
 
         np.save(
-            self.final_embedding_file,
-            embeddings_array
+            self.embedding_output,
+            embeddings
         )
 
-        self.products.to_parquet(
-            self.metadata_file,
-            index=False
-        )
-
-        with open(
-                self.completed_flag,
-                "w"
-        ) as file:
-            file.write("Completed")
+        print()
 
         print(
-            f"Embeddings Saved : {len(embeddings_array):,}"
+            "Merged Embeddings Saved Successfully"
         )
 
         print(
-            f"Metadata Saved : {len(self.products):,}"
+            f"Output File : {self.embedding_output}"
         )
-        # Remove temporary checkpoint files
-        if self.embedding_checkpoint.exists():
-            self.embedding_checkpoint.unlink()
 
-        if self.last_embedding_file.exists():
-            self.last_embedding_file.unlink()
         print(
-            "Embedding Pipeline Completed Successfully"
+            f"Embedding Shape : {embeddings.shape}"
         )
 
+        del embeddings
+    # Create Completion Flag
+    def create_flag(self):
+        """
+        Creates a completion flag
+        after successful embedding
+        generation.
+        """
+
+        print("=" * 60)
+        print("CREATING COMPLETION FLAG")
+        print("=" * 60)
+
+        self.flag_file.write_text(
+            "Embedding generation completed successfully."
+        )
+
+        print(
+            "Completion Flag Created Successfully"
+        )
+
+        print(
+            f"Flag File : {self.flag_file}"
+        )
+    # Cleanup Checkpoints
+    def cleanup_checkpoints(self):
+        """
+        Removes checkpoint files
+        after successful merge.
+        """
+
+        print("=" * 60)
+        print("CLEANING CHECKPOINTS")
+        print("=" * 60)
+
+        batch_files = sorted(
+            self.checkpoint_dir.glob(
+                "batch_*.npy"
+            )
+        )
+
+        for batch_file in batch_files:
+            batch_file.unlink()
+
+        if self.progress_file.exists():
+            self.progress_file.unlink()
+
+        print(
+            "Checkpoint Files Removed Successfully"
+        )
     # Complete Pipeline
     def process(self):
         """
-        Runs complete embedding pipeline.
+        Runs the complete
+        embedding generation
+        pipeline.
         """
 
-        self.load_dataset()
-
-        self.prepare_products()
-
-        self.create_documents()
+        self.load_documents()
 
         self.load_model()
 
-        self.initialize_checkpoint_files()
-
-        self.load_checkpoint()
-
         self.generate_embeddings()
 
-        self.save_embeddings()
+        self.merge_batches()
+
+        self.create_flag()
+
+        self.cleanup_checkpoints()
+
+        # Free Memory
+        del self.documents
+        del self.model
+
+        print()
+
+        print("=" * 60)
+        print("EMBEDDING GENERATION COMPLETED")
+        print("=" * 60)
+
+        print(
+            f"Embeddings : {self.embedding_output}"
+        )
+
+        print(
+            f"Flag File : {self.flag_file}"
+        )
+
+# Main
+if __name__ == "__main__":
+
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    INPUT_FILE = (
+        BASE_DIR /
+        "outputs" /
+        "product_documents.parquet"
+    )
+
+    OUTPUT_DIR = (
+        BASE_DIR /
+        "outputs"
+    )
+
+    processor = EmbeddingProcessor(
+
+        input_file=INPUT_FILE,
+
+        output_dir=OUTPUT_DIR,
+
+        model_name="all-MiniLM-L6-v2",
+
+        batch_size=256
+
+    )
+
+    processor.process()
