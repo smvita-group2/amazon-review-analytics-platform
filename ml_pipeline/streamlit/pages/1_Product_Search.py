@@ -310,7 +310,7 @@ st.markdown(
 
 Intelligent product discovery powered by Semantic Search, BM25,
 Reciprocal Rank Fusion (RRF), CrossEncoder reranking and
-Google Gemini 3.5 Flash.
+Google Gemini 3.5 Flash-lite.
 
 </p>
 
@@ -327,7 +327,7 @@ m1, m2, m3, m4 = st.columns(4)
 cards = [
     ("Category", category.replace("_", " ")),
     ("Retrieval", "Hybrid RAG"),
-    ("LLM", "Gemini 3.5 Flash"),
+    ("LLM", "Gemini 3.5 Flash-L"),
     ("Status", "Online"),
 ]
 
@@ -745,7 +745,7 @@ if st.session_state.result:
              Prompt Builder
                          │
                          ▼
-        Google Gemini 3.5 Flash
+        Google Gemini 3.5 Flash-lite LLM
                          │
                          ▼
               Generated Answer
