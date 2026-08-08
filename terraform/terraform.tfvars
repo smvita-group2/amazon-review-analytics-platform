@@ -3,7 +3,11 @@ aws_region = "us-east-1"
 project_name = "amazon-review-analytics"
 environment  = "dev"
 
-# Existing bucket
+# Category Filter (Set to "Appliances" for testing, or "" to process all datasets)
+category = "Appliances"
+datasets = "Appliances,Video_Games,Musical_Instruments,Sports_and_Outdoors"
+
+# Existing S3 Bucket (Reuse existing bucket)
 create_bucket = false
 bucket_name   = "amazon-review-analytics-group-2"
 
@@ -11,13 +15,8 @@ bucket_name   = "amazon-review-analytics-group-2"
 artifact_bucket = "amazon-review-analytics-group-2"
 artifact_prefix = "artifacts"
 
-# Network
-vpc_id    = "vpc-023ac2f6325567736"
-subnet_id = "subnet-00e3d0807c2aa3752"
-
-# EMR
-master_instance_type  = "m4.xlarge"
-master_instance_count = 1
-
-core_instance_type  = "m4.xlarge"
-core_instance_count = 1
+# Reuse existing resources
+create_database  = false
+create_workflow  = false
+create_crawler   = true
+create_log_group = false

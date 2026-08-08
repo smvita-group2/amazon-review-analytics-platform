@@ -11,7 +11,7 @@ def create_spark_session(
     Args:
         app_name: Name of the Spark application.
         local: Run Spark in local mode if True.
-               Set to False when running on EMR.
+               Set to False when running on AWS Glue or Spark Cluster.
 
     Returns:
         Configured SparkSession.
@@ -25,6 +25,9 @@ def create_spark_session(
     spark = (
         builder.config("spark.sql.caseSensitive", "true")
         .config("spark.sql.shuffle.partitions", "8")
+        .config("spark.sql.adaptive.enabled", "true")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .getOrCreate()
     )
 

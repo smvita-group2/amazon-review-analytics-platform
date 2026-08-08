@@ -16,56 +16,68 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "category" {
+  description = "Single category filter to process (e.g. Appliances). If empty, processes all datasets."
+  type        = string
+  default     = "Appliances"
+}
+
+variable "datasets" {
+  description = "Comma-separated list of default datasets"
+  type        = string
+  default     = "Appliances,Video_Games,Musical_Instruments,Sports_and_Outdoors"
+}
+
 variable "bucket_name" {
   description = "Project S3 Bucket"
   type        = string
+  default     = "amazon-review-analytics-group-2"
 }
 
 variable "create_bucket" {
   description = "Create a new S3 bucket or use an existing one"
   type        = bool
-  default     = true
+  default     = false
 }
 
-variable "vpc_id" {
-  description = "VPC ID"
+variable "create_database" {
+  description = "Create a new Glue Database or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "create_workflow" {
+  description = "Create a new Glue Workflow or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "create_crawler" {
+  description = "Create a new Glue Crawler or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "create_log_group" {
+  description = "Create a new CloudWatch Log Group or reuse an existing one"
+  type        = bool
+  default     = false
+}
+
+variable "lab_role_arn" {
+  description = "IAM Role ARN for AWS Glue jobs and crawler execution"
   type        = string
-}
-
-variable "subnet_id" {
-  description = "Subnet ID for EMR"
-  type        = string
-}
-
-variable "master_instance_type" {
-  type    = string
-  default = "m4.xlarge"
-}
-
-variable "core_instance_type" {
-  type    = string
-  default = "m4.xlarge"
+  default     = null
 }
 
 variable "artifact_bucket" {
   description = "S3 bucket containing deployment artifacts"
   type        = string
+  default     = "amazon-review-analytics-group-2"
 }
 
 variable "artifact_prefix" {
   description = "Artifact folder"
   type        = string
-  default     = "artifacts/develop"
-}
-
-variable "master_instance_count" {
-  description = "Master node count"
-  type        = number
-  default     = 1
-}
-
-variable "core_instance_count" {
-  description = "Core node count"
-  type        = number
-  default     = 1
+  default     = "artifacts"
 }

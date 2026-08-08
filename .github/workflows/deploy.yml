@@ -1,16 +1,65 @@
-name: Terraform Infrastructure Deployment
+name: CD Pipeline - Glue & Infrastructure Deployment
 
 on:
   push:
     branches:
       - main
-      - develop
-      - feature/terraform
+      # - develop
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION || vars.AWS_REGION || 'us-east-1' }}
+  S3_BUCKET: ${{ vars.S3_BUCKET || 'amazon-review-analytics-group-2' }}
+  S3_ARTIFACT_PREFIX: ${{ vars.S3_ARTIFACT_PREFIX || 'artifacts' }}
+
 jobs:
-  terraform:
-    name: Deploy Infrastructure
+  build-and-upload:
+    name: Build Artifacts & Upload to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validate Build Environment
+        run: |
+          chmod +x scripts/build/build.sh
+          ./scripts/build/build.sh
+
+      - name: Package Deployment Artifact
+        run: |
+          chmod +x scripts/build/package.sh
+          ./scripts/build/package.sh
+
+      - name: Deploy Artifact ZIP to S3
+        run: |
+          chmod +x scripts/deploy/deploy-dev.sh
+          ./scripts/deploy/deploy-dev.sh
+
+      - name: Upload Latest Glue Scripts to S3
+        run: |
+          aws s3 sync gluejobs/ "s3://${S3_BUCKET}/scripts/gluejobs/" --delete
+
+  terraform-cd:
+    name: Terraform Plan & Apply
+    needs: build-and-upload
     runs-on: ubuntu-latest
 
     defaults:
@@ -21,21 +70,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Format Check
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
 
       - name: Terraform Validate
         run: terraform validate
@@ -44,5 +94,5 @@ jobs:
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-test'
         run: terraform apply -auto-approve tfplan

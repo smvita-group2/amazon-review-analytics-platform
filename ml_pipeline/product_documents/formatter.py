@@ -143,20 +143,25 @@ class ProductDocumentFormatter:
             start=1,
         ):
 
-            review_text = safe_string(review.review_text)
+            review_text = safe_string(getattr(review, "review_text", ""))
 
             if len(review_text) > self.MAX_REVIEW_LENGTH:
 
                 review_text = review_text[: self.MAX_REVIEW_LENGTH].rstrip() + "..."
 
+            rating = getattr(review, "review_rating", 5)
+            verified = getattr(review, "verified_purchase", False)
+            helpful = getattr(review, "helpful_vote", 0)
+            title = safe_string(getattr(review, "review_title", ""))
+
             lines.extend(
                 [
                     f"Review {index}",
-                    f"Rating: {review.review_rating}/5",
-                    f"Verified Purchase: {'Yes' if review.verified_purchase else 'No'}",
-                    f"Helpful Votes: {review.helpful_vote}",
+                    f"Rating: {rating}/5",
+                    f"Verified Purchase: {'Yes' if verified else 'No'}",
+                    f"Helpful Votes: {helpful}",
                     "",
-                    f"Title: {safe_string(review.review_title)}",
+                    f"Title: {title}",
                     "",
                     "Review:",
                     review_text,
