@@ -60,7 +60,7 @@ class GeminiClient:
     def generate(
         cls,
         prompt: str,
-    ) -> str:
+    ) -> tuple[str, int]:
         """
         Generate a response from Gemini.
 
@@ -71,8 +71,8 @@ class GeminiClient:
 
         Returns
         -------
-        str
-            Generated response.
+        tuple[str, int]
+            Generated response and total token count.
         """
 
         cls._initialize()
@@ -87,10 +87,33 @@ class GeminiClient:
                 ),
             )
 
-            return response.text.strip() if response.text else ""
+            # ==================================================
+            # Token Usage
+            # ==================================================
+
+            total_tokens = 0
+
+            if response.usage_metadata:
+
+                total_tokens = response.usage_metadata.total_token_count or 0
+
+            logger.info(
+                "Gemini generation completed | Tokens=%s",
+                total_tokens,
+            )
+
+            # ==================================================
+            # Return Answer + Token Count
+            # ==================================================
+
+            answer = response.text.strip() if response.text else ""
+
+            return answer, total_tokens
 
         except Exception:
 
-            logger.exception("Gemini generation failed.")
+            logger.exception(
+                "Gemini generation failed.",
+            )
 
             raise

@@ -10,6 +10,7 @@ from ml_pipeline.llm.gemini_client import GeminiClient
 from ml_pipeline.llm.prompt_builder import PromptBuilder
 from ml_pipeline.retrieval.hybrid_search import HybridSearch
 
+
 logger = get_logger(__name__)
 
 
@@ -52,13 +53,15 @@ class Pipeline:
         Returns
         -------
         dict
-            Generated answer and retrieved
-            documents.
+            Generated answer, token usage,
+            and retrieved documents.
         """
 
         if not query.strip():
 
-            raise ValueError("Query cannot be empty.")
+            raise ValueError(
+                "Query cannot be empty."
+            )
 
         logger.info(
             "Executing pipeline for category '%s'.",
@@ -67,42 +70,79 @@ class Pipeline:
 
         try:
 
+            # ==================================================
+            # Hybrid Retrieval
+            # ==================================================
+
             documents = self.hybrid_search.search(
                 query=query,
             )
+
+            # ==================================================
+            # Prompt Construction
+            # ==================================================
 
             prompt = PromptBuilder.build(
                 query=query,
                 documents=documents,
             )
 
-            answer = GeminiClient.generate(
+            # ==================================================
+            # Gemini Generation
+            # ==================================================
+
+            answer, total_tokens = GeminiClient.generate(
                 prompt=prompt,
             )
 
-            logger.info("Pipeline execution completed successfully.")
+            logger.info(
+                "Gemini generation completed | Tokens=%s",
+                total_tokens,
+            )
 
-            # ==============================
+            logger.info(
+                "Pipeline execution completed successfully."
+            )
+
+            # ==================================================
             # DEBUG
-            # ==============================
+            # ==================================================
 
-            print("\n========== FIRST DOCUMENT ==========")
+            print(
+                "\n========== FIRST DOCUMENT =========="
+            )
 
             if documents:
-                print(documents[0])
-            else:
-                print("No documents returned.")
 
-            print("====================================\n")
+                print(
+                    documents[0]
+                )
+
+            else:
+
+                print(
+                    "No documents returned."
+                )
+
+            print(
+                "====================================\n"
+            )
+
+            # ==================================================
+            # Pipeline Result
+            # ==================================================
 
             return {
                 "query": query,
                 "answer": answer,
                 "documents": documents,
+                "total_tokens": total_tokens,
             }
 
         except Exception:
 
-            logger.exception("Pipeline execution failed.")
+            logger.exception(
+                "Pipeline execution failed."
+            )
 
             raise
