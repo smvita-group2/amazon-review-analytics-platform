@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 locals {
   common_tags = {
     Project     = var.project_name
@@ -15,46 +17,25 @@ module "s3" {
   environment   = var.environment
 }
 
-########################################
-# Identity
-########################################
-
-module "emr" {
-  source = "./modules/emr"
-
-  project_name = var.project_name
-  environment  = var.environment
-
-  subnet_id = var.subnet_id
-
-  service_role     = "EMR_DefaultRole"
-  instance_profile = "EMR_EC2_DefaultRole"
-
-  log_uri = "s3://${module.s3.bucket_name}/logs/"
-
-  master_instance_type  = var.master_instance_type
-  master_instance_count = var.master_instance_count
-
-  core_instance_type  = var.core_instance_type
-  core_instance_count = var.core_instance_count
-}
-
 module "glue" {
-
   source = "./modules/glue"
 
-  project_name = var.project_name
-  environment  = var.environment
+  project_name    = var.project_name
+  environment     = var.environment
+  category        = var.category
+  datasets        = var.datasets
+  create_database = var.create_database
+  create_workflow = var.create_workflow
+  create_crawler  = var.create_crawler
 
-  bucket_name = module.s3.bucket_name
+  bucket_name  = module.s3.bucket_name
+  lab_role_arn = var.lab_role_arn != null && var.lab_role_arn != "" ? var.lab_role_arn : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
 }
 
 module "monitoring" {
-
   source = "./modules/monitoring"
 
-  project_name = var.project_name
-  environment  = var.environment
-
-  emr_cluster_id = module.emr.cluster_id
+  project_name     = var.project_name
+  environment      = var.environment
+  create_log_group = var.create_log_group
 }

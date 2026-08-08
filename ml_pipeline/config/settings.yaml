@@ -10,11 +10,11 @@ aws:
 # ==========================================================
 
 paths:
-  cleaned: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/cleaned_data"
-  product_documents: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/product_documents"
-  embeddings: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/embeddings"
-  bm25: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/bm25"
-  chromadb_backup: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/chromadb"
+  cleaned: "data/cleaned_data"
+  product_documents: "data/product_documents"
+  embeddings: "data/embeddings"
+  bm25: "data/bm25"
+  chromadb_backup: "data/chromadb"
 
 # ==========================================================
 # Embedding Configuration
@@ -22,8 +22,9 @@ paths:
 
 embedding:
   model_name: "sentence-transformers/all-MiniLM-L6-v2"
-  dimension: 384
-  batch_size: 32
+  dimension: 256
+  batch_size: 128
+  max_seq_length: 256
   normalize_embeddings: true
   show_progress_bar: true
 
@@ -34,13 +35,13 @@ embedding:
 review_selection:
   helpful_reviews: 5
   recent_reviews: 3
-  
+
 # ==========================================================
 # ChromaDB
 # ==========================================================
 
 chromadb:
-  persist_directory: "C:/Users/affaa/OneDrive/Desktop/Amazon_RAG_Data/chromadb"
+  persist_directory: "data/chromadb"
 
 # ==========================================================
 # Retrieval

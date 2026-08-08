@@ -6,11 +6,13 @@ variable "environment" {
   type = string
 }
 
-variable "emr_cluster_id" {
-  type = string
+variable "create_log_group" {
+  description = "Create a new CloudWatch Log Group or reuse an existing one"
+  type        = bool
+  default     = false
 }
 
 variable "log_group_name" {
   type    = string
-  default = "/aws/emr/cluster"
+  default = "/aws/glue/amazon-review-analytics"
 }

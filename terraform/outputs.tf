@@ -18,17 +18,17 @@ output "glue_crawler" {
   value       = module.glue.crawler_name
 }
 
+output "glue_workflow" {
+  description = "Automated Glue Pipeline Workflow Name"
+  value       = module.glue.workflow_name
+}
+
+output "glue_jobs" {
+  description = "Map of all Glue PySpark Job Names"
+  value       = module.glue.job_names
+}
+
 output "log_group" {
   description = "CloudWatch Log Group"
   value       = module.monitoring.log_group_name
-}
-
-output "emr_cluster_id" {
-  description = "EMR Cluster ID"
-  value       = module.emr.cluster_id
-}
-
-output "emr_cluster_name" {
-  description = "EMR Cluster Name"
-  value       = module.emr.cluster_name
 }

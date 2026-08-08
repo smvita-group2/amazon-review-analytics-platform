@@ -3,6 +3,7 @@ Transformation logic for creating the Silver Master dataset.
 """
 
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import broadcast
 
 
 class SilverMasterTransformer:
@@ -22,11 +23,11 @@ class SilverMasterTransformer:
     def transform(self) -> DataFrame:
         """
         Joins the Silver Reviews and Silver Metadata
-        datasets into a single Silver Master dataset.
+        datasets into a single Silver Master dataset using Broadcast Hash Join.
         """
 
         master_df = self.reviews_df.join(
-            self.metadata_df,
+            broadcast(self.metadata_df),
             on="parent_asin",
             how="inner",
         )

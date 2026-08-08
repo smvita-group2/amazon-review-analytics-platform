@@ -3,7 +3,7 @@ Validation logic for the Silver reviews dataset.
 """
 
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, count, when
 
 
 class ReviewsValidator:
@@ -69,74 +69,58 @@ class ReviewsValidator:
 
         return self
 
-    def validate_required_columns(self):
+    def run(self):
         """
-        Validates that required columns do not contain NULL values.
+        Executes all validation checks in a single PySpark aggregation pass.
         """
 
-        for column_name in self.REQUIRED_COLUMNS:
+        self.validate_schema()
 
-            null_count = self.df.filter(col(column_name).isNull()).count()
+        # Build single-pass aggregation expressions
+        agg_exprs = []
 
+        for req_col in self.REQUIRED_COLUMNS:
+            agg_exprs.append(
+                count(when(col(req_col).isNull(), 1)).alias(f"null_{req_col}")
+            )
+
+        agg_exprs.append(
+            count(
+                when(
+                    col("review_rating").isNotNull()
+                    & ((col("review_rating") < 1) | (col("review_rating") > 5)),
+                    1,
+                )
+            ).alias("invalid_ratings")
+        )
+
+        agg_exprs.append(
+            count(
+                when(
+                    col("helpful_vote").isNotNull() & (col("helpful_vote") < 0),
+                    1,
+                )
+            ).alias("invalid_helpful_votes")
+        )
+
+        metrics = self.df.select(*agg_exprs).collect()[0]
+
+        for req_col in self.REQUIRED_COLUMNS:
+            null_count = metrics[f"null_{req_col}"]
             if null_count > 0:
                 raise ValueError(
-                    f"Column '{column_name}' contains {null_count} NULL values."
+                    f"Column '{req_col}' contains {null_count} NULL values."
                 )
 
-        return self
-
-    def validate_rating_range(self):
-        """
-        Validates that review ratings are between 1 and 5.
-        """
-
-        invalid_count = self.df.filter(
-            col("review_rating").isNotNull()
-            & ((col("review_rating") < 1) | (col("review_rating") > 5))
-        ).count()
-
-        if invalid_count > 0:
-            raise ValueError(f"Found {invalid_count} review(s) with invalid ratings.")
-
-        return self
-
-    def validate_helpful_vote(self):
-        """
-        Validates that helpful votes are non-negative.
-        """
-
-        invalid_count = self.df.filter(
-            col("helpful_vote").isNotNull() & (col("helpful_vote") < 0)
-        ).count()
-
-        if invalid_count > 0:
+        if metrics["invalid_ratings"] > 0:
             raise ValueError(
-                f"Found {invalid_count} review(s) with negative helpful votes."
+                f"Found {metrics['invalid_ratings']} review(s) with invalid ratings."
+            )
+
+        if metrics["invalid_helpful_votes"] > 0:
+            count_val = metrics["invalid_helpful_votes"]
+            raise ValueError(
+                f"Found {count_val} review(s) with negative helpful votes."
             )
 
         return self
-
-    def validate_timestamp(self):
-        """
-        Validates that review timestamps are not NULL.
-        """
-
-        null_count = self.df.filter(col("review_timestamp").isNull()).count()
-
-        if null_count > 0:
-            raise ValueError(f"Found {null_count} review(s) with NULL timestamps.")
-
-        return self
-
-    def run(self):
-        """
-        Executes all validation checks.
-        """
-
-        return (
-            self.validate_schema()
-            .validate_required_columns()
-            .validate_rating_range()
-            .validate_helpful_vote()
-            .validate_timestamp()
-        )

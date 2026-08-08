@@ -31,14 +31,14 @@ from pyspark.sql.functions import (
 )
 
 # ==========================================================
-# Glue Initialization
+# Glue Initialization & Argument Parsing
 # ==========================================================
 
+# Parse JOB_NAME safely
 args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "datasets",
     ],
 )
 
@@ -65,10 +65,39 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ==========================================================
-# Datasets
+# Datasets & Category Filter
 # ==========================================================
 
-DATASETS = [dataset.strip() for dataset in args["datasets"].split(",")]
+category_param = None
+if "--category" in sys.argv:
+    idx = sys.argv.index("--category")
+    if idx + 1 < len(sys.argv) and not sys.argv[idx + 1].startswith("--"):
+        val = sys.argv[idx + 1].strip()
+        if val:
+            category_param = val
+
+datasets_param = None
+if "--datasets" in sys.argv:
+    idx = sys.argv.index("--datasets")
+    if idx + 1 < len(sys.argv) and not sys.argv[idx + 1].startswith("--"):
+        val = sys.argv[idx + 1].strip()
+        if val:
+            datasets_param = val
+
+if category_param:
+    DATASETS = [category_param]
+elif datasets_param:
+    DATASETS = [d.strip() for d in datasets_param.split(",") if d.strip()]
+else:
+    DATASETS = [
+        "Appliances",
+        "Video_Games",
+        "Musical_Instruments",
+        "Sports_and_Outdoors",
+    ]
+
+logger.info(f"Datasets to process: {DATASETS}")
+
 
 # ==========================================================
 # Constants
