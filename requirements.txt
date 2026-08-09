@@ -1,53 +1,27 @@
 # ==========================================================
 # Amazon Review Analytics Platform
-# Python 3.11
+# Production Runtime Dependencies
 # ==========================================================
+# Note: PySpark and AWS Glue runtime components are provided
+# directly by the AWS Glue 4.0 execution environment in AWS.
 
 # ----------------------------------------------------------
 # Core Data Processing
 # ----------------------------------------------------------
-numpy==2.3.2
-pandas==2.3.2
-pyarrow==21.0.0
+numpy>=1.24.0,<2.0.0
+pandas>=1.5.0,<2.2.0
+pyarrow>=10.0.0,<15.0.0
 
 # ----------------------------------------------------------
-# Big Data
+# AWS & Environment
 # ----------------------------------------------------------
-pyspark
+boto3
+python-dotenv
+tqdm
 
 # ----------------------------------------------------------
-# Machine Learning & NLP
+# Machine Learning & Hybrid Search
 # ----------------------------------------------------------
-chromadb==1.0.20
-rank-bm25==0.2.2
-scikit-learn==1.7.1
-sentence-transformers==5.1.0
-transformers==4.56.1
-
-# ----------------------------------------------------------
-# Google Gemini & AWS
-# ----------------------------------------------------------
-boto3==1.40.25
-google-genai==1.37.0
-
-# ----------------------------------------------------------
-# Web Application
-# ----------------------------------------------------------
-streamlit==1.49.1
-
-# ----------------------------------------------------------
-# Environment & Utilities
-# ----------------------------------------------------------
-python-dotenv==1.1.1
-tqdm==4.67.1
-
-# ----------------------------------------------------------
-# Development & Testing
-# ----------------------------------------------------------
-bandit==1.8.6
-black==25.1.0
-flake8==7.3.0
-isort==6.0.1
-mypy==1.17.1
-pytest==8.4.2
-pytest-cov==6.2.1
+rank-bm25
+google-genai
+sentence-transformers
