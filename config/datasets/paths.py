@@ -1,81 +1,113 @@
 """
-Dataset path configuration.
+Centralized S3 paths used across the Medallion Architecture.
 
-This module centralizes all dataset locations used across
-local development and AWS EMR execution.
+Bronze
+    ├── metadata
+    └── reviews
+
+Silver
+    ├── metadata
+    ├── reviews
+    └── master
+
+Gold
+    ├── visualization
+    └── ml
 """
 
-# ============================================================
-# SOURCE BUCKET (Read Only)
-# ============================================================
+from config.datasets.constants import BUCKET_NAME
 
-SOURCE_BUCKET = "amazon-raw-data-group2"
+# ============================================================================
+# Root Paths
+# ============================================================================
 
-RAW_REVIEWS_PATH = (
-    f"s3://{SOURCE_BUCKET}/Sports_and_Outdoors.jsonl"
-)
+S3_ROOT = f"s3://{BUCKET_NAME}"
 
-RAW_METADATA_PATH = (
-    f"s3://{SOURCE_BUCKET}/meta_Sports_and_Outdoors.jsonl"
-)
+BRONZE_ROOT = f"{S3_ROOT}/bronze"
+SILVER_ROOT = f"{S3_ROOT}/silver"
+GOLD_ROOT = f"{S3_ROOT}/gold"
 
+# ============================================================================
+# Bronze Layer
+# ============================================================================
 
-# ============================================================
-# DESTINATION BUCKET (Your Data Lake)
-# ============================================================
+BRONZE_METADATA_ROOT = f"{BRONZE_ROOT}/metadata"
+BRONZE_REVIEWS_ROOT = f"{BRONZE_ROOT}/reviews"
 
-DESTINATION_BUCKET = "amazon-parquet-data-group2-shreyash"
+# ============================================================================
+# Silver Layer
+# ============================================================================
 
+SILVER_METADATA_ROOT = f"{SILVER_ROOT}/metadata"
+SILVER_REVIEWS_ROOT = f"{SILVER_ROOT}/reviews"
+SILVER_MASTER_ROOT = f"{SILVER_ROOT}/master"
 
-# ---------------- Bronze ----------------
+# ============================================================================
+# Gold Layer
+# ============================================================================
 
-BRONZE_REVIEWS_PATH = (
-    f"s3://{DESTINATION_BUCKET}/bronze/reviews/"
-)
+GOLD_VISUALIZATION_ROOT = f"{GOLD_ROOT}/visualization"
+GOLD_ML_ROOT = f"{GOLD_ROOT}/ml"
 
-BRONZE_METADATA_PATH = (
-    f"s3://{DESTINATION_BUCKET}/bronze/metadata/")
-
-
-# ---------------- Sample ----------------
-
-SAMPLE_REVIEWS_PATH = (
-    f"s3://{DESTINATION_BUCKET}/sample/reviews/"
-)
-
-SAMPLE_METADATA_PATH = (
-    f"s3://{DESTINATION_BUCKET}/sample/metadata/"
-)
+# ============================================================================
+# Bronze Path Builders
+# ============================================================================
 
 
-# ---------------- Silver ----------------
-
-SILVER_REVIEWS_PATH = (
-    f"s3://{DESTINATION_BUCKET}/silver/reviews/"
-)
-
-SILVER_METADATA_PATH = (
-    f"s3://{DESTINATION_BUCKET}/silver/metadata/"
-)
+def get_bronze_metadata_path(dataset_name: str) -> str:
+    """
+    Returns the Bronze metadata path for the given dataset.
+    """
+    return f"{BRONZE_METADATA_ROOT}/meta_{dataset_name}"
 
 
-# ---------------- Gold ----------------
-
-GOLD_ANALYTICS_PATH = (
-    f"s3://{DESTINATION_BUCKET}/gold/analytics/"
-)
-
-GOLD_DASHBOARD_PATH = (
-    f"s3://{DESTINATION_BUCKET}/gold/dashboard/"
-)
-
-GOLD_ML_PATH = (
-    f"s3://{DESTINATION_BUCKET}/gold/ml/"
-)
+def get_bronze_reviews_path(dataset_name: str) -> str:
+    """
+    Returns the Bronze reviews path for the given dataset.
+    """
+    return f"{BRONZE_REVIEWS_ROOT}/{dataset_name}"
 
 
-# ---------------- Reports ----------------
+# ============================================================================
+# Silver Path Builders
+# ============================================================================
 
-REPORTS_PATH = (
-    f"s3://{DESTINATION_BUCKET}/reports/"
-)
+
+def get_silver_metadata_path(dataset_name: str) -> str:
+    """
+    Returns the Silver metadata path for the given dataset.
+    """
+    return f"{SILVER_METADATA_ROOT}/{dataset_name}"
+
+
+def get_silver_reviews_path(dataset_name: str) -> str:
+    """
+    Returns the Silver reviews path for the given dataset.
+    """
+    return f"{SILVER_REVIEWS_ROOT}/{dataset_name}"
+
+
+def get_silver_master_path(dataset_name: str) -> str:
+    """
+    Returns the Silver Master dataset path.
+    """
+    return f"{SILVER_MASTER_ROOT}/{dataset_name}"
+
+
+# ============================================================================
+# Gold Path Builders
+# ============================================================================
+
+
+def get_gold_visualization_path(dataset_name: str) -> str:
+    """
+    Returns the Gold Visualization dataset path.
+    """
+    return f"{GOLD_VISUALIZATION_ROOT}/{dataset_name}"
+
+
+def get_gold_ml_path(dataset_name: str) -> str:
+    """
+    Returns the Gold ML dataset path.
+    """
+    return f"{GOLD_ML_ROOT}/{dataset_name}"

@@ -12,12 +12,14 @@ __pycache__/
 venv/
 env/
 ENV/
+airflow-venv/
 
 # ==================================================
 # Environment Variables
 # ==================================================
 .env
 .env.*
+!.env.example
 
 # ==================================================
 # Jupyter Notebook
@@ -31,29 +33,41 @@ ENV/
 .idea/
 
 # ==================================================
-# macOS
+# Operating System
 # ==================================================
 .DS_Store
+Thumbs.db
 
 # ==================================================
 # Logs
 # ==================================================
-*.log
 logs/
+*.log
 
 # ==================================================
-# Pytest
+# Runtime
+# ==================================================
+*.pid
+*.out
+*.err
+
+# ==================================================
+# Testing & Coverage
 # ==================================================
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.pyre/
+.mypy_cache/
 
 # ==================================================
-# Build & Packaging
+# Build Artifacts (ONLY root build folder)
 # ==================================================
-build/
+/build/
 dist/
 *.egg-info/
+*.zip
 
 # ==================================================
 # Temporary Files
@@ -68,10 +82,10 @@ temp/
 spark-warehouse/
 metastore_db/
 derby.log
+spark-temp/
 
 # ==================================================
 # Local Data
-# Keep only sample data in Git
 # ==================================================
 data/raw/
 data/bronze/
@@ -82,26 +96,10 @@ data/gold/
 # Models & Embeddings
 # ==================================================
 models/
-embeddings/
+/embeddings/
+data/embeddings/
 faiss_index/
 *.faiss
-
-# ==================================================
-# OS Generated Files
-# ==================================================
-Thumbs.db
-
-# ==================================================
-# Terraform (Future)
-# ==================================================
-.terraform/
-*.tfstate
-*.tfstate.*
-
-# ==================================================
-# Docker
-# ==================================================
-docker-data/
 
 # ==================================================
 # AWS
@@ -114,3 +112,36 @@ docker-data/
 *.pem
 *.key
 *.crt
+
+# ==================================================
+# Apache Airflow
+# ==================================================
+airflow/
+airflow.db
+airflow.cfg
+airflow-webserver.pid
+airflow-scheduler.pid
+
+airflow-runtime/logs/
+airflow-runtime/pids/
+
+# ==================================================
+# Terraform
+# ==================================================
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Variables
+# terraform.tfvars
+
+# Plans
+*.tfplan
+
+# Lock file (recommended to COMMIT)
+# !.terraform.lock.hcl

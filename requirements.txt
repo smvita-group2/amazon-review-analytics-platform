@@ -1,47 +1,27 @@
-# ==========================
-# Data Processing
-# ==========================
-pandas
-numpy
-pyspark
-pyarrow
+# ==========================================================
+# Amazon Review Analytics Platform
+# Production Runtime Dependencies
+# ==========================================================
+# Note: PySpark and AWS Glue runtime components are provided
+# directly by the AWS Glue 4.0 execution environment in AWS.
 
-# ==========================
-# AWS
-# ==========================
+# ----------------------------------------------------------
+# Core Data Processing
+# ----------------------------------------------------------
+numpy>=1.24.0,<2.0.0
+pandas>=1.5.0,<2.2.0
+pyarrow>=10.0.0,<15.0.0
+
+# ----------------------------------------------------------
+# AWS & Environment
+# ----------------------------------------------------------
 boto3
-
-# ==========================
-# Visualization
-# ==========================
-matplotlib
-seaborn
-plotly
-
-# ==========================
-# Dashboard
-# ==========================
-streamlit
-
-# ==========================
-# Machine Learning
-# ==========================
-scikit-learn
-
-# ==========================
-# NLP / Semantic Search
-# ==========================
-sentence-transformers
-faiss-cpu
-
-# ==========================
-# Jupyter Notebook
-# ==========================
-jupyter
-ipykernel
-
-# ==========================
-# Utilities
-# ==========================
 python-dotenv
 tqdm
+
+# ----------------------------------------------------------
+# Machine Learning & Hybrid Search
+# ----------------------------------------------------------
+rank-bm25
+google-genai
+sentence-transformers
