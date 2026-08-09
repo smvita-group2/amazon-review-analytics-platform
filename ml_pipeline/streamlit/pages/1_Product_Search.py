@@ -9,6 +9,10 @@ import time
 import streamlit as st
 
 from ml_pipeline.common.constants import CATEGORIES
+from ml_pipeline.evaluation.faithfulness import FaithfulnessEvaluator
+from ml_pipeline.evaluation.retrieval_relevance import (
+    RetrievalRelevanceEvaluator,
+)
 from ml_pipeline.pipeline import Pipeline
 
 # ==========================================================
@@ -29,11 +33,32 @@ st.set_page_config(
 
 
 @st.cache_resource(show_spinner=False)
-def load_pipeline(category: str):
+def load_pipeline(
+    category: str,
+) -> Pipeline:
     """
     Cache one Pipeline instance per category.
     """
-    return Pipeline(category=category)
+
+    return Pipeline(
+        category=category,
+    )
+
+
+@st.cache_resource(show_spinner=False)
+def warmup() -> None:
+    """
+    Warm up the default category so the first search
+    avoids most of the cold-start initialization.
+    """
+
+    load_pipeline(
+        CATEGORIES[0],
+    )
+
+
+# Execute once when the application starts
+warmup()
 
 
 # ==========================================================
@@ -289,7 +314,7 @@ st.markdown(
 
 Intelligent product discovery powered by Semantic Search, BM25,
 Reciprocal Rank Fusion (RRF), CrossEncoder reranking and
-Google Gemini 3.5 Flash.
+Google Gemini 3.5 Flash-lite.
 
 </p>
 
@@ -306,7 +331,7 @@ m1, m2, m3, m4 = st.columns(4)
 cards = [
     ("Category", category.replace("_", " ")),
     ("Retrieval", "Hybrid RAG"),
-    ("LLM", "Gemini 3.5 Flash"),
+    ("LLM", "Gemini 3.5 Flash-L"),
     ("Status", "Online"),
 ]
 
@@ -456,7 +481,7 @@ if search_clicked:
 
             progress.progress(
                 10,
-                text="Loading Pipeline...",
+                text="Preparing Search...",
             )
 
             pipeline = load_pipeline(
@@ -519,14 +544,19 @@ if search_clicked:
 if st.session_state.result:
 
     result = st.session_state.result
+
     execution_time = st.session_state.execution_time
 
-    documents = result.get("documents", [])
+    documents = result.get(
+        "documents",
+        [],
+    )
 
-    products_tab, answer_tab, architecture_tab = st.tabs(
+    products_tab, answer_tab, evaluation_tab, architecture_tab = st.tabs(
         [
             "📦 Retrieved Products",
             "💬 AI Generated Answer",
+            "📊 Evaluation",
             "🏗 Architecture",
         ]
     )
@@ -544,13 +574,18 @@ if st.session_state.result:
             "No answer generated.",
         )
 
+        total_tokens = result.get(
+            "total_tokens",
+            0,
+        )
+
         with st.container(border=True):
 
             st.markdown(answer)
 
         st.markdown("")
 
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns(4)
 
         with c1:
 
@@ -573,6 +608,313 @@ if st.session_state.result:
                 f"{execution_time:.2f} sec",
             )
 
+        with c4:
+
+            st.metric(
+                "Tokens Consumed",
+                f"{int(total_tokens):,}",
+            )
+
+    # ==========================================================
+    # Evaluation Tab
+    # ==========================================================
+
+    with evaluation_tab:
+
+        st.subheader("📊 RAG Evaluation")
+
+        st.write(
+            "Evaluate whether the generated answer is "
+            "supported by the retrieved product context."
+        )
+
+        if st.button(
+            "🔍 Evaluate Faithfulness",
+            type="primary",
+        ):
+
+            with st.spinner("Evaluating response faithfulness..."):
+
+                faithfulness_result = FaithfulnessEvaluator.evaluate(
+                    answer=answer,
+                    documents=documents,
+                )
+
+            # ======================================================
+            # Evaluation Results
+            # ======================================================
+
+            score = faithfulness_result.get(
+                "score",
+            )
+
+            supported_claims = faithfulness_result.get(
+                "supported_claims",
+                0,
+            )
+
+            total_claims = faithfulness_result.get(
+                "total_claims",
+                0,
+            )
+
+            unsupported_claims = faithfulness_result.get(
+                "unsupported_claims",
+                [],
+            )
+
+            claim_analysis = faithfulness_result.get(
+                "claim_analysis",
+                [],
+            )
+
+            # ======================================================
+            # Faithfulness Score
+            # ======================================================
+
+            st.markdown("### Faithfulness Score")
+
+            if score is not None:
+
+                st.metric(
+                    "Faithfulness",
+                    f"{score:.1f}%",
+                )
+
+            else:
+
+                st.info(
+                    "No factual claims were detected, "
+                    "so a faithfulness score cannot be calculated."
+                )
+
+            # ======================================================
+            # Claim Metrics
+            # ======================================================
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+
+                st.metric(
+                    "Supported Claims",
+                    supported_claims,
+                )
+
+            with c2:
+
+                st.metric(
+                    "Total Claims",
+                    total_claims,
+                )
+
+            # ======================================================
+            # Formula
+            # ======================================================
+
+            if total_claims > 0:
+
+                st.markdown("### Calculation")
+
+                st.code(
+                    f"""Faithfulness = Supported Claims / Total Claims × 100
+
+= {supported_claims} / {total_claims} × 100
+
+= {score:.2f}%
+""".strip(),
+                    language="text",
+                )
+
+            # ======================================================
+            # Claim Analysis
+            # ======================================================
+
+            if claim_analysis:
+
+                st.markdown("### Claim Analysis")
+
+                for claim in claim_analysis:
+
+                    claim_text = claim.get(
+                        "claim",
+                        "",
+                    )
+
+                    supported = claim.get(
+                        "supported",
+                        False,
+                    )
+
+                    evidence = claim.get(
+                        "evidence",
+                        "",
+                    )
+
+                    if supported:
+
+                        st.success(
+                            f"✓ Supported\n\n"
+                            f"**Claim:** {claim_text}\n\n"
+                            f"**Evidence:** {evidence}"
+                        )
+
+                    else:
+
+                        st.error(
+                            f"✗ Unsupported\n\n"
+                            f"**Claim:** {claim_text}\n\n"
+                            f"**Evidence:** "
+                            f"{evidence if evidence else'No supporting evidence found'}"
+                        )
+
+        # ==========================================================
+        # Retrieval Relevance
+        # ==========================================================
+
+        st.markdown("---")
+
+        st.subheader("🎯 Retrieval Relevance")
+
+        st.write(
+            "Evaluates whether the top 5 retrieved products "
+            "are relevant to the user's query."
+        )
+
+        if st.button(
+            "🔍 Evaluate Retrieval Relevance",
+            type="secondary",
+        ):
+
+            with st.spinner("Evaluating retrieved products..."):
+
+                relevance_result = RetrievalRelevanceEvaluator.evaluate(
+                    query=query,
+                    documents=documents[:5],
+                )
+
+            relevance_score = relevance_result.get(
+                "score",
+            )
+
+            relevant_products = relevance_result.get(
+                "relevant_products",
+                0,
+            )
+
+            total_products = relevance_result.get(
+                "total_products",
+                0,
+            )
+
+            product_analysis = relevance_result.get(
+                "product_analysis",
+                [],
+            )
+
+            # ======================================================
+            # Relevance Score
+            # ======================================================
+
+            st.markdown("### Retrieval Relevance Score")
+
+            if relevance_score is not None:
+
+                st.metric(
+                    "Retrieval Relevance",
+                    f"{relevance_score:.1f}%",
+                )
+
+            else:
+
+                st.info("Retrieval relevance could not be calculated.")
+
+            # ======================================================
+            # Product Metrics
+            # ======================================================
+
+            r1, r2 = st.columns(2)
+
+            with r1:
+
+                st.metric(
+                    "Relevant Products",
+                    relevant_products,
+                )
+
+            with r2:
+
+                st.metric(
+                    "Retrieved Products",
+                    total_products,
+                )
+
+            # ======================================================
+            # Formula
+            # ======================================================
+
+            if total_products > 0:
+
+                st.markdown("### Calculation")
+
+                st.code(
+                    f"""Retrieval Relevance =
+Relevant Products / Retrieved Products × 100
+
+= {relevant_products} / {total_products} × 100
+
+= {relevance_score:.2f}%
+""".strip(),
+                    language="text",
+                )
+
+            # ======================================================
+            # Product Analysis
+            # ======================================================
+
+            if product_analysis:
+
+                st.markdown("### Product Analysis")
+
+                for product in product_analysis:
+
+                    product_index = product.get(
+                        "product_index",
+                        0,
+                    )
+
+                    product_title = product.get(
+                        "product_title",
+                        "Unknown Product",
+                    )
+
+                    relevant = product.get(
+                        "relevant",
+                        False,
+                    )
+
+                    reason = product.get(
+                        "reason",
+                        "",
+                    )
+
+                    if relevant:
+
+                        st.success(
+                            f"✓ Relevant\n\n"
+                            f"**Product {product_index}:** "
+                            f"{product_title}\n\n"
+                            f"**Reason:** {reason}"
+                        )
+
+                    else:
+
+                        st.error(
+                            f"✗ Not Relevant\n\n"
+                            f"**Product {product_index}:** "
+                            f"{product_title}\n\n"
+                            f"**Reason:** {reason}"
+                        )
     # ==========================================================
     # Products Tab
     # ==========================================================
@@ -724,7 +1066,7 @@ if st.session_state.result:
              Prompt Builder
                          │
                          ▼
-        Google Gemini 3.5 Flash
+        Google Gemini 3.5 Flash-lite LLM
                          │
                          ▼
               Generated Answer

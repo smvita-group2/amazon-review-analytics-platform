@@ -52,8 +52,8 @@ class Pipeline:
         Returns
         -------
         dict
-            Generated answer and retrieved
-            documents.
+            Generated answer, token usage,
+            and retrieved documents.
         """
 
         if not query.strip():
@@ -67,38 +67,63 @@ class Pipeline:
 
         try:
 
+            # ==================================================
+            # Hybrid Retrieval
+            # ==================================================
+
             documents = self.hybrid_search.search(
                 query=query,
             )
+
+            # ==================================================
+            # Prompt Construction
+            # ==================================================
 
             prompt = PromptBuilder.build(
                 query=query,
                 documents=documents,
             )
 
-            answer = GeminiClient.generate(
+            # ==================================================
+            # Gemini Generation
+            # ==================================================
+
+            answer, total_tokens = GeminiClient.generate(
                 prompt=prompt,
+            )
+
+            logger.info(
+                "Gemini generation completed | Tokens=%s",
+                total_tokens,
             )
 
             logger.info("Pipeline execution completed successfully.")
 
-            # ==============================
+            # ==================================================
             # DEBUG
-            # ==============================
+            # ==================================================
 
             print("\n========== FIRST DOCUMENT ==========")
 
             if documents:
+
                 print(documents[0])
+
             else:
+
                 print("No documents returned.")
 
             print("====================================\n")
+
+            # ==================================================
+            # Pipeline Result
+            # ==================================================
 
             return {
                 "query": query,
                 "answer": answer,
                 "documents": documents,
+                "total_tokens": total_tokens,
             }
 
         except Exception:

@@ -163,7 +163,7 @@ BM25,
 Reciprocal Rank Fusion (RRF),
 CrossEncoder Reranking
 and
-Google Gemini 3.5 Flash.
+Google Gemini 3.5 Flash-lite.
 
 </p>
 
@@ -196,7 +196,7 @@ with c3:
 
     st.metric(
         "AI Model",
-        "Gemini 3.5 Flash",
+        "Gemini 3.5 Flash-lite",
     )
 
 st.markdown("---")
@@ -243,7 +243,7 @@ keyword search and large language models.
 
             st.write("• CrossEncoder Reranking")
 
-            st.write("• Google Gemini 3.5 Flash")
+            st.write("• Google Gemini 3.5 Flash-lite")
 
             st.write("• ChromaDB")
 

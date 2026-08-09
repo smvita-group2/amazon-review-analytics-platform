@@ -33,13 +33,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
           cache: "pip"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          python -m pip install -r requirements-dev.txt
 
       - name: Code Formatting Check (Black)
         run: black --check .
@@ -49,6 +49,16 @@ jobs:
 
       - name: Linting (Flake8)
         run: flake8 .
+
+      - name: Show Python and PySpark versions
+        run: |
+          python --version
+          python -c "import sys; print(sys.version)"
+          python -c "import pyspark; print('PySpark:', pyspark.__version__)"
+          python -c "import pyspark.cloudpickle; print('PySpark cloudpickle:', pyspark.cloudpickle.__file__)"
+          python -c "import pyspark.cloudpickle.cloudpickle; print('PySpark bundled cloudpickle:', getattr(pyspark.cloudpickle.cloudpickle, '__version__', 'unknown'))"
+          pip show pyspark
+          pip freeze | grep -Ei 'pyspark|cloudpickle|py4j' || true
 
       - name: Unit Tests & Coverage (Pytest)
         run: pytest --cov=src --cov-report=term-missing
