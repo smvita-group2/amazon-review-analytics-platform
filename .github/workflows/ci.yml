@@ -56,10 +56,9 @@ jobs:
           python -c "import sys; print(sys.version)"
           python -c "import pyspark; print('PySpark:', pyspark.__version__)"
           python -c "import pyspark.cloudpickle; print('PySpark cloudpickle:', pyspark.cloudpickle.__file__)"
-          python -c "import cloudpickle; print('cloudpickle:', getattr(cloudpickle, '__version__', 'unknown'))"
+          python -c "import pyspark.cloudpickle.cloudpickle; print('PySpark bundled cloudpickle:', getattr(pyspark.cloudpickle.cloudpickle, '__version__', 'unknown'))"
           pip show pyspark
-          pip show cloudpickle
-          pip freeze | grep -Ei 'pyspark|cloudpickle|py4j'
+          pip freeze | grep -Ei 'pyspark|cloudpickle|py4j' || true
 
       - name: Unit Tests & Coverage (Pytest)
         run: pytest --cov=src --cov-report=term-missing
