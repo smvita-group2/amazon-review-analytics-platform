@@ -1,12 +1,13 @@
 # ==========================================================
 # Amazon Review Analytics Platform
-# AWS Glue 4.0 Compatible Dependencies (Python 3.10 / 3.11)
+# Production Runtime Dependencies
 # ==========================================================
+# Note: PySpark and AWS Glue runtime components are provided
+# directly by the AWS Glue 4.0 execution environment in AWS.
 
 # ----------------------------------------------------------
-# Big Data & Core Data Processing (AWS Glue 4.0 Compatible)
+# Core Data Processing
 # ----------------------------------------------------------
-pyspark==3.3.0
 numpy>=1.24.0,<2.0.0
 pandas>=1.5.0,<2.2.0
 pyarrow>=10.0.0,<15.0.0
@@ -24,14 +25,3 @@ tqdm
 rank-bm25
 google-genai
 sentence-transformers
-
-# ----------------------------------------------------------
-# Development & Quality Checks (CI)
-# ----------------------------------------------------------
-black
-isort
-flake8
-pytest
-pytest-cov
-bandit
-mypy
