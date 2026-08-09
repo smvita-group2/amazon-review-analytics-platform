@@ -10,7 +10,6 @@ from ml_pipeline.llm.gemini_client import GeminiClient
 from ml_pipeline.llm.prompt_builder import PromptBuilder
 from ml_pipeline.retrieval.hybrid_search import HybridSearch
 
-
 logger = get_logger(__name__)
 
 
@@ -59,9 +58,7 @@ class Pipeline:
 
         if not query.strip():
 
-            raise ValueError(
-                "Query cannot be empty."
-            )
+            raise ValueError("Query cannot be empty.")
 
         logger.info(
             "Executing pipeline for category '%s'.",
@@ -100,33 +97,23 @@ class Pipeline:
                 total_tokens,
             )
 
-            logger.info(
-                "Pipeline execution completed successfully."
-            )
+            logger.info("Pipeline execution completed successfully.")
 
             # ==================================================
             # DEBUG
             # ==================================================
 
-            print(
-                "\n========== FIRST DOCUMENT =========="
-            )
+            print("\n========== FIRST DOCUMENT ==========")
 
             if documents:
 
-                print(
-                    documents[0]
-                )
+                print(documents[0])
 
             else:
 
-                print(
-                    "No documents returned."
-                )
+                print("No documents returned.")
 
-            print(
-                "====================================\n"
-            )
+            print("====================================\n")
 
             # ==================================================
             # Pipeline Result
@@ -141,8 +128,6 @@ class Pipeline:
 
         except Exception:
 
-            logger.exception(
-                "Pipeline execution failed."
-            )
+            logger.exception("Pipeline execution failed.")
 
             raise
