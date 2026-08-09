@@ -1,85 +1,50 @@
 """
 Analytics Dashboard
-
-Embedded Microsoft Power BI Dashboard
+Embedded Microsoft Power BI Dashboard with Amazon Review Intelligence Header
 """
 
+import os
+import sys
 import streamlit as st
 import streamlit.components.v1 as components
+
+# Ensure parent directory is in python path for importing theme
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from theme import (
+    inject_amazon_theme,
+    render_custom_sidebar,
+    render_top_navbar,
+)
 
 # ==========================================================
 # Page Configuration
 # ==========================================================
 
 st.set_page_config(
-    page_title="Analytics Dashboard",
+    page_title="Analytics Dashboard - Amazon Review Intelligence",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
+# Inject Amazon theme styles
+inject_amazon_theme()
+
+# Render custom sidebar with moving logo at the VERY TOP
+render_custom_sidebar(active_page="Dashboard")
+
+# Render top navbar with active Dashboard tab
+render_top_navbar(active_tab="dashboard")
+
 # ==========================================================
-# Custom CSS
+# Power BI Header & Embedded Frame
 # ==========================================================
 
 st.markdown(
-    """
-<style>
-
-/* -------------------------------------------------- */
-/* Hide Streamlit Elements */
-/* -------------------------------------------------- */
-
-#MainMenu {visibility:hidden;}
-footer {visibility:hidden;}
-header {visibility:hidden;}
-
-/* -------------------------------------------------- */
-/* Layout */
-/* -------------------------------------------------- */
-
-.main .block-container{
-
-    max-width:99%;
-
-    padding-top:0.5rem;
-
-    padding-bottom:0rem;
-
-}
-
-/* Remove unnecessary top spacing */
-
-section.main > div{
-    padding-top:0rem;
-}
-
-/* Hide the anchor icon beside headings */
-
-h1>a,
-h2>a,
-h3>a{
-    display:none !important;
-}
-
-</style>
-""",
+    """<div style="background: #FFFFFF; border: 1px solid #D9E2EC; border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);"><div style="display: flex; align-items: center; justify-content: space-between;"><div><h2 style="font-size: 22px; font-weight: 800; color: #172033; margin: 0;">📊 Business Analytics & Power BI Dashboard</h2><div style="font-size: 14px; color: #64748B; margin-top: 4px;">Explore product performance, rating distributions, customer sentiment, and business KPIs.</div></div><div style="background: #ECFDF3; border: 1px solid #A7F3D0; color: #15803D; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;">● Power BI Live Sync</div></div></div>""",
     unsafe_allow_html=True,
 )
-
-# ==========================================================
-# Sidebar
-# ==========================================================
-
-st.sidebar.title("Amazon Review Analytics")
-
-st.sidebar.caption("Enterprise Product Search & Analytics Platform")
-
-st.sidebar.markdown("---")
-
-# ==========================================================
-# Embedded Power BI Dashboard
-# ==========================================================
 
 powerbi_url = (
     "https://app.powerbi.com/reportEmbed?"
@@ -93,8 +58,11 @@ powerbi_url = (
 
 components.iframe(
     powerbi_url,
-    height=980,
+    height=900,
     scrolling=True,
 )
 
-st.caption("Powered by Microsoft Power BI")
+st.markdown(
+    """<div style="text-align: center; color: #64748B; font-size: 12px; margin-top: 15px;">Powered by Microsoft Power BI & Amazon Review Intelligence Platform</div>""",
+    unsafe_allow_html=True,
+)
