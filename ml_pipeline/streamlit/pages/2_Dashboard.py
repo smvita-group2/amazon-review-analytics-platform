@@ -42,11 +42,12 @@ render_top_navbar(active_tab="dashboard")
 # ==========================================================
 
 st.markdown(
-    """<div style="background: #FFFFFF; border: 1px solid #D9E2EC; border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);"><div style="display: flex; align-items: center; justify-content: space-between;"><div><h2 style="font-size: 22px; font-weight: 800; color: #172033; margin: 0;">📊 Business Analytics & Power BI Dashboard</h2><div style="font-size: 14px; color: #64748B; margin-top: 4px;">Explore product performance, rating distributions, customer sentiment, and business KPIs.</div></div><div style="background: #ECFDF3; border: 1px solid #A7F3D0; color: #15803D; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;">● Power BI Live Sync</div></div></div>""",
+    """<div style="background: #FFFFFF; border: 1px solid #D9E2EC; border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);"><div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;"><div><h2 style="font-size: 22px; font-weight: 800; color: #172033; margin: 0;">📊 Business Analytics & Power BI Dashboard</h2><div style="font-size: 14px; color: #64748B; margin-top: 4px;">Explore product performance, rating distributions, customer sentiment, and business KPIs across 26.95M+ reviews.</div></div><div style="background: #ECFDF3; border: 1px solid #A7F3D0; color: #15803D; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700;">● Power BI Live Sync</div></div></div>""",
     unsafe_allow_html=True,
 )
 
-powerbi_url = (
+# Default Organizational Report Embed URL
+DEFAULT_POWERBI_URL = (
     "https://app.powerbi.com/reportEmbed?"
     "reportId=c8911bd6-0b82-41e3-9be1-187224fa9a94"
     "&autoAuth=true"
@@ -55,6 +56,16 @@ powerbi_url = (
     "&filterPaneEnabled=false"
     "&pageView=fitToWidth"
 )
+
+# Allow environment override for Public Embed URL (e.g. view?r=...)
+powerbi_url = os.getenv("POWERBI_EMBED_URL", DEFAULT_POWERBI_URL)
+
+# Display authentication helper banner if using Organizational AutoAuth URL
+if "autoAuth=true" in powerbi_url or "reportEmbed" in powerbi_url:
+    st.markdown(
+        """<div style="background: #EAF3FB; border: 1px solid #B8D5EE; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; font-size: 13.5px; color: #146EB4; line-height: 1.5;"><div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">💡 Power BI Organizational Authentication Notice</div><div>If the frame below shows <b>"Sign in to view this report"</b>, click the <b>[Sign in]</b> button inside the frame to log in with your authorized Microsoft/Azure AD account. Alternatively, set <code>POWERBI_EMBED_URL</code> in <code>.env</code> with a Power BI <i>Publish to Web</i> public link (<code>https://app.powerbi.com/view?r=...</code>) for automatic unauthenticated viewing.</div></div>""",
+        unsafe_allow_html=True,
+    )
 
 components.iframe(
     powerbi_url,
