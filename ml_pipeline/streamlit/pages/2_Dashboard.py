@@ -60,12 +60,6 @@ DEFAULT_POWERBI_URL = (
 # Allow environment override for Public Embed URL (e.g. view?r=...)
 powerbi_url = os.getenv("POWERBI_EMBED_URL", DEFAULT_POWERBI_URL)
 
-# Display authentication helper banner if using Organizational AutoAuth URL
-if "autoAuth=true" in powerbi_url or "reportEmbed" in powerbi_url:
-    st.markdown(
-        """<div style="background: #EAF3FB; border: 1px solid #B8D5EE; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; font-size: 13.5px; color: #146EB4; line-height: 1.5;"><div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">💡 Power BI Organizational Authentication Notice</div><div>If the frame below shows <b>"Sign in to view this report"</b>, click the <b>[Sign in]</b> button inside the frame to log in with your authorized Microsoft/Azure AD account. Alternatively, set <code>POWERBI_EMBED_URL</code> in <code>.env</code> with a Power BI <i>Publish to Web</i> public link (<code>https://app.powerbi.com/view?r=...</code>) for automatic unauthenticated viewing.</div></div>""",
-        unsafe_allow_html=True,
-    )
 
 components.iframe(
     powerbi_url,
