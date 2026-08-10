@@ -93,20 +93,70 @@ with col_main:
         st.session_state["category"] = st.session_state.selected_category
         st.switch_page("pages/1_Product_Search.py")
 
-    # 3. Clickable Example Query Chips Below Search Bar
+    # 3. Clickable Category-Specific Example Query Chips Below Search Bar
+    EXAMPLE_QUERIES = {
+        "Appliances": [
+            "best quiet dishwasher",
+            "refrigerator water filter",
+            "best washing machine",
+        ],
+        "Musical_Instruments": [
+            "best acoustic guitar",
+            "beginner electric guitar",
+            "best guitar strings",
+        ],
+        "Musical Instruments": [
+            "best acoustic guitar",
+            "beginner electric guitar",
+            "best guitar strings",
+        ],
+        "Video_Games": [
+            "best PS5 controller",
+            "gaming headset",
+            "best Nintendo Switch games",
+        ],
+        "Video Games": [
+            "best PS5 controller",
+            "gaming headset",
+            "best Nintendo Switch games",
+        ],
+        "Sports_and_Outdoors": [
+            "best hiking shoes",
+            "camping tent for 2 people",
+            "best running backpack",
+        ],
+        "Sports and Outdoors": [
+            "best hiking shoes",
+            "camping tent for 2 people",
+            "best running backpack",
+        ],
+    }
+
+    current_cat = st.session_state.selected_category
+    cat_key = current_cat.replace(" ", "_")
+    examples = EXAMPLE_QUERIES.get(
+        current_cat,
+        EXAMPLE_QUERIES.get(
+            cat_key,
+            [
+                "best quiet dishwasher",
+                "refrigerator water filter",
+                "best washing machine",
+            ],
+        ),
+    )
+
     st.markdown(
         """<div style="font-size: 13px; color: #64748B; margin-top: 10px; margin-bottom: 6px; font-weight: 600;">💡 Click an example search query to run:</div>""",
         unsafe_allow_html=True,
     )
 
-    ex_col1, ex_col2, ex_col3 = st.columns(3)
-    examples = ["best noise cancelling headphones", "quiet dishwasher", "gaming laptop under $1000"]
-
-    for idx, (col, ex) in enumerate(zip([ex_col1, ex_col2, ex_col3], examples)):
-        with col:
-            if st.button(f'"{ex}"', key=f"ex_btn_{idx}", use_container_width=True):
+    ex_cols = st.columns(len(examples))
+    for idx, ex in enumerate(examples):
+        with ex_cols[idx]:
+            if st.button(f'"{ex}"', key=f"home_ex_btn_{cat_key}_{idx}", use_container_width=True):
                 st.session_state["search_query_initial"] = ex
-                st.session_state["category"] = st.session_state.selected_category
+                st.session_state["category"] = current_cat
                 st.switch_page("pages/1_Product_Search.py")
 
     st.markdown("<br>", unsafe_allow_html=True)

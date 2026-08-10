@@ -87,6 +87,45 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Category-Specific Example Search Queries Mapping
+EXAMPLE_QUERIES = {
+    "Appliances": [
+        "best quiet dishwasher",
+        "refrigerator water filter",
+        "best washing machine",
+    ],
+    "Musical_Instruments": [
+        "best acoustic guitar",
+        "beginner electric guitar",
+        "best guitar strings",
+    ],
+    "Musical Instruments": [
+        "best acoustic guitar",
+        "beginner electric guitar",
+        "best guitar strings",
+    ],
+    "Video_Games": [
+        "best PS5 controller",
+        "gaming headset",
+        "best Nintendo Switch games",
+    ],
+    "Video Games": [
+        "best PS5 controller",
+        "gaming headset",
+        "best Nintendo Switch games",
+    ],
+    "Sports_and_Outdoors": [
+        "best hiking shoes",
+        "camping tent for 2 people",
+        "best running backpack",
+    ],
+    "Sports and Outdoors": [
+        "best hiking shoes",
+        "camping tent for 2 people",
+        "best running backpack",
+    ],
+}
+
 # ==========================================================
 # Search Controls Bar
 # ==========================================================
@@ -100,6 +139,20 @@ with c_cat:
         key="category_select_box",
     )
 
+# Dynamically retrieve example queries based on currently selected category
+cat_key = selected_cat.replace(" ", "_")
+examples = EXAMPLE_QUERIES.get(
+    selected_cat,
+    EXAMPLE_QUERIES.get(
+        cat_key,
+        [
+            "best quiet dishwasher",
+            "refrigerator water filter",
+            "best washing machine",
+        ],
+    ),
+)
+
 with c_input:
     query = st.text_input(
         "🔎 Search Query",
@@ -107,6 +160,20 @@ with c_input:
         placeholder=f"Search in {selected_cat.replace('_', ' ')}...",
         key="search_query_box",
     )
+
+# Render Category-Specific Example Search Query Chips
+st.markdown(
+    """<div style="font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px; margin-bottom: 6px;">💡 Click an example search query to run:</div>""",
+    unsafe_allow_html=True,
+)
+
+ex_cols = st.columns(len(examples))
+clicked_example = None
+
+for idx, ex_text in enumerate(examples):
+    with ex_cols[idx]:
+        if st.button(f'"{ex_text}"', key=f"ex_btn_{cat_key}_{idx}", use_container_width=True):
+            clicked_example = ex_text
 
 btn_c1, btn_c2, _ = st.columns([1, 1, 3])
 
@@ -124,8 +191,11 @@ if clear_clicked:
     st.rerun()
 
 # Execute search against production RAG pipeline
-if search_clicked or (initial_query and not st.session_state.result):
-    target_q = query.strip() if query.strip() else (initial_query.strip() if initial_query else "refrigerator water filter")
+if clicked_example or search_clicked or (initial_query and not st.session_state.result):
+    if clicked_example:
+        target_q = clicked_example
+    else:
+        target_q = query.strip() if query.strip() else (initial_query.strip() if initial_query else examples[0])
     
     start = time.perf_counter()
     with st.spinner("Running Hybrid RAG Search Pipeline..."):
