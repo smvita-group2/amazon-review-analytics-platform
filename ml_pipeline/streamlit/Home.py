@@ -150,7 +150,7 @@ with col_right:
 
     # Platform Statistics 2x2 Grid
     st.markdown(
-        """<div class="side-widget-card"><div class="side-widget-title"><span>📈</span> Platform Statistics</div><div class="stats-grid-2x2"><div class="stat-subcard"><div class="stat-subval">3.2M+</div><div class="stat-sublbl">Products</div></div><div class="stat-subcard"><div class="stat-subval">15M+</div><div class="stat-sublbl">Reviews</div></div><div class="stat-subcard"><div class="stat-subval">4</div><div class="stat-sublbl">Categories</div></div><div class="stat-subcard"><div class="stat-subval">2</div><div class="stat-sublbl">Modules</div></div></div></div>""",
+        """<div class="side-widget-card"><div class="side-widget-title"><span>📈</span> Platform Statistics</div><div class="stats-grid-2x2"><div class="stat-subcard"><div class="stat-subval">1.91M+</div><div class="stat-sublbl">Products</div></div><div class="stat-subcard"><div class="stat-subval">26.95M+</div><div class="stat-sublbl">Reviews</div></div><div class="stat-subcard"><div class="stat-subval">4</div><div class="stat-sublbl">Categories</div></div><div class="stat-subcard"><div class="stat-subval">2</div><div class="stat-sublbl">Modules</div></div></div></div>""",
         unsafe_allow_html=True,
     )
 
