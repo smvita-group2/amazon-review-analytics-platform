@@ -61,9 +61,23 @@ DEFAULT_POWERBI_URL = (
 powerbi_url = os.getenv("POWERBI_EMBED_URL", DEFAULT_POWERBI_URL)
 
 
-components.iframe(
-    powerbi_url,
-    height=900,
+# Render Power BI iframe with explicit permissions for Microsoft Entra ID authentication popups
+powerbi_iframe_html = f"""
+<iframe 
+    title="Amazon Review Intelligence Power BI Dashboard"
+    width="100%" 
+    height="900" 
+    src="{powerbi_url}" 
+    frameborder="0" 
+    allowFullScreen="true"
+    allow="fullscreen; geolocation; microphone; camera"
+    sandbox="allow-downloads allow-forms allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals">
+</iframe>
+"""
+
+components.html(
+    powerbi_iframe_html,
+    height=910,
     scrolling=True,
 )
 
