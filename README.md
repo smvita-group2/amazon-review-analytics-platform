@@ -1,4 +1,3 @@
-````markdown
 # Hybrid RAG for Intelligent Product Search
 
 An end-to-end **Hybrid RAG-based Intelligent Product Search Platform** built using Amazon Product Metadata and Customer Review data.
@@ -28,7 +27,7 @@ The project also includes a **Power BI Business Intelligence layer** to analyze 
 
 ---
 
-# Problem Statement
+## Problem Statement
 
 Traditional e-commerce product search requires users to manually browse and analyze multiple products and their reviews.
 
@@ -54,7 +53,7 @@ Build an intelligent product search system that can:
 
 ---
 
-# Solution
+## Solution
 
 Our solution uses a **Hybrid Retrieval-Augmented Generation (RAG)** architecture.
 
@@ -62,107 +61,111 @@ The system combines:
 
 ```text
 Semantic Search
-       +
+      +
 Keyword Search
-       ↓
+      ↓
 Hybrid Retrieval
-       ↓
+      ↓
 RRF Fusion
-       ↓
+      ↓
 Cross-Encoder Re-ranking
-       ↓
+      ↓
 Relevant Context
-       ↓
+      ↓
 Gemini
-       ↓
+      ↓
 Intelligent Response
-````
+```
 
 This allows the system to benefit from both:
 
-* **Semantic understanding**
-* **Exact keyword matching**
+- **Semantic understanding**
+- **Exact keyword matching**
 
 ---
 
-# Architecture
+## Architecture
 
-![Hybrid RAG Architecture](docs/architecture/hybrid-rag-architecture.png)
+<p align="center">
+  <img src="docs/architecture/Architecture.jpeg" alt="Hybrid RAG Architecture" width="1000">
+</p>
+
+### Architecture Flow
 
 ```text
-                         AMAZON PRODUCT & REVIEW DATA
+                          AMAZON PRODUCT & REVIEW DATA
                                       |
                                       v
-                              ┌───────────────┐
-                              │   Amazon S3   │
-                              │   Bronze      │
-                              └───────┬───────┘
-                                      |
-                                      v
-                              ┌───────────────┐
-                              │ AWS Glue +    │
-                              │ PySpark ETL   │
-                              └───────┬───────┘
-                                      |
-                                      v
-                              ┌───────────────┐
-                              │  S3 Silver    │
-                              │ Cleaned Data  │
-                              └───────┬───────┘
-                                      |
-                                      v
-                              ┌───────────────┐
-                              │  S3 Gold      │
-                              │ Curated Data  │
-                              └───────┬───────┘
-                                      |
-                     ┌────────────────┴────────────────┐
-                     |                                 |
-                     v                                 v
-             BUSINESS INTELLIGENCE                HYBRID RAG
-                     |                                 |
-                     v                                 v
-              Glue Crawler                    Product Documents
-                     |                                 |
-                     v                                 v
-              Glue Data Catalog                    Chunking
-                     |                                 |
-                     v                                 v
-                 Athena                         Embeddings
-                     |                                 |
-                     v                      ┌──────────┴──────────┐
-              Athena Views                  |                     |
-                     |                      v                     v
-                     v                  ChromaDB                BM25
-                  Power BI             Semantic Search       Keyword Search
-                     |                      |                     |
-                     |                      └─────────┬───────────┘
-                     |                                |
-                     |                                v
-                     |                         RRF Fusion
-                     |                                |
-                     |                                v
-                     |                       Cross-Encoder
-                     |                         Re-ranking
-                     |                                |
-                     |                                v
-                     |                         Prompt Builder
-                     |                                |
-                     |                                v
-                     |                         Gemini 3.5 Flash
-                     |                                |
-                     └────────────────┬───────────────┘
-                                      |
-                                      v
-                                  Streamlit
-                                      |
-                                      v
-                                  End Users
+                               ┌───────────────┐
+                               │   Amazon S3   │
+                               │   Bronze      │
+                               └───────┬───────┘
+                                       |
+                                       v
+                               ┌───────────────┐
+                               │ AWS Glue +    │
+                               │ PySpark ETL   │
+                               └───────┬───────┘
+                                       |
+                                       v
+                               ┌───────────────┐
+                               │  S3 Silver    │
+                               │ Cleaned Data  │
+                               └───────┬───────┘
+                                       |
+                                       v
+                               ┌───────────────┐
+                               │  S3 Gold      │
+                               │ Curated Data  │
+                               └───────┬───────┘
+                                       |
+                      ┌────────────────┴────────────────┐
+                      |                                 |
+                      v                                 v
+              BUSINESS INTELLIGENCE                HYBRID RAG
+                      |                                 |
+                      v                                 v
+               Glue Crawler                    Product Documents
+                      |                                 |
+                      v                                 v
+               Glue Data Catalog                    Chunking
+                      |                                 |
+                      v                                 v
+                  Athena                         Embeddings
+                      |                                 |
+                      v                      ┌──────────┴──────────┐
+               Athena Views                  |                     |
+                      |                      v                     v
+                      v                  ChromaDB                BM25
+                   Power BI             Semantic Search       Keyword Search
+                      |                      |                     |
+                      |                      └─────────┬───────────┘
+                      |                                |
+                      |                                v
+                      |                         RRF Fusion
+                      |                                |
+                      |                                v
+                      |                       Cross-Encoder
+                      |                         Re-ranking
+                      |                                |
+                      |                                v
+                      |                         Prompt Builder
+                      |                                |
+                      |                                v
+                      |                         Gemini 3.5 Flash
+                      |                                |
+                      └────────────────┬───────────────┘
+                                       |
+                                       v
+                                   Streamlit
+                                       |
+                                       v
+                                   End Users
 ```
 
 ---
 
-# Data Lake Architecture
+## Data Lake Architecture
 
 The project follows a **Medallion Architecture** using Amazon S3.
 
@@ -176,33 +179,33 @@ Silver
 Gold
 ```
 
-## Bronze Layer
+### Bronze Layer
 
 The Bronze layer stores the raw Amazon Reviews and Product Metadata data in Amazon S3.
 
-Purpose:
+**Purpose:**
 
-* Raw data preservation
-* Original data availability
-* Reprocessing capability
-* Data archival
+- Raw data preservation
+- Original data availability
+- Reprocessing capability
+- Data archival
 
-## Silver Layer
+### Silver Layer
 
 AWS Glue and PySpark are used to clean and transform the Bronze data.
 
-Processing includes:
+**Processing includes:**
 
-* Data cleaning
-* Duplicate handling
-* Missing-value treatment
-* Schema standardization
-* Timestamp transformation
-* Nested metadata processing
-* Column selection
-* Data integration
+- Data cleaning
+- Duplicate handling
+- Missing-value treatment
+- Schema standardization
+- Timestamp transformation
+- Nested metadata processing
+- Column selection
+- Data integration
 
-## Silver Master
+### Silver Master
 
 Product metadata and customer reviews are integrated using:
 
@@ -214,25 +217,25 @@ parent_asin
 
 The Silver Master provides the common transformed dataset for downstream pipelines.
 
-## Gold Layer
+### Gold Layer
 
 The curated Silver data is used to create two major downstream pipelines:
 
 ```text
                     Silver Master
                          |
-              ┌──────────┴──────────┐
-              |                     |
-              v                     v
-          Gold ML              Gold Visualization
-              |                     |
-              v                     v
-        Hybrid RAG               Power BI
+                   ┌─────┴─────┐
+                   |           |
+                   v           v
+                Gold ML    Gold Visualization
+                   |           |
+                   v           v
+               Hybrid RAG    Power BI
 ```
 
 ---
 
-# Gold ML Pipeline
+## Gold ML Pipeline
 
 The Gold ML pipeline prepares product information for the Hybrid RAG system.
 
@@ -271,7 +274,7 @@ The validated document dataset contains approximately **445K product documents**
 
 ---
 
-# Document Generation
+## Document Generation
 
 Structured product information is converted into a unified textual representation.
 
@@ -281,26 +284,26 @@ The purpose is to create meaningful text that can be processed by NLP and embedd
 Structured Product Data
           |
           v
-   Document Creation
+     Document Creation
           |
           v
- Document Length Control
+   Document Length Control
           |
           v
-    Final Documents
+      Final Documents
           |
           v
-       Chunking
+        Chunking
           |
           v
-      Embeddings
+       Embeddings
 ```
 
 Document truncation is applied to control excessively large documents and make downstream NLP and embedding processing more efficient.
 
 ---
 
-# Embedding Generation
+## Embedding Generation
 
 The final product documents and chunks are converted into vector representations using **Sentence Transformers**.
 
@@ -321,7 +324,7 @@ These embeddings capture the semantic meaning of the product information and ena
 
 ---
 
-# Semantic Retrieval
+## Semantic Retrieval
 
 ChromaDB is used as the vector store for semantic retrieval.
 
@@ -341,18 +344,18 @@ Semantic retrieval is useful when the query and product information have similar
 
 ---
 
-# Keyword Retrieval using BM25
+## Keyword Retrieval using BM25
 
 In parallel with semantic search, the system performs keyword-based retrieval using **BM25**.
 
 BM25 is particularly useful for:
 
-* Exact product names
-* Brand names
-* Model numbers
-* Technical terms
-* Product-specific keywords
-* Exact feature requirements
+- Exact product names
+- Brand names
+- Model numbers
+- Technical terms
+- Product-specific keywords
+- Exact feature requirements
 
 ```text
 User Query
@@ -364,7 +367,7 @@ Keyword-Based Results
 
 ---
 
-# Hybrid Retrieval
+## Hybrid Retrieval
 
 The key feature of our retrieval system is the combination of:
 
@@ -373,7 +376,7 @@ Semantic Retrieval
        +
 BM25 Keyword Retrieval
        ↓
-   RRF Fusion
+    RRF Fusion
 ```
 
 Semantic search provides contextual understanding, while BM25 provides exact keyword matching.
@@ -382,7 +385,7 @@ Combining both improves retrieval robustness.
 
 ---
 
-# Reciprocal Rank Fusion (RRF)
+## Reciprocal Rank Fusion (RRF)
 
 The results from ChromaDB and BM25 are combined using **Reciprocal Rank Fusion**.
 
@@ -402,7 +405,7 @@ This allows the system to leverage the strengths of both retrieval methods.
 
 ---
 
-# Cross-Encoder Re-ranking
+## Cross-Encoder Re-ranking
 
 After hybrid retrieval, the candidate results are passed through a **Cross-Encoder re-ranker**.
 
@@ -430,7 +433,7 @@ This improves the quality of the context passed to the generation model.
 
 ---
 
-# Generative AI
+## Generative AI
 
 The most relevant retrieved information is passed to a Prompt Builder.
 
@@ -452,7 +455,7 @@ The objective is to provide responses grounded in the retrieved product informat
 
 ---
 
-# Business Intelligence Pipeline
+## Business Intelligence Pipeline
 
 The project also contains a separate Business Intelligence pipeline.
 
@@ -474,22 +477,22 @@ This layer provides business-level insights into product and review data.
 
 ---
 
-# Power BI Analytics
+## Power BI Analytics
 
 The Power BI dashboard is designed to quickly visualize product and customer review activity.
 
 The dashboard supports analysis such as:
 
-* Product performance
-* Review volume
-* Average ratings
-* Rating distribution
-* Verified purchases
-* Product categories
-* Review trends
-* Helpful votes
-* Customer sentiment
-* Product-level engagement patterns
+- Product performance
+- Review volume
+- Average ratings
+- Rating distribution
+- Verified purchases
+- Product categories
+- Review trends
+- Helpful votes
+- Customer sentiment
+- Product-level engagement patterns
 
 Power BI provides the analytical perspective:
 
@@ -501,7 +504,7 @@ The Hybrid RAG system addresses the user-facing question:
 
 ---
 
-# Application Layer
+## Application Layer
 
 The complete solution is exposed through a **Streamlit application**.
 
@@ -528,11 +531,11 @@ The application can also provide access to the Power BI business intelligence la
 
 ---
 
-# RAG Evaluation
+## RAG Evaluation
 
 The project includes evaluation of both retrieval quality and generated responses.
 
-## Faithfulness
+### Faithfulness
 
 Measures whether factual claims in the generated response are supported by the retrieved context.
 
@@ -541,7 +544,7 @@ Faithfulness =
 Supported Claims / Total Claims × 100
 ```
 
-## Retrieval Relevance
+### Retrieval Relevance
 
 Measures how many of the Top-K retrieved products are relevant to the user's query.
 
@@ -554,7 +557,7 @@ Relevant Products / 5 × 100
 
 ---
 
-# CI/CD & Infrastructure as Code
+## CI/CD & Infrastructure as Code
 
 The project uses GitHub, GitHub Actions, and Terraform for development automation and infrastructure management.
 
@@ -574,7 +577,7 @@ Terraform
 AWS Infrastructure
 ```
 
-## Terraform
+### Terraform
 
 Terraform is used for Infrastructure as Code (IaC).
 
@@ -588,87 +591,87 @@ terraform apply
 
 Terraform helps make cloud infrastructure reproducible and easier to manage.
 
-## GitHub Actions
+### GitHub Actions
 
 GitHub Actions supports CI/CD automation including:
 
-* Code quality checks
-* Automated testing
-* Validation
-* Deployment workflows
+- Code quality checks
+- Automated testing
+- Validation
+- Deployment workflows
 
 ---
 
-# AWS Services
+## AWS Services
 
 The project uses the following AWS services:
 
-| Service               | Purpose                         |
-| --------------------- | ------------------------------- |
-| Amazon S3             | Data Lake and storage           |
-| AWS Glue              | PySpark ETL and data cataloging |
-| AWS Glue Crawler      | Schema discovery                |
-| AWS Glue Data Catalog | Metadata management             |
-| Amazon Athena         | Serverless SQL analytics        |
-| Amazon S3 Glacier     | Backup / archival               |
-| Terraform             | Infrastructure as Code          |
+| Service | Purpose |
+| --- | --- |
+| Amazon S3 | Data Lake and storage |
+| AWS Glue | PySpark ETL and data cataloging |
+| AWS Glue Crawler | Schema discovery |
+| AWS Glue Data Catalog | Metadata management |
+| Amazon Athena | Serverless SQL analytics |
+| Amazon S3 Glacier | Backup / archival |
+| Terraform | Infrastructure as Code |
 
 ---
 
-# Technology Stack
+## Technology Stack
 
-| Category              | Technologies           |
-| --------------------- | ---------------------- |
-| Programming           | Python, SQL            |
-| Big Data              | PySpark                |
-| Data Engineering      | AWS Glue, Databricks   |
-| Cloud Storage         | Amazon S3              |
-| Data Format           | Apache Parquet, Snappy |
-| NLP                   | Sentence Transformers  |
-| Vector Store          | ChromaDB               |
-| Keyword Retrieval     | BM25                   |
-| Hybrid Retrieval      | RRF                    |
-| Re-ranking            | Cross-Encoder          |
-| Generative AI         | Google Gemini          |
-| Business Intelligence | Power BI               |
-| Application           | Streamlit              |
-| Infrastructure        | Terraform              |
-| Containerization      | Docker                 |
-| Version Control       | Git, GitHub            |
-| CI/CD                 | GitHub Actions         |
+| Category | Technologies |
+| --- | --- |
+| Programming | Python, SQL |
+| Big Data | PySpark |
+| Data Engineering | AWS Glue, Databricks |
+| Cloud Storage | Amazon S3 |
+| Data Format | Apache Parquet, Snappy |
+| NLP | Sentence Transformers |
+| Vector Store | ChromaDB |
+| Keyword Retrieval | BM25 |
+| Hybrid Retrieval | RRF |
+| Re-ranking | Cross-Encoder |
+| Generative AI | Google Gemini |
+| Business Intelligence | Power BI |
+| Application | Streamlit |
+| Infrastructure | Terraform |
+| Containerization | Docker |
+| Version Control | Git, GitHub |
+| CI/CD | GitHub Actions |
 
 ---
 
-# Dataset
+## Dataset
 
 The project uses the:
 
 **Amazon Reviews 2023 Dataset**
 
-Source:
+**Source:**
 
 McAuley-Lab Amazon Reviews 2023
 
-Selected Categories:
+**Selected Categories:**
 
-* Appliances
-* Musical Instruments
-* Sports & Outdoors
-* Video Games
+- Appliances
+- Musical Instruments
+- Sports & Outdoors
+- Video Games
 
 The data consists of:
 
-* Product Metadata
-* Customer Reviews
-* Ratings
-* Review Text
-* Verified Purchase Information
-* Helpful Votes
-* Product Information
+- Product Metadata
+- Customer Reviews
+- Ratings
+- Review Text
+- Verified Purchase Information
+- Helpful Votes
+- Product Information
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 amazon-review-analytics-platform/
@@ -678,6 +681,10 @@ amazon-review-analytics-platform/
 │
 ├── config/
 │   └── datasets/
+│
+├── docs/
+│   └── architecture/
+│       └── Architecture.jpeg
 │
 ├── gluejobs/
 │
@@ -706,7 +713,7 @@ amazon-review-analytics-platform/
 
 ---
 
-# Repository Components
+## Repository Components
 
 ### `config/datasets`
 
@@ -724,17 +731,17 @@ Contains local Jupyter notebooks used for exploratory data analysis and developm
 
 Contains the Machine Learning and Hybrid RAG components:
 
-* Document generation
-* Chunking
-* Embeddings
-* ChromaDB
-* BM25
-* Hybrid retrieval
-* RRF
-* Cross-Encoder re-ranking
-* Gemini integration
-* Evaluation
-* Streamlit application
+- Document generation
+- Chunking
+- Embeddings
+- ChromaDB
+- BM25
+- Hybrid retrieval
+- RRF
+- Cross-Encoder re-ranking
+- Gemini integration
+- Evaluation
+- Streamlit application
 
 ### `notebooks`
 
@@ -762,7 +769,7 @@ Contains GitHub Actions workflows for CI/CD and automated validation.
 
 ---
 
-# Development
+## Development
 
 Clone the repository:
 
@@ -805,7 +812,7 @@ pip install -r requirements-dev.txt
 
 ---
 
-# End-to-End Project Flow
+## End-to-End Project Flow
 
 ```text
 Amazon Reviews + Product Metadata
@@ -814,104 +821,104 @@ Amazon Reviews + Product Metadata
              Amazon S3
                 |
                 v
-        Bronze Data Layer
+          Bronze Data Layer
                 |
                 v
-        AWS Glue + PySpark
+         AWS Glue + PySpark
                 |
                 v
-         Silver Data Layer
+          Silver Data Layer
                 |
                 v
-          Silver Master
+           Silver Master
                 |
-        ┌───────┴────────┐
-        |                |
-        v                v
-     Gold ML       Gold Visualization
-        |                |
-        v                v
-Documents          Athena / Power BI
-        |
-        v
-    Chunking
-        |
-        v
-   Embeddings
-        |
-   ┌────┴─────┐
-   |          |
-   v          v
-ChromaDB    BM25
-   |          |
-   └────┬─────┘
-        |
-        v
-    RRF Fusion
-        |
-        v
-Cross-Encoder
-   Re-ranking
-        |
-        v
- Prompt Builder
-        |
-        v
- Gemini
-        |
-        v
-    Streamlit
-        |
-        v
-     End User
+          ┌─────┴─────┐
+          |           |
+          v           v
+       Gold ML   Gold Visualization
+          |           |
+          v           v
+      Documents   Athena / Power BI
+          |
+          v
+       Chunking
+          |
+          v
+      Embeddings
+          |
+       ┌──┴──┐
+       |     |
+       v     v
+   ChromaDB BM25
+       |     |
+       └──┬──┘
+          |
+          v
+       RRF Fusion
+          |
+          v
+   Cross-Encoder
+      Re-ranking
+          |
+          v
+     Prompt Builder
+          |
+          v
+        Gemini
+          |
+          v
+       Streamlit
+          |
+          v
+       End User
 ```
 
 ---
 
-# Key Features
+## Key Features
 
-* End-to-end AWS Data Lake architecture
-* Bronze-Silver-Gold Medallion architecture
-* Large-scale PySpark processing
-* Product and review data integration
-* NLP-based document generation
-* Document length control and truncation
-* Text chunking
-* Sentence Transformer embeddings
-* ChromaDB semantic retrieval
-* BM25 keyword retrieval
-* Hybrid retrieval
-* Reciprocal Rank Fusion
-* Cross-Encoder re-ranking
-* Gemini-powered response generation
-* RAG evaluation
-* Power BI business analytics
-* Streamlit application
-* Terraform Infrastructure as Code
-* GitHub Actions CI/CD
-* S3 archival and backup
+- End-to-end AWS Data Lake architecture
+- Bronze-Silver-Gold Medallion architecture
+- Large-scale PySpark processing
+- Product and review data integration
+- NLP-based document generation
+- Document length control and truncation
+- Text chunking
+- Sentence Transformer embeddings
+- ChromaDB semantic retrieval
+- BM25 keyword retrieval
+- Hybrid retrieval
+- Reciprocal Rank Fusion
+- Cross-Encoder re-ranking
+- Gemini-powered response generation
+- RAG evaluation
+- Power BI business analytics
+- Streamlit application
+- Terraform Infrastructure as Code
+- GitHub Actions CI/CD
+- S3 archival and backup
 
 ---
 
-# Team
+## Team
 
-## Group 2
+### Group 2
 
-| # | Team Member                 |
-| - | --------------------------- |
-| 1 | **Abhijeet Soni**           |
-| 2 | **Akshata Shivram Gawade**  |
-| 3 | **Ankit Kumar**             |
-| 4 | **Kinjal Ramdas Bopte**     |
-| 5 | **Mohammed Affaan Arbani**  |
-| 6 | **Sankalp Suresh Deore**    |
+| # | Team Member |
+| --- | --- |
+| 1 | **Abhijeet Soni** |
+| 2 | **Akshata Shivram Gawade** |
+| 3 | **Ankit Kumar** |
+| 4 | **Kinjal Ramdas Bopte** |
+| 5 | **Mohammed Affaan Arbani** |
+| 6 | **Sankalp Suresh Deore** |
 | 7 | **Shreyash Sanjay Dongare** |
-| 8 | **Vishal Deepak Jadhav**    |
-| 9 | **Yashvardhan Sahu**        |
+| 8 | **Vishal Deepak Jadhav** |
+| 9 | **Yashvardhan Sahu** |
 
 ---
 
-# Project Objective
+## Project Objective
 
 The overall objective of the project is to reduce the effort required by users to search, compare, and understand products by combining:
 
@@ -937,26 +944,22 @@ into a single intelligent product-search platform.
 
 ---
 
-# Future Enhancements
+## Future Enhancements
 
 Potential future improvements include:
 
-* Advanced query understanding
-* Personalized product recommendations
-* Multi-category expansion
-* Conversational product comparison
-* Improved RAG evaluation
-* Feedback-driven retrieval optimization
-* Real-time product data integration
-* Advanced recommendation models
-* Production-scale deployment
+- Advanced query understanding
+- Personalized product recommendations
+- Multi-category expansion
+- Conversational product comparison
+- Improved RAG evaluation
+- Feedback-driven retrieval optimization
+- Real-time product data integration
+- Advanced recommendation models
+- Production-scale deployment
 
 ---
 
-# License
+## License
 
 This project was developed for academic and educational purposes.
-
-```
-```
-
