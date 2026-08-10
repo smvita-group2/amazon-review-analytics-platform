@@ -1,4 +1,4 @@
-# Hybrid RAG for Intelligent Product Search
+# Amazon Review Analytics Platform
 
 An end-to-end **Hybrid RAG-based Intelligent Product Search Platform** built using Amazon Product Metadata and Customer Review data.
 
