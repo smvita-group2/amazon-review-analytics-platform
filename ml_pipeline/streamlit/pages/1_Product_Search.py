@@ -7,6 +7,7 @@ Connected directly to real production backend RAG pipeline & evaluation modules.
 import os
 import sys
 import time
+
 import streamlit as st
 
 # Ensure parent directory is in sys.path
@@ -172,7 +173,9 @@ clicked_example = None
 
 for idx, ex_text in enumerate(examples):
     with ex_cols[idx]:
-        if st.button(f'"{ex_text}"', key=f"ex_btn_{cat_key}_{idx}", use_container_width=True):
+        if st.button(
+            f'"{ex_text}"', key=f"ex_btn_{cat_key}_{idx}", use_container_width=True
+        ):
             clicked_example = ex_text
 
 btn_c1, btn_c2, _ = st.columns([1, 1, 3])
@@ -195,13 +198,17 @@ if clicked_example or search_clicked or (initial_query and not st.session_state.
     if clicked_example:
         target_q = clicked_example
     else:
-        target_q = query.strip() if query.strip() else (initial_query.strip() if initial_query else examples[0])
-    
+        target_q = (
+            query.strip()
+            if query.strip()
+            else (initial_query.strip() if initial_query else examples[0])
+        )
+
     start = time.perf_counter()
     with st.spinner("Running Hybrid RAG Search Pipeline..."):
         pipeline = load_pipeline(selected_cat)
         res = pipeline.run(query=target_q)
-            
+
     end = time.perf_counter()
     st.session_state.result = res
     st.session_state.execution_time = end - start
@@ -222,7 +229,10 @@ if st.session_state.result:
     ans_text = result.get("answer", "No answer generated.")
     tokens = result.get("total_tokens", 0)
 
-    st.markdown("<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>", unsafe_allow_html=True)
+    st.markdown(
+        "<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>",
+        unsafe_allow_html=True,
+    )
 
     # 4 Clean Top Tabs
     products_tab, answer_tab, evaluation_tab, architecture_tab = st.tabs(
@@ -248,12 +258,22 @@ if st.session_state.result:
         else:
             for idx, doc in enumerate(documents, start=1):
                 metadata = doc.get("metadata", doc)
-                title = metadata.get("product_title", doc.get("title", f"Product #{idx}"))
+                title = metadata.get(
+                    "product_title", doc.get("title", f"Product #{idx}")
+                )
                 store = metadata.get("store", doc.get("store", "Amazon Brand"))
-                main_cat = metadata.get("main_category", doc.get("main_category", selected_cat))
-                sub_cat = metadata.get("sub_category", doc.get("sub_category", "General Products"))
-                avg_rating = metadata.get("product_average_rating", doc.get("average_rating", 0))
-                reviews_cnt = metadata.get("product_review_count", doc.get("rating_number", 0))
+                main_cat = metadata.get(
+                    "main_category", doc.get("main_category", selected_cat)
+                )
+                sub_cat = metadata.get(
+                    "sub_category", doc.get("sub_category", "General Products")
+                )
+                avg_rating = metadata.get(
+                    "product_average_rating", doc.get("average_rating", 0)
+                )
+                reviews_cnt = metadata.get(
+                    "product_review_count", doc.get("rating_number", 0)
+                )
                 img_url = metadata.get("product_image_url", doc.get("image_url", ""))
                 parent_asin = metadata.get("parent_asin", doc.get("parent_asin", "N/A"))
                 document_text = doc.get("document", doc.get("description", ""))
@@ -265,7 +285,10 @@ if st.session_state.result:
                     if img_url:
                         st.image(img_url, use_container_width=True)
                     else:
-                        st.image("https://placehold.co/300x300?text=No+Image", use_container_width=True)
+                        st.image(
+                            "https://placehold.co/300x300?text=No+Image",
+                            use_container_width=True,
+                        )
 
                 with col_info:
                     st.markdown(
@@ -295,7 +318,10 @@ if st.session_state.result:
                 with st.expander(f"🔍 Retrieved Context (RAG) - ASIN: {parent_asin}"):
                     st.code(document_text, language="text")
 
-                st.markdown("<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>", unsafe_allow_html=True)
+                st.markdown(
+                    "<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>",
+                    unsafe_allow_html=True,
+                )
 
     # ------------------------------------------------------
     # Tab 2: AI Generated Answer
@@ -311,7 +337,9 @@ if st.session_state.result:
         m1.metric("Retrieved Products", len(documents))
         m2.metric("Category", selected_cat.replace("_", " "))
         m3.metric("Tokens Consumed", f"{int(tokens):,}")
-        m4.metric("Response Time", f"{execution_time:.2f}s" if execution_time else "0.0s")
+        m4.metric(
+            "Response Time", f"{execution_time:.2f}s" if execution_time else "0.0s"
+        )
 
     # ------------------------------------------------------
     # Tab 3: RAG Evaluation (Real Faithfulness & Relevance)
@@ -327,7 +355,9 @@ if st.session_state.result:
             unsafe_allow_html=True,
         )
 
-        if st.button("🔍 Evaluate Retrieval Relevance", type="primary", key="btn_eval_rel"):
+        if st.button(
+            "🔍 Evaluate Retrieval Relevance", type="primary", key="btn_eval_rel"
+        ):
             with st.spinner("Evaluating retrieval relevance with LLM..."):
                 relevance_result = RetrievalRelevanceEvaluator.evaluate(
                     query=result.get("query", query),
@@ -376,7 +406,10 @@ if st.session_state.result:
                             unsafe_allow_html=True,
                         )
 
-        st.markdown("<hr style='margin: 28px 0; border: none; border-top: 1px solid #D9E2EC;'>", unsafe_allow_html=True)
+        st.markdown(
+            "<hr style='margin: 28px 0; border: none; border-top: 1px solid #D9E2EC;'>",
+            unsafe_allow_html=True,
+        )
 
         # B. FAITHFULNESS SECTION
         st.markdown(
@@ -406,7 +439,10 @@ if st.session_state.result:
 
             faith_c1, faith_c2, faith_c3 = st.columns(3)
             with faith_c1:
-                st.metric("Faithfulness Score", f"{faith_score:.1f}%" if faith_score is not None else "N/A")
+                st.metric(
+                    "Faithfulness Score",
+                    f"{faith_score:.1f}%" if faith_score is not None else "N/A",
+                )
             with faith_c2:
                 st.metric("Supported Claims", supp_claims)
             with faith_c3:

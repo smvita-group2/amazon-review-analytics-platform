@@ -5,6 +5,7 @@ Contains shared Amazon Light CSS tokens, top navbar, animated moving logo, and s
 
 import streamlit as st
 
+
 def inject_amazon_theme():
     """
     Inject global Amazon-inspired Light CSS system.
@@ -40,8 +41,8 @@ html, body, [class*="css"], .stApp {
 footer { visibility: hidden; }
 
 /* PAGE TOP SPACING & COMPACT HEADER PADDING */
-header { 
-    background: transparent !important; 
+header {
+    background: transparent !important;
     height: 0px !important;
     min-height: 0px !important;
 }
@@ -126,7 +127,7 @@ header [data-testid="stBaseButton-header"]:hover svg,
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.02) !important;
 }
 
-/* 
+/*
 ==================================================
 STREAMLIT TABS TEXT VISIBILITY FIX (SCOPED STRICTLY TO ST.TABS)
 ==================================================
@@ -158,7 +159,7 @@ STREAMLIT TABS TEXT VISIBILITY FIX (SCOPED STRICTLY TO ST.TABS)
     align-items: flex-end !important;
 }
 
-/* 
+/*
 INACTIVE TABS (#FFFFFF background / EXPLICIT #172033 DARK TEXT ON ALL CHILD ELEMENTS)
 */
 [data-testid="stTabs"] [data-baseweb="tab"],
@@ -189,7 +190,7 @@ INACTIVE TABS (#FFFFFF background / EXPLICIT #172033 DARK TEXT ON ALL CHILD ELEM
     opacity: 1 !important;
 }
 
-/* 
+/*
 HOVER STATE (#FFF3E0 background / EXPLICIT #131921 DARK TEXT / NO RED)
 */
 [data-testid="stTabs"] [data-baseweb="tab"]:hover,
@@ -208,7 +209,7 @@ HOVER STATE (#FFF3E0 background / EXPLICIT #131921 DARK TEXT / NO RED)
     opacity: 1 !important;
 }
 
-/* 
+/*
 ACTIVE SELECTED TAB (#FF9900 orange background / EXPLICIT #131921 DARK BOLD TEXT)
 */
 [data-testid="stTabs"] [aria-selected="true"],
@@ -233,7 +234,7 @@ ACTIVE SELECTED TAB (#FF9900 orange background / EXPLICIT #131921 DARK BOLD TEXT
     opacity: 1 !important;
 }
 
-/* 
+/*
 CATEGORY SELECTBOX & DROPDOWN STYLING
 */
 [data-testid="stSelectbox"] label,
@@ -835,7 +836,7 @@ def render_top_navbar(active_tab="home"):
     Renders the fixed dark top navigation bar with Home, Product Search & Analytics Dashboard.
     """
     logo_html = get_moving_amazon_logo_svg()
-    
+
     home_active = "active" if active_tab == "home" else ""
     search_active = "active" if active_tab == "search" else ""
     dash_active = "active" if active_tab == "dashboard" else ""
@@ -861,16 +862,31 @@ def render_custom_sidebar(active_page="Home"):
         s_type = "primary" if active_page == "Product_Search" else "secondary"
         d_type = "primary" if active_page == "Dashboard" else "secondary"
 
-        if st.button("🏠  Home", key="nav_sb_home", type=h_type, use_container_width=True):
+        if st.button(
+            "🏠  Home", key="nav_sb_home", type=h_type, use_container_width=True
+        ):
             st.switch_page("Home.py")
 
-        if st.button("🔍  Product Search", key="nav_sb_search", type=s_type, use_container_width=True):
+        if st.button(
+            "🔍  Product Search",
+            key="nav_sb_search",
+            type=s_type,
+            use_container_width=True,
+        ):
             st.switch_page("pages/1_Product_Search.py")
 
-        if st.button("📊  Analytics Dashboard", key="nav_sb_dash", type=d_type, use_container_width=True):
+        if st.button(
+            "📊  Analytics Dashboard",
+            key="nav_sb_dash",
+            type=d_type,
+            use_container_width=True,
+        ):
             st.switch_page("pages/2_Dashboard.py")
 
-        st.markdown("<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>", unsafe_allow_html=True)
+        st.markdown(
+            "<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>",
+            unsafe_allow_html=True,
+        )
 
         # 3. System Status
         st.caption("SYSTEM STATUS")
@@ -887,7 +903,10 @@ def render_custom_sidebar(active_page="Home"):
             row_html = f"""<div style="display: flex; align-items: center; justify-content: space-between; padding: 5px 0; font-size: 13px;"><div style="display: flex; align-items: center; gap: 8px; color: #334155; font-weight: 500;"><span style="color: #15803D; font-size: 10px;">●</span> {name}</div><div style="color: #15803D; font-weight: 600; font-size: 12px;">{status}</div></div>"""
             st.markdown(row_html, unsafe_allow_html=True)
 
-        st.markdown("<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>", unsafe_allow_html=True)
+        st.markdown(
+            "<hr style='margin: 16px 0; border: none; border-top: 1px solid #D9E2EC;'>",
+            unsafe_allow_html=True,
+        )
 
         # 4. About Platform
         about_html = """<div style="background: #F7F9FC; border: 1px solid #D9E2EC; padding: 14px; border-radius: 12px; text-align: center;"><div style="font-size: 13px; font-weight: 700; color: #172033; margin-bottom: 4px;">ℹ️ About Platform</div><div style="font-size: 11.5px; color: #64748B; line-height: 1.4;">Enterprise Hybrid RAG platform for Amazon reviews using Gemini 3.5 & ChromaDB.</div></div>"""

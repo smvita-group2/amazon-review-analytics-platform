@@ -5,6 +5,7 @@ Embedded Microsoft Power BI Dashboard with Amazon Review Intelligence Header
 
 import os
 import sys
+
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -63,12 +64,12 @@ powerbi_url = os.getenv("POWERBI_EMBED_URL", DEFAULT_POWERBI_URL)
 
 # Render Power BI iframe with explicit permissions for Microsoft Entra ID authentication popups
 powerbi_iframe_html = f"""
-<iframe 
+<iframe
     title="Amazon Review Intelligence Power BI Dashboard"
-    width="100%" 
-    height="900" 
-    src="{powerbi_url}" 
-    frameborder="0" 
+    width="100%"
+    height="900"
+    src="{powerbi_url}"
+    frameborder="0"
     allowFullScreen="true"
     allow="fullscreen; geolocation; microphone; camera"
     sandbox="allow-downloads allow-forms allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals">

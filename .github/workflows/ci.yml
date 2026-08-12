@@ -8,11 +8,13 @@ on:
       - 'feature/**'
       - 'feat/**'
       - 'dev-test'
+      - 'release/**'
 
   pull_request:
     branches:
       - main
       - develop
+      - 'release/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

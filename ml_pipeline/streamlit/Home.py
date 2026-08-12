@@ -4,11 +4,8 @@ Home Page - Modern Amazon Theme with Animated Moving Logo
 """
 
 import streamlit as st
-import streamlit.components.v1 as components
-
 from theme import (
     get_3d_orb_graphic_html,
-    get_moving_amazon_logo_svg,
     inject_amazon_theme,
     render_custom_sidebar,
     render_top_navbar,
@@ -59,17 +56,26 @@ with col_main:
         unsafe_allow_html=True,
     )
 
-    cat_options = ["Appliances", "Musical_Instruments", "Video_Games", "Sports_and_Outdoors"]
+    cat_options = [
+        "Appliances",
+        "Musical_Instruments",
+        "Video_Games",
+        "Sports_and_Outdoors",
+    ]
     if "selected_category" not in st.session_state:
         st.session_state.selected_category = cat_options[0]
 
     c_col1, c_col2, c_col3, c_col4 = st.columns(4)
-    for idx, (col, cat) in enumerate(zip([c_col1, c_col2, c_col3, c_col4], cat_options)):
+    for idx, (col, cat) in enumerate(
+        zip([c_col1, c_col2, c_col3, c_col4], cat_options)
+    ):
         label = cat.replace("_", " ")
-        is_selected = (st.session_state.selected_category == cat)
+        is_selected = st.session_state.selected_category == cat
         btn_kind = "primary" if is_selected else "secondary"
         with col:
-            if st.button(label, key=f"cat_select_{cat}", type=btn_kind, use_container_width=True):
+            if st.button(
+                label, key=f"cat_select_{cat}", type=btn_kind, use_container_width=True
+            ):
                 st.session_state.selected_category = cat
                 st.rerun()
 
@@ -154,7 +160,9 @@ with col_main:
     ex_cols = st.columns(len(examples))
     for idx, ex in enumerate(examples):
         with ex_cols[idx]:
-            if st.button(f'"{ex}"', key=f"home_ex_btn_{cat_key}_{idx}", use_container_width=True):
+            if st.button(
+                f'"{ex}"', key=f"home_ex_btn_{cat_key}_{idx}", use_container_width=True
+            ):
                 st.session_state["search_query_initial"] = ex
                 st.session_state["category"] = current_cat
                 st.switch_page("pages/1_Product_Search.py")
@@ -176,7 +184,12 @@ with col_main:
             unsafe_allow_html=True,
         )
 
-        if st.button("Start Product Search →", key="btn_start_search", type="primary", use_container_width=True):
+        if st.button(
+            "Start Product Search →",
+            key="btn_start_search",
+            type="primary",
+            use_container_width=True,
+        ):
             st.switch_page("pages/1_Product_Search.py")
 
     with c2:
@@ -185,7 +198,12 @@ with col_main:
             unsafe_allow_html=True,
         )
 
-        if st.button("Open Analytics Dashboard →", key="btn_open_dash", type="secondary", use_container_width=True):
+        if st.button(
+            "Open Analytics Dashboard →",
+            key="btn_open_dash",
+            type="secondary",
+            use_container_width=True,
+        ):
             st.switch_page("pages/2_Dashboard.py")
 
 with col_right:
@@ -214,13 +232,25 @@ st.markdown(
 cat_c1, cat_c2, cat_c3, cat_c4 = st.columns(4)
 
 with cat_c1:
-    st.markdown('<div class="category-pill-card cat-appliances">🧺 Appliances</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="category-pill-card cat-appliances">🧺 Appliances</div>',
+        unsafe_allow_html=True,
+    )
 with cat_c2:
-    st.markdown('<div class="category-pill-card cat-instruments">🎸 Musical Instruments</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="category-pill-card cat-instruments">🎸 Musical Instruments</div>',
+        unsafe_allow_html=True,
+    )
 with cat_c3:
-    st.markdown('<div class="category-pill-card cat-games">🎮 Video Games</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="category-pill-card cat-games">🎮 Video Games</div>',
+        unsafe_allow_html=True,
+    )
 with cat_c4:
-    st.markdown('<div class="category-pill-card cat-sports">🏀 Sports & Outdoors</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="category-pill-card cat-sports">🏀 Sports & Outdoors</div>',
+        unsafe_allow_html=True,
+    )
 
 # Footer
 st.markdown(
