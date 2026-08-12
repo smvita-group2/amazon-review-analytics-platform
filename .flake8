@@ -2,8 +2,8 @@
 max-line-length = 88
 extend-ignore = E203, W503, E501
 per-file-ignores =
-    ml_pipeline/streamlit/pages/*: E402
-    ml_pipeline/streamlit/Home.py: E402
+    streamlit_app/pages/*: E402
+    streamlit_app/Home.py: E402
 exclude =
     .git,
     __pycache__,

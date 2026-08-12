@@ -9,8 +9,13 @@ import sys
 import streamlit as st
 import streamlit.components.v1 as components
 
-# Ensure parent directory is in python path for importing theme
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Ensure streamlit_app and project root are in sys.path
+APP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
+if APP_DIR not in sys.path:
+    sys.path.insert(0, APP_DIR)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 from theme import (
     inject_amazon_theme,

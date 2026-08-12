@@ -3,7 +3,19 @@ Amazon Review Intelligence Platform
 Home Page - Modern Amazon Theme with Animated Moving Logo
 """
 
+import os
+import sys
+
 import streamlit as st
+
+# Ensure streamlit_app and project root are in sys.path
+APP_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
+if APP_DIR not in sys.path:
+    sys.path.insert(0, APP_DIR)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from theme import (
     get_3d_orb_graphic_html,
     inject_amazon_theme,
