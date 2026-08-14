@@ -1,7 +1,18 @@
-# Generated Dependency Index
+# Generated Dependencies Index
 
-## External Third-Party Packages
+## Purpose
+Index of core third-party Python packages, version specs, and inter-module dependency relationships.
 
+## Related Files
+- [03 Tech Stack](../03_TECH_STACK.md)
+- [Module Index](module_index.md)
+
+## Key Concepts
+- **Dependency Inventory**: Core Python libraries, version specs, and functional usage across the platform.
+
+## Content
+
+### External Third-Party Packages
 ```text
 Dependency           Version Specifier   Purpose
 -------------------  ------------------  ----------------------------------------------
@@ -19,11 +30,13 @@ streamlit            ==1.49.1            Interactive web application framework
 pytest               Latest              Automated unit and integration testing
 ```
 
-## Module Dependency Graph
-
+### Module Dependency Mapping
 ```text
 gluejobs/ ──► src/ ──► config/
 ml_pipeline/ ──► config/
 streamlit_app/ ──► ml_pipeline/
 tests/ ──► src/, ml_pipeline/, config/
 ```
+
+## Next Reading
+- [03 Tech Stack](../03_TECH_STACK.md)

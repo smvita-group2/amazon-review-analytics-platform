@@ -1,32 +1,44 @@
 # 11 Configuration
 
-## Configuration Management Strategy
+## Purpose
+Specifies the centralized configuration strategy across PySpark schemas, dataset path mappings, ML model parameters, tool linter configurations, and environment secrets.
 
-The repository follows a centralized configuration pattern split across dataset definitions, ML settings, tool configs, and environment secrets.
+## Related Files
+- [05 Datasets](05_DATASETS.md)
+- [08 ML Pipeline](08_ML_PIPELINE.md)
+- [13 Coding Guidelines](13_CODING_GUIDELINES.md)
 
-## Key Configuration Files
+## Key Concepts
+- **Centralized Schema Map**: PySpark `StructType` schema definitions located in `config/datasets/schema.py`.
+- **Environment Decoupling**: S3 production paths versus local path overrides for unit testing.
+- **YAML ML Settings**: Externalized ML hyperparameters (`settings.yaml`) for retrieval weights, vector database collection names, and model checkpoints.
 
-1. **`config/datasets/paths.py`**:
-   - Central S3 path map for `BRONZE_DIR`, `SILVER_DIR`, `GOLD_DIR`, `SCRIPTS_DIR`.
-   - Local directory path overrides for dev testing.
+## Content
 
-2. **`config/datasets/schema.py`**:
-   - PySpark `StructType` schema declarations for product metadata and reviews.
+### Configuration Files Breakdown
 
-3. **`config/datasets/constants.py`**:
-   - Supported category lists (e.g., `All_Beauty`, `Electronics`).
-   - Default rating bounds, date formats, and partitioning constants.
+#### 1. `config/datasets/paths.py`
+- S3 data path map (`BRONZE_DIR`, `SILVER_DIR`, `GOLD_DIR`, `SCRIPTS_DIR`).
+- Local file system path overrides for development and PyTest execution.
 
-4. **`ml_pipeline/config/settings.yaml`**:
-   - ML model parameters:
-     - Embedding model name (`all-MiniLM-L6-v2`).
-     - Vector DB path & collection name.
-     - RRF parameter $k=60$.
-     - Cross-encoder reranker model name (`ms-marco-MiniLM-L-6-v2`).
-     - Default LLM model (`gemini-2.5-flash`).
+#### 2. `config/datasets/schema.py`
+- PySpark `StructType` schema declarations for product metadata and customer reviews.
 
-5. **`pyproject.toml`**:
-   - Python linting & formatting specs (Black line-length 88, Isort profile black, Mypy settings, PyTest target directory).
+#### 3. `config/datasets/constants.py`
+- Category lists (`All_Beauty`, `Electronics`, `Home_and_Kitchen`).
+- Standard rating bounds [1.0, 5.0], date formats, and partitioning keys.
 
-6. **Environment Secrets (`.env`)**:
-   - `GEMINI_API_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`.
+#### 4. `ml_pipeline/config/settings.yaml`
+- ML pipeline hyperparameters:
+  - Dense embedding model (`all-MiniLM-L6-v2`).
+  - Vector DB collection name and storage path.
+  - RRF fusion parameter ($k=60$).
+  - Cross-Encoder model (`ms-marco-MiniLM-L-6-v2`).
+  - Default LLM checkpoint (`gemini-2.5-flash`).
+
+#### 5. `pyproject.toml` & `.env`
+- Tool specifications (Black line-length 88, Isort, Mypy, PyTest targets).
+- Environment secrets (`GEMINI_API_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`).
+
+## Next Reading
+- [12 Testing](12_TESTING.md)

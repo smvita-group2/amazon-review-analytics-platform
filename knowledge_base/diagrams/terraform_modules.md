@@ -1,4 +1,16 @@
-# Terraform Modules Topology
+# Terraform Modules Diagram
+
+## Purpose
+Provides a Mermaid diagram illustrating the modular topology of Terraform infrastructure modules.
+
+## Related Files
+- [10 Terraform](../10_TERRAFORM.md)
+- [06 AWS Infrastructure](../06_AWS_INFRASTRUCTURE.md)
+
+## Key Concepts
+- **Module Composition**: Root module (`terraform/main.tf`) composing child modules (`modules/s3`, `modules/glue`, `modules/monitoring`).
+
+## Content
 
 ```mermaid
 graph TD
@@ -35,3 +47,6 @@ graph TD
     ROOT --> M_MON
     M_GLUE -.->|References Bucket Name| M_S3
 ```
+
+## Next Reading
+- [10 Terraform](../10_TERRAFORM.md)

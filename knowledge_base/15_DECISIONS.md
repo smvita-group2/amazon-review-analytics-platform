@@ -1,29 +1,45 @@
 # 15 Architectural Decisions
 
-## Architectural Decision Log (ADL)
+## Purpose
+Documents the explicit Architectural Decision Log (ADL), detailing major architectural design choices, technical tradeoffs, and underlying design rationale.
 
-Extracting explicitly documented and implemented design choices in the repository:
+## Related Files
+- [01 Architecture](01_ARCHITECTURE.md)
+- [04 Data Pipeline](04_DATA_PIPELINE.md)
+- [08 ML Pipeline](08_ML_PIPELINE.md)
+- [10 Terraform](10_TERRAFORM.md)
 
-1. **Medallion Architecture Pattern**:
-   - *Decision*: Divide S3 data lake into Bronze (Raw), Silver (Cleaned), and Gold (Curated/Aggregated) layers.
-   - *Rationale*: Guarantees data lineage, auditability, and clear separation of raw data preservation from analytical aggregations.
+## Key Concepts
+- **Architectural Decision Log (ADL)**: Persistent record of architectural choices and justification.
+- **Tradeoff Analysis**: Justifying specific technologies (AWS Glue 4.0, Hybrid RAG, Cross-Encoder, Gemini LLM, Terraform).
 
-2. **AWS Glue 4.0 & PySpark for Big Data ETL**:
-   - *Decision*: Standardize batch transformation pipelines on AWS Glue 4.0 with PySpark.
-   - *Rationale*: Provides serverless distributed compute scaling for multi-GB Amazon review datasets.
+## Content
 
-3. **Hybrid RAG (Dense + Sparse Retrieval)**:
-   - *Decision*: Combine SentenceTransformers vector search (ChromaDB) with Rank-BM25 lexical search via Reciprocal Rank Fusion (RRF).
-   - *Rationale*: Pure vector search misses exact product names/ASIN keywords; pure keyword search fails on semantic natural language queries.
+### Architectural Decision Log
 
-4. **Cross-Encoder Re-ranking Step**:
-   - *Decision*: Apply `ms-marco-MiniLM-L-6-v2` cross-encoder re-ranking on fused top candidate documents before prompting Gemini.
-   - *Rationale*: Filters out low-relevance contexts and significantly improves LLM generation accuracy.
+#### 1. Medallion Architecture Pattern
+- **Decision**: Organize S3 storage into Bronze (Raw), Silver (Cleaned), and Gold (Curated/Aggregated) layers.
+- **Rationale**: Guarantees raw data preservation, complete data auditability, clean schema boundaries, and decoupled analytics layer.
 
-5. **Google Gemini LLM for Response Generation**:
-   - *Decision*: Integrate Google Gemini API (`google-genai` SDK) for prompt synthesis.
-   - *Rationale*: Provides fast inference times, large context window support, and high factual grounding on review contexts.
+#### 2. AWS Glue 4.0 & PySpark for Big Data ETL
+- **Decision**: Standardize batch transformations on serverless AWS Glue 4.0 PySpark jobs.
+- **Rationale**: Delivers automatic compute scaling for multi-GB e-commerce review datasets without managing persistent Spark clusters.
 
-6. **Terraform Infrastructure as Code**:
-   - *Decision*: Provision all AWS resources (S3, Glue Jobs/Catalog/Crawlers, CloudWatch) via modular Terraform code.
-   - *Rationale*: Eliminates manual console setup and guarantees environment reproducibility across environments.
+#### 3. Hybrid RAG (Dense Embeddings + Sparse BM25)
+- **Decision**: Fuse SentenceTransformers (`all-MiniLM-L6-v2`) vector search with Rank-BM25 keyword search via Reciprocal Rank Fusion (RRF).
+- **Rationale**: Pure vector search struggles with exact product ASIN/model terms; pure keyword search fails on semantic natural language queries.
+
+#### 4. Cross-Encoder Re-ranking Step
+- **Decision**: Insert `ms-marco-MiniLM-L-6-v2` cross-encoder re-ranking after RRF fusion.
+- **Rationale**: Filters out noise candidates, improves precision, and prevents LLM context window overflow.
+
+#### 5. Google Gemini LLM Integration
+- **Decision**: Use Google Gemini API (`google-genai` SDK) for RAG answer generation.
+- **Rationale**: Delivers fast inference latency, large context handling, and high factual accuracy on review context grounding.
+
+#### 6. Modular Terraform Infrastructure as Code
+- **Decision**: Provision all AWS cloud resources via modular Terraform configurations.
+- **Rationale**: Eliminates manual AWS console changes and guarantees environment reproducibility across dev, staging, and prod.
+
+## Next Reading
+- [16 TODO](16_TODO.md)
