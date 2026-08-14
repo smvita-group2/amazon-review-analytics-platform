@@ -1,4 +1,16 @@
-# Module Dependencies Graph
+# Module Dependencies Diagram
+
+## Purpose
+Provides a Mermaid graph illustrating Python module dependencies across `streamlit_app/`, `ml_pipeline/`, and `config/`.
+
+## Related Files
+- [02 Repository Structure](../02_REPOSITORY_STRUCTURE.md)
+- [08 ML Pipeline](../08_ML_PIPELINE.md)
+
+## Key Concepts
+- **Python Imports Graph**: Dependency relationships between UI pages, ML search components, vector DB managers, and dataset configuration files.
+
+## Content
 
 ```mermaid
 graph TD
@@ -22,3 +34,6 @@ graph TD
     ML_PIPE --> CONFIG
     HYBRID --> CONFIG
 ```
+
+## Next Reading
+- [02 Repository Structure](../02_REPOSITORY_STRUCTURE.md)

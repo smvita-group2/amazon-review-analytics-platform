@@ -1,4 +1,16 @@
-# Medallion Pipeline Diagram
+# Pipeline Diagram
+
+## Purpose
+Provides a Mermaid flowchart illustrating the Medallion Data Lake transformation flow.
+
+## Related Files
+- [04 Data Pipeline](../04_DATA_PIPELINE.md)
+- [07 Glue Pipeline](../07_GLUE_PIPELINE.md)
+
+## Key Concepts
+- **Data Pipeline Progression**: Sequential transformation from raw JSON files to Silver cleaned master datasets to Gold analytical tables.
+
+## Content
 
 ```mermaid
 flowchart LR
@@ -27,3 +39,6 @@ flowchart LR
     SILVER_MASTER --> GOLD_AGG
     SILVER_MASTER --> GOLD_ML
 ```
+
+## Next Reading
+- [04 Data Pipeline](../04_DATA_PIPELINE.md)

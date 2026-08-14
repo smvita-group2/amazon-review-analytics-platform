@@ -1,31 +1,42 @@
 # 10 Terraform IaC
 
-## Infrastructure Provisioning Architecture
+## Purpose
+Documents the Infrastructure as Code (IaC) modular configurations located in `terraform/`, detailing AWS resource creation for S3 storage, Glue catalog/jobs, IAM roles, and CloudWatch.
 
-Located in `terraform/`:
+## Related Files
+- [06 AWS Infrastructure](06_AWS_INFRASTRUCTURE.md)
+- [07 Glue Pipeline](07_GLUE_PIPELINE.md)
+- [Terraform Modules Diagram](diagrams/terraform_modules.md)
 
+## Key Concepts
+- **Modular Terraform Architecture**: Declarative infrastructure split into reusable `s3`, `glue`, and `monitoring` modules.
+- **Environment Isolation**: Managing dev/staging/prod workspaces via `var.environment` variable inputs.
+- **Remote State Control**: S3 backend configuration for state storage (`backend.tf`).
+
+## Content
+
+### Infrastructure Directory Layout
 ```text
 terraform/
 ├── main.tf                  # Root module instantiating child modules
-├── variables.tf             # Input variable definitions
+├── variables.tf             # Input variable declarations
 ├── outputs.tf               # Infrastructure export attributes
 ├── backend.tf               # Terraform remote state configuration
-├── terraform.tfvars.example # Sample variable overrides
+├── terraform.tfvars.example # Sample environment variable overrides
 └── modules/
-    ├── s3/                  # Data lake S3 bucket creation and policy configuration
-    ├── glue/                # Glue database, jobs, crawlers, and IAM role management
-    └── monitoring/          # CloudWatch log groups and monitoring alarms
+    ├── s3/                  # S3 data lake bucket creation & lifecycle policies
+    ├── glue/                # Glue database, PySpark jobs, crawlers, workflows & IAM
+    └── monitoring/          # CloudWatch log groups & failure alarm triggers
 ```
 
-## Key Infrastructure Resources
-
-- **`modules/s3`**: Creates target S3 data lake bucket with folder structure.
+### Module Resource Summary
+- **`modules/s3`**: Creates target S3 data lake bucket and prefix folder structure (`/data/`, `/scripts/`, `/extra_jars/`).
 - **`modules/glue`**:
-  - `aws_glue_catalog_database`: Database container for Glue tables.
-  - `aws_glue_job`: Distributed PySpark job declarations referencing S3 script paths.
+  - `aws_glue_catalog_database`: Catalog database container.
+  - `aws_glue_job`: Declarations for 6 PySpark jobs referencing script paths.
   - `aws_glue_crawler`: Automated catalog crawler.
-  - `aws_iam_role`: Glue execution role attachment.
-- **`modules/monitoring`**: Configures CloudWatch log retention and job failure alerts.
+  - `aws_iam_role`: S3 and Glue service execution policies.
+- **`modules/monitoring`**: CloudWatch log retention (14 days) and job execution metrics.
 
-## State & Environment Control
-- Environment variable `var.environment` switches between `dev`, `staging`, and `prod`.
+## Next Reading
+- [11 Configuration](11_CONFIGURATION.md)

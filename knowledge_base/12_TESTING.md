@@ -1,25 +1,39 @@
 # 12 Testing
 
-## Testing Strategy
+## Purpose
+Outlines the PyTest test framework, test suite architecture, local PySpark session fixtures, schema validation rules, ML unit tests, and pipeline integration tests.
 
-The test suite in `tests/` uses PyTest and local PySpark sessions to validate data transformations, schema validation rules, ML components, and pipeline end-to-end flows.
+## Related Files
+- [11 Configuration](11_CONFIGURATION.md)
+- [13 Coding Guidelines](13_CODING_GUIDELINES.md)
+- [14 Common Commands](14_COMMON_COMMANDS.md)
 
-## Test Files Breakdown
+## Key Concepts
+- **Isolated PySpark Fixture**: Automated setup and teardown of lightweight local PySpark sessions in `conftest.py`.
+- **Validation Unit Testing**: Verification of rating boundary limits, missing field handling, and null cleaning logic.
+- **ML Component Testing**: Verifying dense/sparse indexing, RRF score calculations, and Cross-Encoder outputs.
 
-- **`tests/conftest.py`**:
-  - Provides shared PyTest fixtures, including `spark_session` (local PySpark context configured with memory limits) and sample mock review/metadata dataframes.
+## Content
 
-- **`tests/test_smoke.py`**:
-  - Smoke tests verifying environment imports, PySpark initialization, and configuration file accessibility.
+### Test Suite Breakdown (`tests/`)
 
-- **`tests/test_validation.py`**:
-  - Validates schema validation rules, type checking, boundary enforcement (e.g. rating [1, 5]), and missing field handling in `src/validation/`.
+#### 1. `tests/conftest.py`
+- Shared PyTest fixtures: `spark_session` (memory-capped local PySpark context) and synthetic review/metadata DataFrames.
 
-- **`tests/test_transformers.py`**:
-  - Unit tests for PySpark data transformations in `src/bronze_to_silver/` and `src/silver_to_gold/`.
+#### 2. `tests/test_smoke.py`
+- Environment verification: confirms module imports, PySpark initialization, and configuration loading.
 
-- **`tests/test_pipelines.py`**:
-  - End-to-end integration tests running PySpark pipelines against mock S3/local data paths.
+#### 3. `tests/test_validation.py`
+- Unit tests for schema validation rules, boundary checking (rating range [1.0, 5.0]), and missing value sanitization in `src/validation/`.
 
-- **`tests/test_ml_pipeline.py`**:
-  - Tests ML components (Document Builder, BM25 indexing, ChromaDB vector manager, RRF score calculation, Cross-Encoder reranking).
+#### 4. `tests/test_transformers.py`
+- Unit tests for PySpark data transformations in `src/bronze_to_silver/` and `src/silver_to_gold/`.
+
+#### 5. `tests/test_pipelines.py`
+- End-to-end integration tests executing PySpark workflows against mock data paths.
+
+#### 6. `tests/test_ml_pipeline.py`
+- Unit tests for ML modules (Document Builder, BM25 indexing, ChromaDB vector manager, RRF calculation, Cross-Encoder reranking).
+
+## Next Reading
+- [13 Coding Guidelines](13_CODING_GUIDELINES.md)

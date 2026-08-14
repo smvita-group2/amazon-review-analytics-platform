@@ -1,28 +1,42 @@
 # 00 Project Overview
 
 ## Purpose
+The Amazon Review Analytics Platform is an intelligent product search and analytics platform that transforms raw e-commerce metadata and customer reviews into actionable insights and conversational answers.
 
-The **Amazon Review Analytics Platform** is an intelligent product search and analytics platform that transforms raw e-commerce metadata and customer reviews into actionable insights and conversational answers.
+## Related Files
+- [01 Architecture](01_ARCHITECTURE.md)
+- [02 Repository Structure](02_REPOSITORY_STRUCTURE.md)
+- [03 Tech Stack](03_TECH_STACK.md)
+- [04 Data Pipeline](04_DATA_PIPELINE.md)
+- [20 Agent Index](20_AGENT_INDEX.md)
 
-## Business Problem
+## Key Concepts
+- **Medallion Architecture**: Data lake split into Bronze (raw), Silver (cleaned), and Gold (curated) layers.
+- **Hybrid RAG**: Fuses vector dense search (`SentenceTransformers` + `ChromaDB`) with lexical search (`Rank-BM25`) using Reciprocal Rank Fusion (RRF) and Cross-Encoder re-ranking.
+- **Generative Synthesis**: Context-grounded response generation via Google Gemini LLM API.
 
-When shopping online, users struggle with:
-- Manually reading hundreds of customer reviews across multiple product pages.
+## Content
+
+### Business Problem
+Online shoppers encounter significant friction:
+- Manually reading hundreds of reviews across multiple product pages.
 - Standard search engines failing on complex natural language queries.
-- Disconnect between lexical (keyword) match and semantic intent.
-- Comparing customer feedback trends across multiple product variants.
+- Disconnect between keyword matches and true semantic shopper intent.
+- Difficulty comparing feedback and sentiment trends across product variants.
 
-## Core Solution
+### Core Solution
+An end-to-end cloud platform combining big data batch ETL with hybrid RAG:
+1. **Medallion Data Lake**: Automated data processing via AWS Glue 4.0 & PySpark.
+2. **Hybrid Retrieval**: Combines semantic embeddings (`all-MiniLM-L6-v2`) and Rank-BM25 keyword indices.
+3. **Cross-Encoder Reranking**: Re-ranks candidate documents using `ms-marco-MiniLM-L-6-v2`.
+4. **Generative RAG**: Context-grounded answer generation via Google Gemini API.
+5. **Analytics & Frontend**: Streamlit multi-page web app and Athena / Power BI integrations.
 
-A hybrid retrieval-augmented generation (RAG) system combined with an automated big data ETL pipeline:
-1. **Medallion Data Lake**: Scalable ingestion & cleaning of Amazon dataset using AWS Glue & PySpark.
-2. **Hybrid RAG Engine**: Combines vector semantic search (SentenceTransformers + ChromaDB) with keyword search (BM25), fused via Reciprocal Rank Fusion (RRF) and re-ranked with Cross-Encoder models.
-3. **Generative AI Response**: Grounds user prompts in factual product reviews using Google Gemini LLM.
-4. **Interactive BI & Dashboard**: Streamlit interface and Athena/Power BI integrations for visual review analytics.
+### Core Capabilities
+- **Natural Language Search**: Intelligent query execution over product reviews and metadata.
+- **Review Summarization**: AI-generated summaries of positive, negative, and key product aspects.
+- **Automated Data Processing**: End-to-end PySpark ETL pipeline for Bronze, Silver, and Gold datasets.
+- **Infrastructure as Code**: Reproducible AWS infrastructure deployment managed via Terraform.
 
-## Core Capabilities
-
-- **Natural Language Product Search**: Intelligent queries over product metadata and customer reviews.
-- **Review Summary Generation**: AI-generated summaries of positive, negative, and key product aspects.
-- **Automated Data Processing**: End-to-end Glue PySpark ETL pipeline for Bronze, Silver, and Gold datasets.
-- **Infrastructure as Code**: Reproducible AWS deployment managed via Terraform.
+## Next Reading
+- [01 Architecture](01_ARCHITECTURE.md)
